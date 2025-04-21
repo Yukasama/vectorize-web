@@ -44,6 +44,7 @@ const eslintConfig = tseslint.config(
       '**/.vercel',
       '**/node_modules',
       '**/.next',
+      'eslint.config.mjs',
     ],
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
