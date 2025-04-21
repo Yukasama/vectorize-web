@@ -32,9 +32,7 @@ export default function Home() {
                 Model 1
               </Button>
               <div className="flex gap-2 pt-2">
-                <Button className="w-full" variant="ghost">
-                  <ModelUpload />
-                </Button>
+                <ModelUpload />
               </div>
             </CardContent>
           </Card>

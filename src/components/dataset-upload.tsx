@@ -32,9 +32,9 @@ export const DatasetUpload = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="w-full" variant="ghost">
-          <Upload className="mr-2 h-4 w-4" /> Upload
-        </Button>
+        <div className="text-primary hover:bg-muted flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-transparent px-4 py-2">
+          <Upload className="h-4 w-4" /> Upload
+        </div>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

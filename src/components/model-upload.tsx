@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Upload } from 'lucide-react';
+import Image from 'next/image';
 import React, { useRef, useState } from 'react';
 
 export const ModelUpload = () => {
@@ -41,6 +42,41 @@ export const ModelUpload = () => {
           <DialogTitle>Modell Upload</DialogTitle>
         </DialogHeader>
 
+        {/* GitHub Section */}
+        <div className="mb-4 flex items-center space-x-4">
+          <Image
+            alt="GitHub Logo"
+            className="h-8 w-8"
+            height={32}
+            src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+            width={32}
+          />
+          <div className="flex-1">
+            <label className="text-muted-foreground block text-sm font-medium">
+              URL
+            </label>
+            <Input placeholder="Value" />
+          </div>
+        </div>
+
+        {/* Hugging Face Section */}
+        <div className="mb-4 flex items-center space-x-4">
+          <Image
+            alt="Hugging Face Logo"
+            className="h-8 w-8"
+            height={32}
+            src="https://huggingface.co/front/assets/huggingface_logo.svg"
+            width={32}
+          />
+          <div className="flex-1">
+            <label className="text-muted-foreground block text-sm font-medium">
+              Modell Tag
+            </label>
+            <Input placeholder="Value" />
+          </div>
+        </div>
+
+        {/* Drag-and-Drop Upload Section */}
         <div
           className={`flex h-32 cursor-pointer items-center justify-center rounded border-2 border-dashed transition ${
             dragActive ? 'border-primary bg-muted' : 'border-muted'
@@ -68,7 +104,7 @@ export const ModelUpload = () => {
           />
         </div>
 
-        <Button className="w-full">Upload</Button>
+        <Button className="mt-4 w-full">Upload</Button>
       </DialogContent>
     </Dialog>
   );

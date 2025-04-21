@@ -34,6 +34,9 @@ const nextConfig: NextConfig = {
       source: '/(.*)',
     },
   ],
+  images: {
+    domains: ['github.githubassets.com', 'huggingface.co'],
+  },
   serverExternalPackages: ['pino', 'pino-pretty'],
 };
 
