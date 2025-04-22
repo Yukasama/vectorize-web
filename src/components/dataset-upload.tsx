@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -9,38 +10,61 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Upload } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Upload, X } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 
 export const DatasetUpload = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>();
+  const [files, setFiles] = useState<File[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragActive(false);
-    setSelectedFile(e.dataTransfer.files[0]);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      setSelectedFile(e.target.files[0]);
+    if (e.dataTransfer.files) {
+      setFiles((prevFiles) => [
+        ...prevFiles,
+        ...Array.from(e.dataTransfer.files),
+      ]);
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setFiles((prevFiles) => [...prevFiles, ...Array.from(files)]);
+    }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  };
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+    setFiles([]);
+  };
+
   return (
-    <Dialog>
+    <Dialog
+      open={isDialogOpen}
+      onOpenChange={(open) =>
+        open ? setIsDialogOpen(true) : handleDialogClose()
+      }
+    >
       <DialogTrigger asChild>
         <div className="text-primary hover:bg-muted flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-transparent px-4 py-2">
           <Upload className="h-4 w-4" /> Upload
         </div>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="scrollbar-none max-h-[80vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Datensatz Upload</DialogTitle>
         </DialogHeader>
 
+        {/* Drag-and-Drop Area */}
         <div
           className={`flex h-32 cursor-pointer items-center justify-center rounded border-2 border-dashed transition ${
             dragActive ? 'border-primary bg-muted' : 'border-muted'
@@ -53,22 +77,50 @@ export const DatasetUpload = () => {
           }}
           onDrop={handleDrop}
         >
-          {selectedFile ? (
-            <p className="text-sm">{selectedFile.name}</p>
-          ) : (
-            <p className="text-muted-foreground text-sm">
-              Datei hier ablegen oder klicken
-            </p>
-          )}
+          <p className="text-muted-foreground text-sm">
+            Datei hier ablegen oder klicken
+          </p>
           <Input
             className="hidden"
             onChange={handleChange}
             ref={fileInputRef}
             type="file"
+            multiple
           />
         </div>
 
-        <Button className="w-full">Upload</Button>
+        {/* File List */}
+        <Card className="mt-4">
+          <CardHeader>
+            <CardTitle>Hochgeladene Dateien</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="max-h-40 overflow-y-auto">
+              {files.length > 0 ? (
+                files.map((file, index) => (
+                  <div
+                    key={index}
+                    className="mb-2 flex items-center justify-between rounded border p-2"
+                  >
+                    <p className="truncate text-sm">{file.name}</p>
+                    <button
+                      onClick={() => handleRemoveFile(index)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  Keine Dateien hochgeladen.
+                </p>
+              )}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+
+        <Button className="mt-4 w-full">Upload</Button>
       </DialogContent>
     </Dialog>
   );

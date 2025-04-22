@@ -16,7 +16,8 @@ import React, { useRef, useState } from 'react';
 export const ModelUpload = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -30,8 +31,18 @@ export const ModelUpload = () => {
     }
   };
 
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+    setSelectedFile(null);
+  };
+
   return (
-    <Dialog>
+    <Dialog
+      open={isDialogOpen}
+      onOpenChange={(open) =>
+        open ? setIsDialogOpen(true) : handleDialogClose()
+      }
+    >
       <DialogTrigger asChild>
         <Button className="w-full" variant="ghost">
           <Upload className="mr-2 h-4 w-4" /> Upload
