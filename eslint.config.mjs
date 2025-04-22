@@ -22,7 +22,17 @@ const __dirname = path.dirname(__filename);
 const compat = new FlatCompat({ baseDirectory: __dirname });
 
 /** @type {import('eslint').Linter.Config[]} */
-const eslintConfig = tseslint.config(
+const eslintConfig = [
+  {
+    ignores: [
+      '**/test-results',
+      '**/playwright-report',
+      '**/.vercel',
+      '**/node_modules',
+      '**/.next',
+      'eslint.config.mjs',
+    ],
+  },
   js.configs.recommended,
   comments.recommended,
   prettier,
@@ -38,14 +48,6 @@ const eslintConfig = tseslint.config(
   ...compat.extends('next', 'next/core-web-vitals', 'next/typescript'),
   {
     files: ['**/*.{js,mjs,ts,tsx}'],
-    ignores: [
-      '**/test-results',
-      '**/playwright-report',
-      '**/.vercel',
-      '**/node_modules',
-      '**/.next',
-      'eslint.config.mjs',
-    ],
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
       parserOptions: {
@@ -115,6 +117,6 @@ const eslintConfig = tseslint.config(
       ...playwright.configs['flat/recommended'].rules,
     },
   },
-);
+];
 
 export default eslintConfig;
