@@ -1,7 +1,9 @@
 'use client';
 
 import { DatasetUpload } from '@/components/dataset-upload';
+import { EvaluationBox } from '@/components/evaluation';
 import { ModelUpload } from '@/components/model-upload';
+import { TrainingBox } from '@/components/training';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -63,14 +65,16 @@ export default function Home() {
             <TabsContent value="training">
               <Card>
                 <CardContent className="text-muted-foreground p-6">
-                  Trainingsinhalte anzeigen...
+                  {/* Trainingsinhalte */}
+                  <TrainingBox />
                 </CardContent>
               </Card>
             </TabsContent>
             <TabsContent value="evaluation">
               <Card>
                 <CardContent className="text-muted-foreground p-6">
-                  Evaluationsinhalte anzeigen...
+                  {/* Evaluationsinhalte */}
+                  <EvaluationBox />
                 </CardContent>
               </Card>
             </TabsContent>

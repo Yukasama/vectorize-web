@@ -1,5 +1,6 @@
 'use client';
 
+import { uploadLocalDataset } from '@/components/services/datasetUpload/uploadLocalDataset';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -13,12 +14,14 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Upload, X } from 'lucide-react';
 import React, { useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 export const DatasetUpload = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -45,6 +48,27 @@ export const DatasetUpload = () => {
   const handleDialogClose = () => {
     setIsDialogOpen(false);
     setFiles([]);
+  };
+
+  const handleUpload = async () => {
+    if (files.length === 0) {
+      toast.error('Bitte wählen Sie mindestens eine Datei aus.');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      for (const file of files) {
+        await uploadLocalDataset(file);
+      }
+      toast.success('Alle Dateien wurden erfolgreich hochgeladen!');
+      handleDialogClose();
+    } catch (error) {
+      toast.error('Fehler beim Hochladen der Dateien.');
+      console.error(error);
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -120,7 +144,13 @@ export const DatasetUpload = () => {
           </CardContent>
         </Card>
 
-        <Button className="mt-4 w-full">Upload</Button>
+        <Button
+          className="mt-4 w-full"
+          onClick={handleUpload}
+          disabled={uploading}
+        >
+          {uploading ? 'Hochladen...' : 'Upload'}
+        </Button>
       </DialogContent>
     </Dialog>
   );
