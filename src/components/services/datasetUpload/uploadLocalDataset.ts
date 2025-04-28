@@ -1,16 +1,14 @@
+import { logger } from '@/lib/logger';
+import axios from 'axios';
+
 export const uploadLocalDataset = async (file: File) => {
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await fetch('/datasets', {
-    method: 'POST',
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text(); // Server-Fehlermeldung lesen
-    throw new Error(`Datensatz-Upload fehlgeschlagen: ${errorText}`);
+  try {
+    const {data} = await axios.post('http://localhost:8000/v1/datasets', formData);
+    return data;
+  } catch(error) {
+    throw new Error('Fehler beim Hochladen der Datei');
   }
-
-  return await response.json();
 };
