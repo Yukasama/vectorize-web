@@ -1,4 +1,3 @@
-import { logger } from '@/lib/logger';
 import axios from 'axios';
 
 export const uploadLocalDataset = async (file: File) => {

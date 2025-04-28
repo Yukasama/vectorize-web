@@ -1,13 +1,13 @@
+import axios from 'axios';
+
 export const uploadHuggingFace = async (modelId: string, tag: string) => {
-  const response = await fetch('/load', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model_id: modelId, tag }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Hugging Face-Upload fehlgeschlagen');
+  try {
+    const { data } = await axios.post('http://localhost:8000/v1/uploads/load', {
+      model_id: modelId,
+      tag,
+    });
+    return data;
+  } catch (error) {
+    throw new Error('Fehler beim Hochladen des Hugging Face-Modells');
   }
-
-  return await response.json();
 };

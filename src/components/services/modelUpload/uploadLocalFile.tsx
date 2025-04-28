@@ -1,15 +1,31 @@
-export const uploadLocalFile = async (file: File) => {
-  const formData = new FormData();
-  formData.append('files', file);
+import axios from 'axios';
 
-  const response = await fetch('/models', {
-    method: 'POST',
-    body: formData,
+export const uploadLocalFile = async (
+  files: File[], // Mehrere Dateien
+  modelName: string,
+  description = '',
+  extractZip = true
+) => {
+  const formData = new FormData();
+  files.forEach((file) => {
+    formData.append('files', file); // Alle Dateien hinzufügen
   });
 
-  if (!response.ok) {
-    throw new Error('Datei-Upload fehlgeschlagen');
+  try {
+    const { data } = await axios.post(
+      `http://localhost:8000/v1/uploads/models?model_name=${encodeURIComponent(
+        modelName
+      )}&description=${encodeURIComponent(description)}&extract_zip=${extractZip}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return data;
+  } catch (error: any) {
+    console.error('Fehlerdetails:', error.response?.data || error.message);
+    throw new Error('Fehler beim Hochladen der Datei');
   }
-
-  return await response.json();
 };

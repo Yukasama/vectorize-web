@@ -30,7 +30,6 @@ const eslintConfig = [
       '**/.vercel',
       '**/node_modules',
       '**/.next',
-      'eslint.config.mjs',
     ],
   },
   js.configs.recommended,
