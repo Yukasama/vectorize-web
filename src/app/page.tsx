@@ -1,13 +1,11 @@
 'use client';
 
-import { DatasetUpload } from '@/components/dataset-upload';
+import { DatasetList } from '@/components/dataset-list';
 import { EvaluationBox } from '@/components/evaluation';
-import { ModelUpload } from '@/components/model-upload';
+import { ModelList } from '@/components/model-list';
 import { TrainingBox } from '@/components/training';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PlusCircle } from 'lucide-react';
 import { ThemeToggle } from '../features/theme/theme-toggle';
 
 export default function Home() {
@@ -19,40 +17,10 @@ export default function Home() {
       <div className="mt-6 grid grid-cols-4 gap-4">
         <div className="space-y-4">
           {/* Modelle */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Modelle</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button className="w-full justify-between" variant="outline">
-                Model B{' '}
-                <span className="bg-primary rounded px-2 py-0.5 text-xs text-white">
-                  New
-                </span>
-              </Button>
-              <Button className="w-full" variant="outline">
-                Model 1
-              </Button>
-              <div className="flex gap-2 pt-2">
-                <ModelUpload />
-              </div>
-            </CardContent>
-          </Card>
+          <ModelList />
 
           {/* Datensätze */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Datensätze</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button className="w-full" variant="outline">
-                <PlusCircle className="mr-2 h-4 w-4" /> Generierung
-              </Button>
-              <Button className="w-full" variant="ghost">
-                <DatasetUpload />
-              </Button>
-            </CardContent>
-          </Card>
+          <DatasetList />
         </div>
 
         {/* Tabs + Ergebnisse */}
@@ -65,7 +33,6 @@ export default function Home() {
             <TabsContent value="training">
               <Card>
                 <CardContent className="text-muted-foreground p-6">
-                  {/* Trainingsinhalte */}
                   <TrainingBox />
                 </CardContent>
               </Card>
@@ -73,7 +40,6 @@ export default function Home() {
             <TabsContent value="evaluation">
               <Card>
                 <CardContent className="text-muted-foreground p-6">
-                  {/* Evaluationsinhalte */}
                   <EvaluationBox />
                 </CardContent>
               </Card>
