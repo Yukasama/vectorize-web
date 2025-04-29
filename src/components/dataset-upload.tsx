@@ -74,9 +74,11 @@ export const DatasetUpload = () => {
       open={isDialogOpen}
     >
       <DialogTrigger asChild>
-        <div className="text-primary hover:bg-muted flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-transparent px-4 py-2">
-          <Upload className="h-4 w-4" /> Upload
-        </div>
+        <DialogTrigger asChild>
+          <Button className="w-full" variant="ghost">
+            <Upload className="mr-2 h-4 w-4" /> Upload
+          </Button>
+        </DialogTrigger>
       </DialogTrigger>
       <DialogContent className="scrollbar-none max-h-[80vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
@@ -109,9 +111,11 @@ export const DatasetUpload = () => {
         </div>
 
         {/* File List */}
-        <Card className="mt-4">
+        <Card className="bg-muted mt-4">
           <CardHeader>
-            <CardTitle>Hochgeladene Dateien</CardTitle>
+            <CardTitle className="text-muted-foreground">
+              Hochgeladene Dateien
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ScrollArea className="max-h-40 overflow-y-auto">
@@ -121,7 +125,9 @@ export const DatasetUpload = () => {
                     className="mb-2 flex items-center justify-between rounded border p-2"
                     key={index}
                   >
-                    <p className="truncate text-sm">{file.name}</p>
+                    <p className="text-muted-foreground truncate text-sm">
+                      {file.name}
+                    </p>
                     <button
                       className="text-red-500 hover:text-red-700"
                       onClick={() => handleRemoveFile(index)}
