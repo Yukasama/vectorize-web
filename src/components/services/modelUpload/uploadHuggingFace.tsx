@@ -7,7 +7,7 @@ export const uploadHuggingFace = async (modelId: string, tag: string) => {
       tag,
     });
     return data;
-  } catch (error) {
+  } catch {
     throw new Error('Fehler beim Hochladen des Hugging Face-Modells');
   }
 };

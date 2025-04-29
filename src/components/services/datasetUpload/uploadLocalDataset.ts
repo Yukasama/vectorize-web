@@ -5,9 +5,12 @@ export const uploadLocalDataset = async (file: File) => {
   formData.append('file', file);
 
   try {
-    const {data} = await axios.post('http://localhost:8000/v1/datasets', formData);
+    const { data } = await axios.post(
+      'http://localhost:8000/v1/datasets',
+      formData,
+    );
     return data;
-  } catch(error) {
+  } catch {
     throw new Error('Fehler beim Hochladen der Datei');
   }
 };

@@ -27,17 +27,14 @@ export const DatasetUpload = () => {
     e.preventDefault();
     setDragActive(false);
     if (e.dataTransfer.files) {
-      setFiles((prevFiles) => [
-        ...prevFiles,
-        ...Array.from(e.dataTransfer.files),
-      ]);
+      setFiles((prevFiles) => [...prevFiles, ...e.dataTransfer.files]);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      setFiles((prevFiles) => [...prevFiles, ...Array.from(files)]);
+      setFiles((prevFiles) => [...prevFiles, ...files]);
     }
   };
 
@@ -73,10 +70,10 @@ export const DatasetUpload = () => {
 
   return (
     <Dialog
-      open={isDialogOpen}
       onOpenChange={(open) =>
         open ? setIsDialogOpen(true) : handleDialogClose()
       }
+      open={isDialogOpen}
     >
       <DialogTrigger asChild>
         <div className="text-primary hover:bg-muted flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-transparent px-4 py-2">
@@ -106,10 +103,10 @@ export const DatasetUpload = () => {
           </p>
           <Input
             className="hidden"
+            multiple
             onChange={handleChange}
             ref={fileInputRef}
             type="file"
-            multiple
           />
         </div>
 
@@ -123,13 +120,13 @@ export const DatasetUpload = () => {
               {files.length > 0 ? (
                 files.map((file, index) => (
                   <div
-                    key={index}
                     className="mb-2 flex items-center justify-between rounded border p-2"
+                    key={index}
                   >
                     <p className="truncate text-sm">{file.name}</p>
                     <button
-                      onClick={() => handleRemoveFile(index)}
                       className="text-red-500 hover:text-red-700"
+                      onClick={() => handleRemoveFile(index)}
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -146,8 +143,8 @@ export const DatasetUpload = () => {
 
         <Button
           className="mt-4 w-full"
-          onClick={handleUpload}
           disabled={uploading}
+          onClick={handleUpload}
         >
           {uploading ? 'Hochladen...' : 'Upload'}
         </Button>

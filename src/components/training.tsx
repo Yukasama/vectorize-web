@@ -27,7 +27,7 @@ export const TrainingBox = () => {
 
   const handleStartTraining = () => {
     // Logik für Training starten
-    console.log('Training gestartet mit:', { models, datasets });
+    console.log('Training gestartet mit:', { datasets, models });
     alert('Training gestartet!');
   };
 
@@ -43,7 +43,7 @@ export const TrainingBox = () => {
           <p className="text-sm font-semibold">Modelle</p>
           <ul className="mt-2 space-y-1">
             {models.map((model, index) => (
-              <li key={index} className="text-sm">
+              <li className="text-sm" key={index}>
                 {model}
               </li>
             ))}
@@ -60,7 +60,7 @@ export const TrainingBox = () => {
           <p className="text-sm font-semibold">Datensätze</p>
           <ul className="mt-2 space-y-1">
             {datasets.map((dataset, index) => (
-              <li key={index} className="text-sm">
+              <li className="text-sm" key={index}>
                 {dataset}
               </li>
             ))}

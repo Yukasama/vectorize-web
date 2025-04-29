@@ -27,7 +27,7 @@ export const EvaluationBox = () => {
 
   const handleStartEvaluation = () => {
     // Logik für Evaluation starten
-    console.log('Evaluation gestartet mit:', { models, datasets });
+    console.log('Evaluation gestartet mit:', { datasets, models });
     alert('Evaluation gestartet!');
   };
 
@@ -43,7 +43,7 @@ export const EvaluationBox = () => {
           <p className="text-sm font-semibold">Modelle</p>
           <ul className="mt-2 space-y-1">
             {models.map((model, index) => (
-              <li key={index} className="text-sm">
+              <li className="text-sm" key={index}>
                 {model}
               </li>
             ))}
@@ -60,7 +60,7 @@ export const EvaluationBox = () => {
           <p className="text-sm font-semibold">Datensätze</p>
           <ul className="mt-2 space-y-1">
             {datasets.map((dataset, index) => (
-              <li key={index} className="text-sm">
+              <li className="text-sm" key={index}>
                 {dataset}
               </li>
             ))}

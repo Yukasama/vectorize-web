@@ -22,16 +22,7 @@ const __dirname = path.dirname(__filename);
 const compat = new FlatCompat({ baseDirectory: __dirname });
 
 /** @type {import('eslint').Linter.Config[]} */
-const eslintConfig = [
-  {
-    ignores: [
-      '**/test-results',
-      '**/playwright-report',
-      '**/.vercel',
-      '**/node_modules',
-      '**/.next',
-    ],
-  },
+const eslintConfig = tseslint.config(
   js.configs.recommended,
   comments.recommended,
   prettier,
@@ -43,10 +34,17 @@ const eslintConfig = [
   sonarjs.configs.recommended,
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,
-  unicorn.configs['flat/recommended'],
+  unicorn.configs.recommended,
   ...compat.extends('next', 'next/core-web-vitals', 'next/typescript'),
   {
     files: ['**/*.{js,mjs,ts,tsx}'],
+    ignores: [
+      '**/test-results',
+      '**/playwright-report',
+      '**/.vercel',
+      '**/node_modules',
+      '**/.next',
+    ],
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
       parserOptions: {
@@ -99,10 +97,10 @@ const eslintConfig = [
     },
     settings: {
       'import/resolver': {
-        node: true,
-        typescript: true,
         alwaysTryTypes: true,
+        node: true,
         project: import.meta.url,
+        typescript: true,
       },
       react: {
         version: 'detect',
@@ -112,10 +110,8 @@ const eslintConfig = [
   {
     ...playwright.configs['flat/recommended'],
     files: ['tests/**'],
-    rules: {
-      ...playwright.configs['flat/recommended'].rules,
-    },
+    rules: playwright.configs['flat/recommended'].rules,
   },
-];
+);
 
 export default eslintConfig;

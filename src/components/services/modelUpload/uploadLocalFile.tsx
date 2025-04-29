@@ -4,24 +4,24 @@ export const uploadLocalFile = async (
   files: File[], // Mehrere Dateien
   modelName: string,
   description = '',
-  extractZip = true
+  extractZip = true,
 ) => {
   const formData = new FormData();
-  files.forEach((file) => {
+  for (const file of files) {
     formData.append('files', file); // Alle Dateien hinzufügen
-  });
+  }
 
   try {
     const { data } = await axios.post(
       `http://localhost:8000/v1/uploads/models?model_name=${encodeURIComponent(
-        modelName
+        modelName,
       )}&description=${encodeURIComponent(description)}&extract_zip=${extractZip}`,
       formData,
       {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-      }
+      },
     );
     return data;
   } catch (error: any) {

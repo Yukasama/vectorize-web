@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Upload } from 'lucide-react';
 import Image from 'next/image';
 import React, { useRef, useState } from 'react';
-import { Toaster, toast } from 'sonner';
+import { toast, Toaster } from 'sonner';
 
 export const ModelUpload = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -31,13 +31,13 @@ export const ModelUpload = () => {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragActive(false);
-    const files = Array.from(e.dataTransfer.files);
+    const files = [...e.dataTransfer.files];
     setSelectedFiles(files);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const files = Array.from(e.target.files);
+      const files = [...e.target.files];
       setSelectedFiles(files);
     }
   };
@@ -102,10 +102,10 @@ export const ModelUpload = () => {
     <>
       <Toaster position="bottom-right" />
       <Dialog
-        open={isDialogOpen}
         onOpenChange={(open) =>
           open ? setIsDialogOpen(true) : handleDialogClose()
         }
+        open={isDialogOpen}
       >
         <DialogTrigger asChild>
           <Button className="w-full" variant="ghost">
@@ -127,9 +127,9 @@ export const ModelUpload = () => {
               width={32}
             />
             <Input
-              value={githubUrl}
               onChange={(e) => setGithubUrl(e.target.value)}
               placeholder="GitHub-URL eingeben"
+              value={githubUrl}
             />
           </div>
 
@@ -144,15 +144,15 @@ export const ModelUpload = () => {
             />
             <div className="flex-1">
               <Input
-                value={huggingFaceModelId}
                 onChange={(e) => setHuggingFaceModelId(e.target.value)}
                 placeholder="Modell-ID eingeben"
+                value={huggingFaceModelId}
               />
               <Input
                 className="mt-2"
-                value={huggingFaceTag}
                 onChange={(e) => setHuggingFaceTag(e.target.value)}
                 placeholder="Tag (optional)"
+                value={huggingFaceTag}
               />
             </div>
           </div>
@@ -183,10 +183,10 @@ export const ModelUpload = () => {
             )}
             <Input
               className="hidden"
+              multiple
               onChange={handleChange}
               ref={fileInputRef}
               type="file"
-              multiple
             />
           </div>
 
@@ -194,16 +194,16 @@ export const ModelUpload = () => {
           {selectedFiles.length > 0 && (
             <Input
               className="mt-4"
-              value={localModelName}
               onChange={(e) => setLocalModelName(e.target.value)}
               placeholder="Modellname eingeben"
+              value={localModelName}
             />
           )}
 
           <Button
             className="mt-4 w-full"
-            onClick={handleUpload}
             disabled={uploading}
+            onClick={handleUpload}
           >
             {uploading ? 'Hochladen...' : 'Upload'}
           </Button>
