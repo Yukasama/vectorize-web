@@ -9,7 +9,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "eslint": "eslint --cache .",
     "eslint:fix": "eslint --fix src",
     "prettier": "prettier --write .",
     "sonar": "node scripts/sonar-scanner"

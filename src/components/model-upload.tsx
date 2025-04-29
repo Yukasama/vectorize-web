@@ -1,8 +1,8 @@
 'use client';
 
-import { uploadGithub } from '@/components/services/modelUpload/uploadGithub';
-import { uploadHuggingFace } from '@/components/services/modelUpload/uploadHuggingFace';
-import { uploadLocalFile } from '@/components/services/modelUpload/uploadLocalFile';
+import { uploadGithub } from '@/components/services/modelUpload/upload-github';
+import { uploadHuggingFace } from '@/components/services/modelUpload/upload-huggingface';
+import { uploadLocalFile } from '@/components/services/modelUpload/upload-local-file';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -16,6 +16,22 @@ import { Upload } from 'lucide-react';
 import Image from 'next/image';
 import React, { useRef, useState } from 'react';
 import { toast, Toaster } from 'sonner';
+
+interface GithubUploadResponse {
+  message: string;
+  repository: string;
+}
+
+interface HuggingFaceUploadResponse {
+  message: string;
+  modelId: string;
+  tag?: string;
+}
+
+interface LocalFileUploadResponse {
+  message: string;
+  modelId: string;
+}
 
 export const ModelUpload = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -74,15 +90,18 @@ export const ModelUpload = () => {
 
     try {
       if (selectedFiles.length > 0) {
-        const data = await uploadLocalFile(selectedFiles, localModelName);
+        const data: LocalFileUploadResponse = await uploadLocalFile(
+          selectedFiles,
+          localModelName,
+        );
         console.log('Datei-Upload erfolgreich:', data);
         toast.success('Datei-Upload erfolgreich!');
       } else if (githubUrl) {
-        const data = await uploadGithub(githubUrl);
+        const data: GithubUploadResponse = await uploadGithub(githubUrl);
         console.log('GitHub-Upload erfolgreich:', data);
         toast.success('GitHub-Upload erfolgreich!');
       } else if (huggingFaceModelId) {
-        const data = await uploadHuggingFace(
+        const data: HuggingFaceUploadResponse = await uploadHuggingFace(
           huggingFaceModelId,
           huggingFaceTag,
         );

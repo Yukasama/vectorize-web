@@ -1,6 +1,6 @@
 'use client';
 
-import { uploadLocalDataset } from '@/components/services/datasetUpload/uploadLocalDataset';
+import { uploadLocalDataset } from '@/components/services/datasetUpload/upload-local-dataset';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -26,9 +26,7 @@ export const DatasetUpload = () => {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragActive(false);
-    if (e.dataTransfer.files) {
-      setFiles((prevFiles) => [...prevFiles, ...e.dataTransfer.files]);
-    }
+    setFiles((prevFiles) => [...prevFiles, ...e.dataTransfer.files]);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
