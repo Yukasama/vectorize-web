@@ -16,6 +16,8 @@ export const uploadLocalFile = async (
     formData.append('files', file);
   }
 
+  formData.append('model_name', modelName);
+
   try {
     const { data } = await axios.post<LocalFileUploadResponse>(
       `http://localhost:8000/v1/uploads/models?model_name=${encodeURIComponent(

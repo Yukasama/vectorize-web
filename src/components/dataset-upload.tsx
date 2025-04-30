@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -56,7 +57,9 @@ export const DatasetUpload = () => {
       for (const file of files) {
         await uploadLocalDataset(file);
       }
-      toast.success('Alle Dateien wurden erfolgreich hochgeladen!');
+      toast.success('Alle Dateien wurden erfolgreich hochgeladen!', {
+        duration: 4000,
+      });
       handleDialogClose();
     } catch (error) {
       toast.error('Fehler beim Hochladen der Dateien.');
@@ -83,6 +86,10 @@ export const DatasetUpload = () => {
       <DialogContent className="scrollbar-none max-h-[80vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Datensatz Upload</DialogTitle>
+          <DialogDescription>
+            Bitte wählen Sie die Dateien aus, die Sie hochladen möchten, oder
+            ziehen Sie sie in den Bereich unten.
+          </DialogDescription>
         </DialogHeader>
 
         {/* Drag-and-Drop Area */}

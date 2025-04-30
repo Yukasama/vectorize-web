@@ -12,13 +12,13 @@ import { ThemeToggle } from '../features/theme/theme-toggle';
 export default function Home() {
   return (
     <div className="p-6">
-      <p className="mb-4 text-xl font-semibold">Nextjs-Template</p>
+      <p className="mb-4 text-xl font-semibold">TXT2VEC</p>
       <ThemeToggle />
 
       <div className="mt-6 grid grid-cols-4 gap-4">
         <div className="space-y-4">
           {/* Modelle */}
-          <Card>
+          <Card className="bg-accent text-gray-100">
             <CardHeader>
               <CardTitle>Modelle</CardTitle>
             </CardHeader>
@@ -39,7 +39,9 @@ export default function Home() {
           </Card>
 
           {/* Datensätze */}
-          <DatasetList />
+          <Card className="bg-accent text-gray-100">
+            <DatasetList />
+          </Card>
         </div>
 
         {/* Tabs + Ergebnisse */}
@@ -50,14 +52,14 @@ export default function Home() {
               <TabsTrigger value="evaluation">Evaluation</TabsTrigger>
             </TabsList>
             <TabsContent value="training">
-              <Card>
+              <Card className="bg-accent text-gray-100">
                 <CardContent className="text-muted-foreground p-6">
                   <TrainingBox />
                 </CardContent>
               </Card>
             </TabsContent>
             <TabsContent value="evaluation">
-              <Card>
+              <Card className="bg-accent text-gray-100">
                 <CardContent className="text-muted-foreground p-6">
                   <EvaluationBox />
                 </CardContent>
@@ -65,7 +67,7 @@ export default function Home() {
             </TabsContent>
           </Tabs>
 
-          <Card>
+          <Card className="bg-accent text-gray-100">
             <CardHeader>
               <CardTitle>Trainingsergebnisse</CardTitle>
             </CardHeader>
@@ -76,7 +78,7 @@ export default function Home() {
         </div>
 
         {/* Actions */}
-        <Card>
+        <Card className="bg-accent text-gray-100">
           <CardHeader>
             <CardTitle>Actions</CardTitle>
           </CardHeader>

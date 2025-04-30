@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -28,15 +29,13 @@ interface HuggingFaceUploadResponse {
   tag?: string;
 }
 
-interface LocalFileUploadResponse {
-  message: string;
-  modelId: string;
-}
-
+/**
+ * Component for uploading models from local files, GitHub, or Hugging Face.
+ */
 export const ModelUpload = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]); // Mehrere Dateien
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [githubUrl, setGithubUrl] = useState('');
@@ -90,12 +89,20 @@ export const ModelUpload = () => {
 
     try {
       if (selectedFiles.length > 0) {
-        const data: LocalFileUploadResponse = await uploadLocalFile(
+        const toastId = toast('Upload gestartet...', { duration: Infinity });
+
+        const response = await uploadLocalFile(
           selectedFiles,
           localModelName,
+          '',
+          true,
         );
-        console.log('Datei-Upload erfolgreich:', data);
-        toast.success('Datei-Upload erfolgreich!');
+
+        console.log('Datei-Upload erfolgreich:', response);
+        toast.success('Datei-Upload erfolgreich!', {
+          duration: 4000,
+          id: toastId,
+        });
       } else if (githubUrl) {
         const data: GithubUploadResponse = await uploadGithub(githubUrl);
         console.log('GitHub-Upload erfolgreich:', data);
@@ -134,6 +141,10 @@ export const ModelUpload = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Modell Upload</DialogTitle>
+            <DialogDescription>
+              Bitte wählen Sie die Dateien aus, die Sie hochladen möchten, oder
+              ziehen Sie sie in den Bereich unten.
+            </DialogDescription>
           </DialogHeader>
 
           {/* GitHub Section */}
@@ -158,7 +169,7 @@ export const ModelUpload = () => {
               alt="Hugging Face Logo"
               className="h-8 w-8"
               height={32}
-              src="https://huggingface.co/front/assets/huggingface_logo.svg"
+              src="/images/huggingface_logo.svg"
               width={32}
             />
             <div className="flex-1">
