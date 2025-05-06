@@ -2,7 +2,6 @@ import axios from 'axios';
 
 interface DatasetUploadResponse {
   datasetId: string;
-  message: string;
 }
 
 export const uploadLocalDataset = async (

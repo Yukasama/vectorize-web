@@ -1,8 +1,5 @@
 'use client';
 
-import { uploadGithub } from '@/components/services/modelUpload/upload-github';
-import { uploadHuggingFace } from '@/components/services/modelUpload/upload-huggingface';
-import { uploadLocalFile } from '@/components/services/modelUpload/upload-local-file';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -13,6 +10,9 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { uploadGithub } from '@/features/sidebar/services/modelUpload/upload-github';
+import { uploadHuggingFace } from '@/features/sidebar/services/modelUpload/upload-huggingface';
+import { uploadLocalFile } from '@/features/sidebar/services/modelUpload/upload-local-file';
 import { Upload } from 'lucide-react';
 import Image from 'next/image';
 import React, { useRef, useState } from 'react';
@@ -20,7 +20,6 @@ import { toast, Toaster } from 'sonner';
 
 interface GithubUploadResponse {
   message: string;
-  repository: string;
 }
 
 interface HuggingFaceUploadResponse {
@@ -134,8 +133,8 @@ export const ModelUpload = () => {
         open={isDialogOpen}
       >
         <DialogTrigger asChild>
-          <Button className="w-full" variant="ghost">
-            <Upload className="mr-2 h-4 w-4" /> Upload
+          <Button className="h-10 w-10 p-0" variant="ghost">
+            <Upload className="h-5 w-5" />
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">

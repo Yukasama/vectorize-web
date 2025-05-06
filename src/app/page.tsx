@@ -1,91 +1,70 @@
 'use client';
 
-import { DatasetList } from '@/components/dataset-list';
-import { EvaluationBox } from '@/components/evaluation';
-import { ModelUpload } from '@/components/model-upload';
-import { TrainingBox } from '@/components/training';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DatasetList } from '@/features/service-starter/dataset-list';
+import { ModelList } from '@/features/service-starter/model-list';
+import { Sidebar } from '@/features/sidebar/sidebar';
+import { useState } from 'react';
 import { ThemeToggle } from '../features/theme/theme-toggle';
 
 export default function Home() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
   return (
-    <div className="p-6">
-      <p className="mb-4 text-xl font-semibold">TXT2VEC</p>
-      <ThemeToggle />
+    <div className="flex h-screen bg-black">
+      {/* Sidebar */}
+      <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-      <div className="mt-6 grid grid-cols-4 gap-4">
-        <div className="space-y-4">
-          {/* Modelle */}
-          <Card className="bg-accent text-gray-100">
-            <CardHeader>
-              <CardTitle>Modelle</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button className="w-full justify-between" variant="outline">
-                Model B{' '}
-                <span className="bg-primary rounded px-2 py-0.5 text-xs text-white">
-                  New
-                </span>
-              </Button>
-              <Button className="w-full" variant="outline">
-                Model 1
-              </Button>
-              <div className="flex gap-2 pt-2">
-                <ModelUpload />
-              </div>
+      {/* Main Content */}
+      <div className="flex-1 p-6">
+        <div className="mb-4 flex items-center justify-between">
+          {/* Title */}
+          <div className="flex items-center gap-4">
+            <p className="text-xl font-semibold">TXT2VEC</p>
+          </div>
+
+          {/* Darkmode Toggle */}
+          <ThemeToggle />
+        </div>
+
+        <div
+          className="mt-6 grid gap-4"
+          style={{ gridTemplateColumns: `1fr 16rem` }}
+        >
+          {/* Tabs + Ergebnisse */}
+          <Card
+            className={`bg-accent text-gray-100 transition-all duration-300`}
+            style={{
+              marginRight: '1rem',
+            }}
+          >
+            <CardContent className="space-y-4">
+              <Tabs className="w-full" defaultValue="models">
+                <TabsList>
+                  <TabsTrigger value="models">Modelle</TabsTrigger>
+                  <TabsTrigger value="datasets">Datensätze</TabsTrigger>
+                </TabsList>
+                <TabsContent value="models">
+                  <ModelList />
+                </TabsContent>
+                <TabsContent value="datasets">
+                  <DatasetList />
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
 
-          {/* Datensätze */}
-          <Card className="bg-accent text-gray-100">
-            <DatasetList />
-          </Card>
-        </div>
-
-        {/* Tabs + Ergebnisse */}
-        <div className="col-span-2 space-y-4">
-          <Tabs className="w-full" defaultValue="evaluation">
-            <TabsList>
-              <TabsTrigger value="training">Training</TabsTrigger>
-              <TabsTrigger value="evaluation">Evaluation</TabsTrigger>
-            </TabsList>
-            <TabsContent value="training">
-              <Card className="bg-accent text-gray-100">
-                <CardContent className="text-muted-foreground p-6">
-                  <TrainingBox />
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="evaluation">
-              <Card className="bg-accent text-gray-100">
-                <CardContent className="text-muted-foreground p-6">
-                  <EvaluationBox />
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-
-          <Card className="bg-accent text-gray-100">
+          {/* Actions */}
+          <Card className="bg-accent w-64 text-gray-100">
             <CardHeader>
-              <CardTitle>Trainingsergebnisse</CardTitle>
+              <CardTitle>Actions</CardTitle>
             </CardHeader>
-            <CardContent className="text-muted-foreground p-6">
-              Ergebnisse des Modells nach Training anzeigen...
+            <CardContent className="text-muted-foreground">
+              Evaluation ist fertiggestellt
             </CardContent>
           </Card>
         </div>
-
-        {/* Actions */}
-        <Card className="bg-accent text-gray-100">
-          <CardHeader>
-            <CardTitle>Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="text-muted-foreground">
-            Evaluation ist fertiggestellt
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

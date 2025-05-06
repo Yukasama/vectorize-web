@@ -1,8 +1,6 @@
 'use client';
 
-import { uploadLocalDataset } from '@/components/services/datasetUpload/upload-local-dataset';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -12,8 +10,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Upload, X } from 'lucide-react';
+import { uploadLocalDataset } from '@/features/sidebar/services/datasetUpload/upload-local-dataset';
+import { Upload } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -77,11 +75,9 @@ export const DatasetUpload = () => {
       open={isDialogOpen}
     >
       <DialogTrigger asChild>
-        <DialogTrigger asChild>
-          <Button className="w-full" variant="ghost">
-            <Upload className="mr-2 h-4 w-4" /> Upload
-          </Button>
-        </DialogTrigger>
+        <Button className="h-10 w-10 p-0" variant="ghost">
+          <Upload className="h-5 w-5" />
+        </Button>
       </DialogTrigger>
       <DialogContent className="scrollbar-none max-h-[80vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
@@ -118,39 +114,30 @@ export const DatasetUpload = () => {
         </div>
 
         {/* File List */}
-        <Card className="bg-muted mt-4">
-          <CardHeader>
-            <CardTitle className="text-muted-foreground">
-              Hochgeladene Dateien
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="max-h-40 overflow-y-auto">
-              {files.length > 0 ? (
-                files.map((file, index) => (
-                  <div
-                    className="mb-2 flex items-center justify-between rounded border p-2"
-                    key={index}
-                  >
-                    <p className="text-muted-foreground truncate text-sm">
-                      {file.name}
-                    </p>
-                    <button
-                      className="text-red-500 hover:text-red-700"
-                      onClick={() => handleRemoveFile(index)}
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <p className="text-muted-foreground text-sm">
-                  Keine Dateien hochgeladen.
+        <div className="bg-muted mt-4 rounded p-4">
+          {files.length > 0 ? (
+            files.map((file, index) => (
+              <div
+                className="mb-2 flex items-center justify-between rounded border p-2"
+                key={index}
+              >
+                <p className="text-muted-foreground truncate text-sm">
+                  {file.name}
                 </p>
-              )}
-            </ScrollArea>
-          </CardContent>
-        </Card>
+                <button
+                  className="text-red-500 hover:text-red-700"
+                  onClick={() => handleRemoveFile(index)}
+                >
+                  <Upload className="h-4 w-4" />
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="text-muted-foreground text-sm">
+              Keine Dateien hochgeladen.
+            </p>
+          )}
+        </div>
 
         <Button
           className="mt-4 w-full"

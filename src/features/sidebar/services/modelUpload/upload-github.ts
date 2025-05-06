@@ -2,7 +2,6 @@ import axios from 'axios';
 
 interface GithubUploadResponse {
   message: string;
-  repository: string;
 }
 
 export const uploadGithub = async (

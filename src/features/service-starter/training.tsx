@@ -1,11 +1,11 @@
 'use client';
 
-import { DatasetUpload } from '@/components/dataset-upload';
-import { ModelUpload } from '@/components/model-upload';
 import { Button } from '@/components/ui/button';
+import { DatasetUpload } from '@/features/sidebar/dataset-upload';
+import { ModelUpload } from '@/features/sidebar/model-upload';
 import React, { useState } from 'react';
 
-export const EvaluationBox = () => {
+export const TrainingBox = () => {
   const [models, setModels] = useState<string[]>([]);
   const [datasets, setDatasets] = useState<string[]>([]);
 
@@ -25,10 +25,10 @@ export const EvaluationBox = () => {
     }
   };
 
-  const handleStartEvaluation = () => {
-    // Logik für Evaluation starten
-    console.log('Evaluation gestartet mit:', { datasets, models });
-    alert('Evaluation gestartet!');
+  const handleStartTraining = () => {
+    // Logik für Training starten
+    console.log('Training gestartet mit:', { datasets, models });
+    alert('Training gestartet!');
   };
 
   return (
@@ -69,10 +69,10 @@ export const EvaluationBox = () => {
         </div>
       </div>
 
-      {/* Evaluation starten Button */}
+      {/* Training starten Button */}
       <div className="mt-4 flex justify-end">
-        <Button onClick={handleStartEvaluation} variant="default">
-          Evaluation starten
+        <Button onClick={handleStartTraining} variant="default">
+          Training starten
         </Button>
       </div>
     </div>
