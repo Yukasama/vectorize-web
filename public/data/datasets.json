@@ -1,0 +1,5 @@
+[
+  { "id": "1", "name": "MNIST" },
+  { "id": "2", "name": "CIFAR-10" },
+  { "id": "3", "name": "ImageNet" }
+]

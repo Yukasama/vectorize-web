@@ -26,10 +26,17 @@ export const ModelList = () => {
   useEffect(() => {
     const fetchModels = async () => {
       try {
+        // Beispiel-Daten aus der JSON-Datei abrufen
+        const response = await axios.get<Model[]>('/data/models.json');
+        setModels(response.data);
+
+        // Auskommentierte Logik für die spätere Verwendung der echten Datenbank
+        /*
         const response = await axios.get<Model[]>(
           'http://localhost:8000/v1/models',
         );
         setModels(response.data);
+        */
       } catch (error) {
         console.error('Fehler beim Abrufen der Modelle:', error);
       }

@@ -3,7 +3,8 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import axios from 'axios';
+import { fetchDatasets } from '@/features/sidebar/services/dataset-service';
+import { fetchModels } from '@/features/sidebar/services/model-service';
 import { ChevronDown, ChevronUp, Menu, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { DatasetUpload } from './dataset-upload';
@@ -34,32 +35,18 @@ export const Sidebar = ({
   const [datasetsDropdownOpen, setDatasetsDropdownOpen] = useState(false);
 
   useEffect(() => {
-    const fetchModels = async () => {
-      try {
-        const response = await axios.get<Model[]>(
-          'http://localhost:8000/v1/models',
-        );
-        setModels(response.data);
-      } catch (error) {
-        console.error('Fehler beim Abrufen der Modelle:', error);
-        setModels([]);
-      }
+    const loadModels = async () => {
+      const data = await fetchModels();
+      setModels(data);
     };
 
-    const fetchDatasets = async () => {
-      try {
-        const response = await axios.get<Dataset[]>(
-          'http://localhost:8000/v1/datasets',
-        );
-        setDatasets(response.data);
-      } catch (error) {
-        console.error('Fehler beim Abrufen der Datensätze:', error);
-        setDatasets([]);
-      }
+    const loadDatasets = async () => {
+      const data = await fetchDatasets();
+      setDatasets(data);
     };
 
-    void fetchModels();
-    void fetchDatasets();
+    void loadModels();
+    void loadDatasets();
   }, []);
 
   const filteredModels = models.filter((model) =>
