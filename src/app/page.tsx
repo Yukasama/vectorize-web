@@ -12,12 +12,12 @@ export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   return (
-    <div className="flex h-screen bg-black">
+    <div className="flex h-screen overflow-hidden bg-black">
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
+      <div className="flex flex-1 flex-col p-6">
         <div className="mb-4 flex items-center justify-between">
           {/* Title */}
           <div className="flex items-center gap-4">
@@ -34,12 +34,12 @@ export default function Home() {
         >
           {/* Tabs + Ergebnisse */}
           <Card
-            className={`bg-accent text-gray-100 transition-all duration-300`}
+            className={`bg-accent overflow-hidden text-gray-100 transition-all duration-300`}
             style={{
               marginRight: '1rem',
             }}
           >
-            <CardContent className="space-y-4">
+            <CardContent className="h-full max-h-[calc(100vh-6rem)] space-y-4 overflow-y-auto">
               <Tabs className="w-full" defaultValue="models">
                 <TabsList>
                   <TabsTrigger value="models">Modelle</TabsTrigger>
@@ -56,11 +56,11 @@ export default function Home() {
           </Card>
 
           {/* Actions */}
-          <Card className="bg-accent w-64 text-gray-100">
+          <Card className="bg-accent w-64 overflow-hidden text-gray-100">
             <CardHeader>
               <CardTitle>Actions</CardTitle>
             </CardHeader>
-            <CardContent className="text-muted-foreground">
+            <CardContent className="text-muted-foreground h-full overflow-y-auto">
               Evaluation ist fertiggestellt
             </CardContent>
           </Card>

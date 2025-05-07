@@ -1,11 +1,24 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { fetchDatasets } from '@/features/sidebar/services/dataset-service';
 import { fetchModels } from '@/features/sidebar/services/model-service';
-import { ChevronDown, ChevronUp, Menu, Search } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronUp,
+  Menu,
+  MoreVertical,
+  Plus,
+  Search,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { DatasetUpload } from './dataset-upload';
 import { ModelUpload } from './model-upload';
@@ -33,6 +46,8 @@ export const Sidebar = ({
   const [datasetSearch, setDatasetSearch] = useState('');
   const [modelsDropdownOpen, setModelsDropdownOpen] = useState(false);
   const [datasetsDropdownOpen, setDatasetsDropdownOpen] = useState(false);
+  const [showMoreModels, setShowMoreModels] = useState(false);
+  const [showMoreDatasets, setShowMoreDatasets] = useState(false);
 
   useEffect(() => {
     const loadModels = async () => {
@@ -59,16 +74,11 @@ export const Sidebar = ({
 
   return (
     <div
-      className={`bg-accent h-full text-white transition-all duration-300 ${
+      className={`bg-accent h-screen text-white transition-all duration-300 ${
         isOpen ? 'w-64' : 'w-16'
-      }`}
+      } overflow-y-auto`}
     >
       <div className="flex items-center justify-end p-2">
-        <h2
-          className={`text-lg font-semibold transition-opacity duration-300 ${
-            isOpen ? 'opacity-100' : 'opacity-0'
-          }`}
-        ></h2>
         <Button onClick={() => setIsOpen(!isOpen)} variant="ghost">
           <Menu className="h-5 w-5" />
         </Button>
@@ -109,16 +119,57 @@ export const Sidebar = ({
                   value={modelSearch}
                 />
               </div>
-              <div className="mt-4 space-y-2">
-                {filteredModels.map((model) => (
-                  <div
-                    className="rounded bg-gray-700 p-2 text-sm"
-                    key={model.id}
-                  >
-                    {model.name}
-                  </div>
-                ))}
+              <div
+                className={`mt-4 space-y-2 ${
+                  showMoreModels
+                    ? 'max-h-[calc(100%-4rem)] overflow-y-auto'
+                    : ''
+                }`}
+              >
+                {filteredModels
+                  .slice(0, showMoreModels ? filteredModels.length : 5)
+                  .map((model) => (
+                    <div
+                      className="flex items-center justify-between rounded bg-gray-700 p-2 text-sm"
+                      key={model.id}
+                    >
+                      <span>{model.name}</span>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="icon" variant="ghost">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            onClick={() => alert(`Edit ${model.name}`)}
+                          >
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => alert(`Train ${model.name}`)}
+                          >
+                            Train
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => alert(`Evaluate ${model.name}`)}
+                          >
+                            Evaluate
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  ))}
               </div>
+              {filteredModels.length > 5 && (
+                <Button
+                  className="mt-2 w-full"
+                  onClick={() => setShowMoreModels(!showMoreModels)}
+                  variant="ghost"
+                >
+                  {showMoreModels ? 'Show Less' : 'Show More'}
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -135,6 +186,15 @@ export const Sidebar = ({
                 Datensätze
               </h3>
               {isOpen && <DatasetUpload />}
+              {isOpen && (
+                <Button
+                  onClick={() => alert('Neuen Datensatz hinzufügen')}
+                  size="icon"
+                  variant="ghost"
+                >
+                  <Plus className="h-5 w-5" />
+                </Button>
+              )}
             </div>
             <Button
               onClick={() => setDatasetsDropdownOpen(!datasetsDropdownOpen)}
@@ -157,16 +217,57 @@ export const Sidebar = ({
                   value={datasetSearch}
                 />
               </div>
-              <div className="mt-4 space-y-2">
-                {filteredDatasets.map((dataset) => (
-                  <div
-                    className="rounded bg-gray-700 p-2 text-sm"
-                    key={dataset.id}
-                  >
-                    {dataset.name}
-                  </div>
-                ))}
+              <div
+                className={`mt-4 space-y-2 ${
+                  showMoreDatasets
+                    ? 'max-h-[calc(100%-4rem)] overflow-y-auto'
+                    : ''
+                }`}
+              >
+                {filteredDatasets
+                  .slice(0, showMoreDatasets ? filteredDatasets.length : 5)
+                  .map((dataset) => (
+                    <div
+                      className="flex items-center justify-between rounded bg-gray-700 p-2 text-sm"
+                      key={dataset.id}
+                    >
+                      <span>{dataset.name}</span>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="icon" variant="ghost">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            onClick={() => alert(`Edit ${dataset.name}`)}
+                          >
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => alert(`Train ${dataset.name}`)}
+                          >
+                            Train
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => alert(`Evaluate ${dataset.name}`)}
+                          >
+                            Evaluate
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  ))}
               </div>
+              {filteredDatasets.length > 5 && (
+                <Button
+                  className="mt-2 w-full"
+                  onClick={() => setShowMoreDatasets(!showMoreDatasets)}
+                  variant="ghost"
+                >
+                  {showMoreDatasets ? 'Show Less' : 'Show More'}
+                </Button>
+              )}
             </div>
           )}
         </div>

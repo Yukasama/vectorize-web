@@ -56,7 +56,7 @@ export const ModelList = () => {
       </div>
 
       {view === 'grid' ? (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-4 gap-4">
           {models.map((model) => (
             <Card className="p-4" key={model.id}>
               <p className="text-sm font-medium">{model.name}</p>
