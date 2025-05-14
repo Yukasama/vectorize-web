@@ -40,7 +40,6 @@ export const ModelUpload = () => {
   const [githubUrl, setGithubUrl] = useState('');
   const [huggingFaceModelId, setHuggingFaceModelId] = useState('');
   const [huggingFaceTag, setHuggingFaceTag] = useState('');
-  const [localModelName, setLocalModelName] = useState('');
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -62,7 +61,6 @@ export const ModelUpload = () => {
     setGithubUrl('');
     setHuggingFaceModelId('');
     setHuggingFaceTag('');
-    setLocalModelName('');
   };
 
   const handleUpload = async () => {
@@ -79,23 +77,13 @@ export const ModelUpload = () => {
       return;
     }
 
-    if (selectedFiles.length > 0 && !localModelName) {
-      toast.error('Bitte geben Sie einen Modellnamen für die Dateien ein.');
-      return;
-    }
-
     setUploading(true);
 
     try {
       if (selectedFiles.length > 0) {
         const toastId = toast('Upload gestartet...', { duration: Infinity });
 
-        const response = await uploadLocalFile(
-          selectedFiles,
-          localModelName,
-          '',
-          true,
-        );
+        const response = await uploadLocalFile(selectedFiles, true);
 
         console.log('Datei-Upload erfolgreich:', response);
         toast.success('Datei-Upload erfolgreich!', {
@@ -218,16 +206,6 @@ export const ModelUpload = () => {
               type="file"
             />
           </div>
-
-          {/* Modellname für lokale Dateien */}
-          {selectedFiles.length > 0 && (
-            <Input
-              className="mt-4"
-              onChange={(e) => setLocalModelName(e.target.value)}
-              placeholder="Modellname eingeben"
-              value={localModelName}
-            />
-          )}
 
           <Button
             className="mt-4 w-full"

@@ -1,28 +1,32 @@
 import axios from 'axios';
 
 interface LocalFileUploadResponse {
-  message: string;
-  modelId: string;
+  file_count: number;
+  model_dir: string;
+  model_id: string;
+  model_name: string;
 }
 
 export const uploadLocalFile = async (
   files: File[],
-  modelName: string,
-  description = '',
   extractZip = true,
-): Promise<LocalFileUploadResponse> => {
+): Promise<{ message: string; modelId: string }> => {
+  if (files.length === 0) {
+    throw new Error('Keine Datei ausgewählt');
+  }
+
+  const modelName = files[0].name.replace(/\.[^/.]+$/, '') || 'uploaded-model';
+
   const formData = new FormData();
   for (const file of files) {
     formData.append('files', file);
   }
 
-  formData.append('model_name', modelName);
-
   try {
     const { data } = await axios.post<LocalFileUploadResponse>(
       `http://localhost:8000/v1/uploads/models?model_name=${encodeURIComponent(
         modelName,
-      )}&description=${encodeURIComponent(description)}&extract_zip=${extractZip.toString()}`,
+      )}&extract_zip=${extractZip.toString()}`,
       formData,
       {
         headers: {
@@ -30,7 +34,10 @@ export const uploadLocalFile = async (
         },
       },
     );
-    return data;
+    return {
+      message: `Model '${data.model_name}' erfolgreich hochgeladen.`,
+      modelId: data.model_id,
+    };
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       console.error('Fehlerdetails:', error.response?.data ?? error.message);

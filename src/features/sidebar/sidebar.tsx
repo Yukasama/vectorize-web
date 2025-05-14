@@ -20,6 +20,7 @@ import {
   Search,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { DatasetDetailsDialog } from './dataset-details';
 import { DatasetUpload } from './dataset-upload';
 import { ModelUpload } from './model-upload';
 
@@ -48,6 +49,15 @@ export const Sidebar = ({
   const [datasetsDropdownOpen, setDatasetsDropdownOpen] = useState(false);
   const [showMoreModels, setShowMoreModels] = useState(false);
   const [showMoreDatasets, setShowMoreDatasets] = useState(false);
+  const [selectedDatasetId, setSelectedDatasetId] = useState<
+    string | undefined
+  >();
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
+  const openDatasetDetails = (id: string) => {
+    setSelectedDatasetId(id);
+    setDetailsOpen(true);
+  };
 
   useEffect(() => {
     const loadModels = async () => {
@@ -130,7 +140,7 @@ export const Sidebar = ({
                   .slice(0, showMoreModels ? filteredModels.length : 5)
                   .map((model) => (
                     <div
-                      className="flex items-center justify-between rounded bg-gray-700 p-2 text-sm"
+                      className="bg-accent flex items-center justify-between rounded p-2 text-sm"
                       key={model.id}
                     >
                       <span>{model.name}</span>
@@ -228,13 +238,26 @@ export const Sidebar = ({
                   .slice(0, showMoreDatasets ? filteredDatasets.length : 5)
                   .map((dataset) => (
                     <div
-                      className="flex items-center justify-between rounded bg-gray-700 p-2 text-sm"
+                      className="flex w-full cursor-pointer items-center justify-between rounded bg-gray-700 p-2 text-sm hover:bg-gray-600"
                       key={dataset.id}
+                      onClick={() => openDatasetDetails(dataset.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          openDatasetDetails(dataset.id);
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
                     >
-                      <span>{dataset.name}</span>
+                      <span className="flex-1 text-left">{dataset.name}</span>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button size="icon" variant="ghost">
+                          <Button
+                            onClick={(e) => e.stopPropagation()}
+                            size="icon"
+                            tabIndex={-1}
+                            variant="ghost"
+                          >
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -272,6 +295,13 @@ export const Sidebar = ({
           )}
         </div>
       </ScrollArea>
+
+      {/* Dataset Details Dialog */}
+      <DatasetDetailsDialog
+        datasetId={detailsOpen ? selectedDatasetId : undefined}
+        onClose={() => setDetailsOpen(false)}
+        open={detailsOpen}
+      />
     </div>
   );
 };

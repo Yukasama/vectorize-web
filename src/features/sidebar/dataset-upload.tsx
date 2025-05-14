@@ -10,58 +10,131 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
 import { uploadLocalDataset } from '@/features/sidebar/services/datasetUpload/upload-local-dataset';
-import { Upload } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 import { toast } from 'sonner';
+
+interface FileUploadState {
+  done: boolean;
+  error: boolean;
+  file: File;
+  progress: number;
+}
+
+const markFileDone = (
+  states: FileUploadState[],
+  index: number,
+): FileUploadState[] =>
+  states.map((state, i) =>
+    i === index ? { ...state, done: true, progress: 100 } : state,
+  );
+
+const markFileError = (
+  states: FileUploadState[],
+  index: number,
+): FileUploadState[] =>
+  states.map((state, i) => (i === index ? { ...state, error: true } : state));
+
+const updateFileProgress = (
+  states: FileUploadState[],
+  index: number,
+  progress: number,
+): FileUploadState[] =>
+  states.map((state, i) => (i === index ? { ...state, progress } : state));
 
 export const DatasetUpload = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
-  const [files, setFiles] = useState<File[]>([]);
+  const [fileStates, setFileStates] = useState<FileUploadState[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  const handleFilesSelected = (files: File[] | FileList) => {
+    const filesArray = [...files];
+    const newFileStates: FileUploadState[] = filesArray.map((file) => ({
+      done: false,
+      error: false,
+      file,
+      progress: 0,
+    }));
+    setFileStates((prev) => [...prev, ...newFileStates]);
+
+    for (const [idx, file] of filesArray.entries()) {
+      const index = fileStates.length + idx;
+      void uploadFileWithProgress(file, index);
+    }
+  };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragActive(false);
-    setFiles((prevFiles) => [...prevFiles, ...e.dataTransfer.files]);
+    handleFilesSelected(e.dataTransfer.files);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      setFiles((prevFiles) => [...prevFiles, ...files]);
+    if (e.target.files && e.target.files.length > 0) {
+      handleFilesSelected(e.target.files);
     }
   };
 
   const handleRemoveFile = (index: number) => {
-    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    setFileStates((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
-    setFiles([]);
+    setFileStates([]);
   };
 
-  const handleUpload = async () => {
-    if (files.length === 0) {
+  const canUpload = (): boolean => {
+    if (uploading) {
+      return false;
+    }
+    if (fileStates.length === 0) {
+      return false;
+    }
+    return !fileStates.some((f) => !f.done);
+  };
+
+  const getButtonLabel = (): string => {
+    if (uploading) {
+      return 'Upload...';
+    }
+    if (fileStates.length > 0 && fileStates.every((f) => f.done)) {
+      return 'Save';
+    }
+    return 'Upload';
+  };
+
+  const handleUpload = () => {
+    if (fileStates.length === 0) {
       toast.error('Bitte wählen Sie mindestens eine Datei aus.');
       return;
     }
+    if (fileStates.some((f) => !f.done)) {
+      toast.error('Bitte warten Sie, bis alle Uploads abgeschlossen sind.');
+      return;
+    }
+    toast.success('Alle Dateien wurden erfolgreich hochgeladen!', {
+      duration: 4000,
+    });
+    handleDialogClose();
+  };
 
+  const uploadFileWithProgress = async (file: File, index: number) => {
     setUploading(true);
     try {
-      for (const file of files) {
-        await uploadLocalDataset(file);
-      }
-      toast.success('Alle Dateien wurden erfolgreich hochgeladen!', {
-        duration: 4000,
+      await uploadLocalDataset(file, (percent) => {
+        setFileStates((prev) =>
+          updateFileProgress(prev, index, percent < 100 ? percent : 99),
+        );
       });
-      handleDialogClose();
-    } catch (error) {
-      toast.error('Fehler beim Hochladen der Dateien.');
-      console.error(error);
+      setFileStates((prev) => markFileDone(prev, index));
+    } catch {
+      setFileStates((prev) => markFileError(prev, index));
+      toast.error(`Fehler beim Hochladen von ${file.name}`);
     } finally {
       setUploading(false);
     }
@@ -113,22 +186,41 @@ export const DatasetUpload = () => {
           />
         </div>
 
-        {/* File List */}
+        {/* File List mit Fortschritt */}
         <div className="bg-muted mt-4 rounded p-4">
-          {files.length > 0 ? (
-            files.map((file, index) => (
+          {fileStates.length > 0 ? (
+            fileStates.map((state, index) => (
               <div
                 className="mb-2 flex items-center justify-between rounded border p-2"
                 key={index}
               >
-                <p className="text-muted-foreground truncate text-sm">
-                  {file.name}
-                </p>
+                <div className="flex-1">
+                  <p className="text-muted-foreground truncate text-sm">
+                    {state.file.name}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Progress className="flex-1" value={state.progress} />
+                    <span className="w-10 text-right text-xs">
+                      {state.progress}%
+                    </span>
+                    {state.done && !state.error && (
+                      <span className="ml-2 text-xs text-green-600">
+                        Fertig
+                      </span>
+                    )}
+                    {state.error && (
+                      <span className="ml-2 text-xs text-red-600">Fehler</span>
+                    )}
+                  </div>
+                </div>
                 <button
-                  className="text-red-500 hover:text-red-700"
+                  className="ml-2 text-red-500 hover:text-red-700"
+                  disabled={uploading}
                   onClick={() => handleRemoveFile(index)}
+                  title="Entfernen"
+                  type="button"
                 >
-                  <Upload className="h-4 w-4" />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
             ))
@@ -141,10 +233,10 @@ export const DatasetUpload = () => {
 
         <Button
           className="mt-4 w-full"
-          disabled={uploading}
+          disabled={!canUpload()}
           onClick={handleUpload}
         >
-          {uploading ? 'Hochladen...' : 'Upload'}
+          {getButtonLabel()}
         </Button>
       </DialogContent>
     </Dialog>

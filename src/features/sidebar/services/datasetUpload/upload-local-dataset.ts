@@ -6,14 +6,27 @@ interface DatasetUploadResponse {
 
 export const uploadLocalDataset = async (
   file: File,
+  onProgress?: (percent: number) => void,
 ): Promise<DatasetUploadResponse> => {
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append('files', file);
 
   try {
     const { data } = await axios.post<DatasetUploadResponse>(
       'http://localhost:8000/v1/datasets',
       formData,
+      {
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percent = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total,
+            );
+            if (onProgress) {
+              onProgress(percent);
+            }
+          }
+        },
+      },
     );
     return data;
   } catch (error: unknown) {
