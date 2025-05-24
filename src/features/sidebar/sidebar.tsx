@@ -23,6 +23,8 @@ import {
   Search,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { toast, Toaster } from 'sonner';
+import { ConfirmDeleteDialog } from './confirm-delete-dialog';
 import { DatasetDetailsDialog } from './dataset-details';
 import { DatasetUpload } from './dataset-upload';
 import { ModelUpload } from './model-upload';
@@ -57,6 +59,9 @@ export const Sidebar = ({
   >();
   const [detailsOpen, setDetailsOpen] = useState(false);
 
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [datasetToDelete, setDatasetToDelete] = useState<Dataset | null>();
+
   const openDatasetDetails = (id: string) => {
     setSelectedDatasetId(id);
     setDetailsOpen(true);
@@ -82,10 +87,6 @@ export const Sidebar = ({
   );
 
   const handleDeleteDataset = async (id: string) => {
-    const confirmed = globalThis.confirm('Datensatz wirklich löschen?');
-    if (!confirmed) {
-      return;
-    }
     const success = await deleteDataset(id);
     if (success) {
       setDatasets((prev) => prev.filter((d) => d.id !== id));
@@ -294,7 +295,11 @@ export const Sidebar = ({
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-red-600 focus:text-red-600"
-                            onClick={() => handleDeleteDataset(dataset.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDatasetToDelete(dataset);
+                              setDeleteDialogOpen(true);
+                            }}
                           >
                             Delete
                           </DropdownMenuItem>
@@ -323,6 +328,27 @@ export const Sidebar = ({
         onClose={() => setDetailsOpen(false)}
         open={detailsOpen}
       />
+
+      {/* Confirm Delete Dialog */}
+      <ConfirmDeleteDialog
+        datasetName={datasetToDelete?.name ?? ''}
+        onCancel={() => {
+          setDeleteDialogOpen(false);
+          setDatasetToDelete(undefined);
+        }}
+        onConfirm={async () => {
+          if (datasetToDelete) {
+            await handleDeleteDataset(datasetToDelete.id);
+            toast.success(`Dataset "${datasetToDelete.name}" deleted.`, {
+              position: 'bottom-right',
+            });
+            setDeleteDialogOpen(false);
+            setDatasetToDelete(undefined);
+          }
+        }}
+        open={deleteDialogOpen}
+      />
+      <Toaster position="bottom-right" />
     </div>
   );
 };
