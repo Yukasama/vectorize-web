@@ -9,7 +9,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { fetchDatasets } from '@/features/sidebar/services/dataset-service';
+import {
+  deleteDataset,
+  fetchDatasets,
+} from '@/features/sidebar/services/dataset-service';
 import { fetchModels } from '@/features/sidebar/services/model-service';
 import {
   ChevronDown,
@@ -78,6 +81,19 @@ export const Sidebar = ({
     model.name.toLowerCase().includes(modelSearch.toLowerCase()),
   );
 
+  const handleDeleteDataset = async (id: string) => {
+    const confirmed = globalThis.confirm('Datensatz wirklich löschen?');
+    if (!confirmed) {
+      return;
+    }
+    const success = await deleteDataset(id);
+    if (success) {
+      setDatasets((prev) => prev.filter((d) => d.id !== id));
+    } else {
+      globalThis.alert('Fehler beim Löschen des Datensatzes.');
+    }
+  };
+
   const filteredDatasets = datasets.filter((dataset) =>
     dataset.name.toLowerCase().includes(datasetSearch.toLowerCase()),
   );
@@ -95,7 +111,6 @@ export const Sidebar = ({
       </div>
 
       <ScrollArea className="h-full">
-        {/* Modelle Dropdown */}
         <div className="border-b border-gray-700 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -276,6 +291,12 @@ export const Sidebar = ({
                             onClick={() => alert(`Evaluate ${dataset.name}`)}
                           >
                             Evaluate
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-600 focus:text-red-600"
+                            onClick={() => handleDeleteDataset(dataset.id)}
+                          >
+                            Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

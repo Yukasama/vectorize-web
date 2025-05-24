@@ -34,3 +34,13 @@ export const fetchDatasetById = async (
     return undefined;
   }
 };
+
+export const deleteDataset = async (id: string): Promise<boolean> => {
+  try {
+    await axios.delete(`http://localhost:8000/v1/datasets/${id}`);
+    return true;
+  } catch (error) {
+    console.error('Fehler beim Löschen des Datensatzes:', error);
+    return false;
+  }
+};
