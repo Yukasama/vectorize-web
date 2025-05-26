@@ -12,9 +12,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { uploadLocalDataset } from '@/features/sidebar/services/datasetUpload/upload-local-dataset';
+import { messages } from '@/lib/messages';
 import { Upload, X } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 import { toast } from 'sonner';
+
+/**
+ * Dialog and logic for uploading one or more dataset files with progress and removal support.
+ */
 
 interface FileUploadState {
   done: boolean;
@@ -23,6 +28,7 @@ interface FileUploadState {
   progress: number;
 }
 
+// Mark a file as done (upload complete)
 const markFileDone = (
   states: FileUploadState[],
   index: number,
@@ -31,12 +37,14 @@ const markFileDone = (
     i === index ? { ...state, done: true, progress: 100 } : state,
   );
 
+// Mark a file as error (upload failed)
 const markFileError = (
   states: FileUploadState[],
   index: number,
 ): FileUploadState[] =>
   states.map((state, i) => (i === index ? { ...state, error: true } : state));
 
+// Update the progress of a file upload
 const updateFileProgress = (
   states: FileUploadState[],
   index: number,
@@ -45,12 +53,14 @@ const updateFileProgress = (
   states.map((state, i) => (i === index ? { ...state, progress } : state));
 
 export const DatasetUpload = () => {
+  // File input ref and component state
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
   const [fileStates, setFileStates] = useState<FileUploadState[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
 
+  // Add files to state and start upload
   const handleFilesSelected = (files: File[] | FileList) => {
     const filesArray = [...files];
     const newFileStates: FileUploadState[] = filesArray.map((file) => ({
@@ -60,34 +70,38 @@ export const DatasetUpload = () => {
       progress: 0,
     }));
     setFileStates((prev) => [...prev, ...newFileStates]);
-
     for (const [idx, file] of filesArray.entries()) {
       const index = fileStates.length + idx;
       void uploadFileWithProgress(file, index);
     }
   };
 
+  // Handle drag-and-drop file upload
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragActive(false);
     handleFilesSelected(e.dataTransfer.files);
   };
 
+  // Handle file input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       handleFilesSelected(e.target.files);
     }
   };
 
+  // Remove a file from the list
   const handleRemoveFile = (index: number) => {
     setFileStates((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Close dialog and reset state
   const handleDialogClose = () => {
     setIsDialogOpen(false);
     setFileStates([]);
   };
 
+  // Check if upload button should be enabled
   const canUpload = (): boolean => {
     if (uploading) {
       return false;
@@ -98,31 +112,34 @@ export const DatasetUpload = () => {
     return !fileStates.some((f) => !f.done);
   };
 
+  // Get label for upload/save button
   const getButtonLabel = (): string => {
     if (uploading) {
-      return 'Upload...';
+      return messages.dataset.upload.uploading;
     }
     if (fileStates.length > 0 && fileStates.every((f) => f.done)) {
-      return 'Save';
+      return messages.dataset.upload.save;
     }
-    return 'Upload';
+    return messages.dataset.upload.upload;
   };
 
+  // Handle upload/save action
   const handleUpload = () => {
     if (fileStates.length === 0) {
-      toast.error('Bitte wählen Sie mindestens eine Datei aus.');
+      toast.error(messages.dataset.upload.selectFile);
       return;
     }
     if (fileStates.some((f) => !f.done)) {
-      toast.error('Bitte warten Sie, bis alle Uploads abgeschlossen sind.');
+      toast.error(messages.dataset.upload.waitForUploads);
       return;
     }
-    toast.success('Alle Dateien wurden erfolgreich hochgeladen!', {
+    toast.success(messages.dataset.upload.allSuccess, {
       duration: 4000,
     });
     handleDialogClose();
   };
 
+  // Upload a single file and update progress
   const uploadFileWithProgress = async (file: File, index: number) => {
     setUploading(true);
     try {
@@ -134,7 +151,7 @@ export const DatasetUpload = () => {
       setFileStates((prev) => markFileDone(prev, index));
     } catch {
       setFileStates((prev) => markFileError(prev, index));
-      toast.error(`Fehler beim Hochladen von ${file.name}`);
+      toast.error(messages.dataset.upload.errorFile(file.name));
     } finally {
       setUploading(false);
     }
@@ -154,10 +171,9 @@ export const DatasetUpload = () => {
       </DialogTrigger>
       <DialogContent className="scrollbar-none max-h-[80vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Datensatz Upload</DialogTitle>
+          <DialogTitle>{messages.dataset.upload.uploadDialogTitle}</DialogTitle>
           <DialogDescription>
-            Bitte wählen Sie die Dateien aus, die Sie hochladen möchten, oder
-            ziehen Sie sie in den Bereich unten.
+            {messages.dataset.upload.uploadDialogDescription}
           </DialogDescription>
         </DialogHeader>
 
@@ -175,7 +191,7 @@ export const DatasetUpload = () => {
           onDrop={handleDrop}
         >
           <p className="text-muted-foreground text-sm">
-            Datei hier ablegen oder klicken
+            {messages.dataset.upload.localDropText}
           </p>
           <Input
             className="hidden"
@@ -186,7 +202,7 @@ export const DatasetUpload = () => {
           />
         </div>
 
-        {/* File List mit Fortschritt */}
+        {/* File List with Progress */}
         <div className="bg-muted mt-4 rounded p-4">
           {fileStates.length > 0 ? (
             fileStates.map((state, index) => (
@@ -205,19 +221,22 @@ export const DatasetUpload = () => {
                     </span>
                     {state.done && !state.error && (
                       <span className="ml-2 text-xs text-green-600">
-                        Fertig
+                        {messages.dataset.upload.done}
                       </span>
                     )}
                     {state.error && (
-                      <span className="ml-2 text-xs text-red-600">Fehler</span>
+                      <span className="ml-2 text-xs text-red-600">
+                        {messages.dataset.upload.error}
+                      </span>
                     )}
                   </div>
                 </div>
+                {/* Remove file button */}
                 <button
                   className="ml-2 text-red-500 hover:text-red-700"
                   disabled={uploading}
                   onClick={() => handleRemoveFile(index)}
-                  title="Entfernen"
+                  title={messages.dataset.upload.remove}
                   type="button"
                 >
                   <X className="h-4 w-4" />
@@ -226,11 +245,12 @@ export const DatasetUpload = () => {
             ))
           ) : (
             <p className="text-muted-foreground text-sm">
-              Keine Dateien hochgeladen.
+              {messages.dataset.upload.noFiles}
             </p>
           )}
         </div>
 
+        {/* Upload/Save button */}
         <Button
           className="mt-4 w-full"
           disabled={!canUpload()}

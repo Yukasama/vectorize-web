@@ -14,6 +14,7 @@ import {
   fetchDatasets,
 } from '@/features/sidebar/services/dataset-service';
 import { fetchModels } from '@/features/sidebar/services/model-service';
+import { messages } from '@/lib/messages';
 import {
   ChevronDown,
   ChevronUp,
@@ -46,6 +47,7 @@ export const Sidebar = ({
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
 }) => {
+  // State for models, datasets, search, dropdowns, and dialogs
   const [models, setModels] = useState<Model[]>([]);
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [modelSearch, setModelSearch] = useState('');
@@ -62,11 +64,17 @@ export const Sidebar = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [datasetToDelete, setDatasetToDelete] = useState<Dataset | null>();
 
+  /**
+   * Opens the dataset details dialog for the selected dataset.
+   */
   const openDatasetDetails = (id: string) => {
     setSelectedDatasetId(id);
     setDetailsOpen(true);
   };
 
+  /**
+   * Loads models and datasets on component mount.
+   */
   useEffect(() => {
     const loadModels = async () => {
       const data = await fetchModels();
@@ -82,19 +90,28 @@ export const Sidebar = ({
     void loadDatasets();
   }, []);
 
+  /**
+   * Filters models based on the search input.
+   */
   const filteredModels = models.filter((model) =>
     model.name.toLowerCase().includes(modelSearch.toLowerCase()),
   );
 
+  /**
+   * Handles dataset deletion and updates state.
+   */
   const handleDeleteDataset = async (id: string) => {
     const success = await deleteDataset(id);
     if (success) {
       setDatasets((prev) => prev.filter((d) => d.id !== id));
     } else {
-      globalThis.alert('Fehler beim Löschen des Datensatzes.');
+      toast.error(messages.dataset.delete.error);
     }
   };
 
+  /**
+   * Filters datasets based on the search input.
+   */
   const filteredDatasets = datasets.filter((dataset) =>
     dataset.name.toLowerCase().includes(datasetSearch.toLowerCase()),
   );
@@ -105,6 +122,7 @@ export const Sidebar = ({
         isOpen ? 'w-64' : 'w-16'
       } overflow-y-auto`}
     >
+      {/* Sidebar toggle button */}
       <div className="flex items-center justify-end p-2">
         <Button onClick={() => setIsOpen(!isOpen)} variant="ghost">
           <Menu className="h-5 w-5" />
@@ -112,6 +130,7 @@ export const Sidebar = ({
       </div>
 
       <ScrollArea className="h-full">
+        {/* Models dropdown section */}
         <div className="border-b border-gray-700 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -120,7 +139,7 @@ export const Sidebar = ({
                   isOpen ? 'opacity-100' : 'opacity-0'
                 }`}
               >
-                Modelle
+                Models
               </h3>
               {isOpen && <ModelUpload />}
             </div>
@@ -137,14 +156,16 @@ export const Sidebar = ({
           </div>
           {modelsDropdownOpen && isOpen && (
             <div className="mt-2">
+              {/* Model search input */}
               <div className="flex items-center gap-2">
                 <Search className="h-4 w-4" />
                 <Input
                   onChange={(e) => setModelSearch(e.target.value)}
-                  placeholder="Modelle durchsuchen"
+                  placeholder="Search models"
                   value={modelSearch}
                 />
               </div>
+              {/* Model list */}
               <div
                 className={`mt-4 space-y-2 ${
                   showMoreModels
@@ -187,6 +208,7 @@ export const Sidebar = ({
                     </div>
                   ))}
               </div>
+              {/* Show more/less models button */}
               {filteredModels.length > 5 && (
                 <Button
                   className="mt-2 w-full"
@@ -200,7 +222,7 @@ export const Sidebar = ({
           )}
         </div>
 
-        {/* Datensätze Dropdown */}
+        {/* Datasets dropdown section */}
         <div className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -209,12 +231,12 @@ export const Sidebar = ({
                   isOpen ? 'opacity-100' : 'opacity-0'
                 }`}
               >
-                Datensätze
+                Datasets
               </h3>
               {isOpen && <DatasetUpload />}
               {isOpen && (
                 <Button
-                  onClick={() => alert('Neuen Datensatz hinzufügen')}
+                  onClick={() => alert(messages.dataset.upload.addNew)}
                   size="icon"
                   variant="ghost"
                 >
@@ -235,14 +257,16 @@ export const Sidebar = ({
           </div>
           {datasetsDropdownOpen && isOpen && (
             <div className="mt-2">
+              {/* Dataset search input */}
               <div className="flex items-center gap-2">
                 <Search className="h-4 w-4" />
                 <Input
                   onChange={(e) => setDatasetSearch(e.target.value)}
-                  placeholder="Datensätze durchsuchen"
+                  placeholder="Search datasets"
                   value={datasetSearch}
                 />
               </div>
+              {/* Dataset list */}
               <div
                 className={`mt-4 space-y-2 ${
                   showMoreDatasets
@@ -308,6 +332,7 @@ export const Sidebar = ({
                     </div>
                   ))}
               </div>
+              {/* Show more/less datasets button */}
               {filteredDatasets.length > 5 && (
                 <Button
                   className="mt-2 w-full"
@@ -339,15 +364,19 @@ export const Sidebar = ({
         onConfirm={async () => {
           if (datasetToDelete) {
             await handleDeleteDataset(datasetToDelete.id);
-            toast.success(`Dataset "${datasetToDelete.name}" deleted.`, {
-              position: 'bottom-right',
-            });
+            toast.success(
+              messages.dataset.delete.success(datasetToDelete.name),
+              {
+                position: 'bottom-right',
+              },
+            );
             setDeleteDialogOpen(false);
             setDatasetToDelete(undefined);
           }
         }}
         open={deleteDialogOpen}
       />
+      {/* Toast notifications for sidebar actions */}
       <Toaster position="bottom-right" />
     </div>
   );

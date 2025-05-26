@@ -1,9 +1,14 @@
+import { messages } from '@/lib/messages';
 import axios from 'axios';
 
 interface DatasetUploadResponse {
   datasetId: string;
 }
 
+/**
+ * Upload a local dataset file to the backend API.
+ * Reports upload progress and throws an error if upload fails.
+ */
 export const uploadLocalDataset = async (
   file: File,
   onProgress?: (percent: number) => void,
@@ -31,8 +36,11 @@ export const uploadLocalDataset = async (
     return data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error('Fehlerdetails:', error.response?.data ?? error.message);
+      console.error(
+        messages.dataset.upload.errorFile(file.name),
+        error.response?.data ?? error.message,
+      );
     }
-    throw new Error('Fehler beim Hochladen der Datei');
+    throw new Error(messages.dataset.upload.errorFile(file.name));
   }
 };

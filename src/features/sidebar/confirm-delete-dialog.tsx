@@ -17,6 +17,9 @@ interface ConfirmDeleteDialogProps {
   open: boolean;
 }
 
+/**
+ * Dialog component to confirm deletion of a dataset.
+ */
 export const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
   datasetName,
   onCancel,
@@ -26,7 +29,9 @@ export const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
   <Dialog onOpenChange={onCancel} open={open}>
     <DialogContent>
       <DialogHeader>
+        {/* Dialog title */}
         <DialogTitle>Delete dataset</DialogTitle>
+        {/* Dialog description with warning */}
         <DialogDescription>
           Are you sure you want to delete{' '}
           <span className="font-semibold text-red-600">{datasetName}</span>?
@@ -34,9 +39,11 @@ export const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
         </DialogDescription>
       </DialogHeader>
       <DialogFooter>
+        {/* Cancel button */}
         <DialogClose asChild>
           <Button variant="ghost">Cancel</Button>
         </DialogClose>
+        {/* Confirm delete button */}
         <Button onClick={onConfirm} variant="destructive">
           Delete
         </Button>

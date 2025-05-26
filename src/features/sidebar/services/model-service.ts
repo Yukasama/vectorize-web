@@ -14,12 +14,3 @@ export const fetchModels = async (): Promise<Model[]> => {
     return [];
   }
 };
-
-export const addModel = async (model: Model): Promise<void> => {
-  try {
-    const response = await axios.post('/models.json', model);
-    console.log('Modell hinzugefügt:', response.data);
-  } catch (error) {
-    console.error('Fehler beim Hinzufügen des Modells:', error);
-  }
-};

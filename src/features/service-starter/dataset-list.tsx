@@ -19,10 +19,17 @@ interface Dataset {
   name: string;
 }
 
+/**
+ * Component to display the list of datasets in grid or table view.
+ */
 export const DatasetList = () => {
+  // State for datasets and current view mode
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [view, setView] = useState<'grid' | 'table'>('grid');
 
+  /**
+   * Fetch datasets from the backend API on component mount.
+   */
   useEffect(() => {
     const fetchDatasets = async () => {
       try {
@@ -31,7 +38,8 @@ export const DatasetList = () => {
         );
         setDatasets(response.data);
       } catch (error) {
-        console.error('Fehler beim Abrufen der Datensätze:', error);
+        // Log error and reset datasets if fetch fails
+        console.error('Error fetching datasets:', error);
         setDatasets([]);
       }
     };
@@ -41,14 +49,16 @@ export const DatasetList = () => {
 
   return (
     <div>
+      {/* Header with title, upload button, and view toggle */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold">Datensätze</h2>
+          <h2 className="text-lg font-semibold">Datasets</h2>
           <DatasetUpload />
         </div>
         <ListViewToggle setView={setView} view={view} />
       </div>
 
+      {/* Render datasets as grid or table based on selected view */}
       {view === 'grid' ? (
         <div className="grid grid-cols-2 gap-4">
           {datasets.map((dataset) => (
