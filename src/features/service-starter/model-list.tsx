@@ -9,9 +9,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { ModelUpload } from '../sidebar/model-upload';
+import { fetchModels } from '../sidebar/services/model-service'; // <-- Importiere fetchModels
 import { ListViewToggle } from './list-view-toggle';
 
 interface Model {
@@ -24,25 +24,16 @@ export const ModelList = () => {
   const [view, setView] = useState<'grid' | 'table'>('grid');
 
   useEffect(() => {
-    const fetchModels = async () => {
+    const loadModels = async () => {
       try {
-        // Beispiel-Daten aus der JSON-Datei abrufen
-        const response = await axios.get<Model[]>('/data/models.json');
-        setModels(response.data);
-
-        // Auskommentierte Logik für die spätere Verwendung der echten Datenbank
-        /*
-        const response = await axios.get<Model[]>(
-          'http://localhost:8000/v1/models',
-        );
-        setModels(response.data);
-        */
+        const data = await fetchModels(); // <-- Nutze den Service
+        setModels(data);
       } catch (error) {
         console.error('Fehler beim Abrufen der Modelle:', error);
       }
     };
 
-    void fetchModels();
+    void loadModels();
   }, []);
 
   return (
