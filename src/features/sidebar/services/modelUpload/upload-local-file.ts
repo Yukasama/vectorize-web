@@ -1,48 +1,54 @@
+import { messages } from '@/lib/messages';
 import axios from 'axios';
 
-interface LocalFileUploadResponse {
-  file_count: number;
-  model_dir: string;
-  model_id: string;
-  model_name: string;
-}
-
+/**
+ * Upload a local model file (ZIP) to the backend API.
+ */
 export const uploadLocalFile = async (
-  files: File[],
-  extractZip = true,
-): Promise<{ message: string; modelId: string }> => {
-  if (files.length === 0) {
-    throw new Error('Keine Datei ausgewählt');
+  file: File,
+  modelName?: string,
+): Promise<{
+  message: string;
+  models: { directory: string; id: string; name: string; url: string }[];
+}> => {
+  if (!file.name.toLowerCase().endsWith('.zip')) {
+    throw new Error(messages.model.upload.onlyZip);
   }
 
-  const modelName = files[0].name.replace(/\.[^/.]+$/, '') || 'uploaded-model';
-
   const formData = new FormData();
-  for (const file of files) {
-    formData.append('files', file);
+  formData.append('file', file);
+
+  let url = 'http://localhost:8000/v1/uploads/local_models';
+  if (modelName) {
+    url += '?model_name=' + encodeURIComponent(modelName);
   }
 
   try {
-    const { data } = await axios.post<LocalFileUploadResponse>(
-      `http://localhost:8000/v1/uploads/models?model_name=${encodeURIComponent(
-        modelName,
-      )}&extract_zip=${extractZip.toString()}`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+    const response = await axios.post<{
+      message: string;
+      models: { directory: string; id: string; name: string; url: string }[];
+    }>(url, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
       },
-    );
-    return {
-      message: `Model '${data.model_name}' erfolgreich hochgeladen.`,
-      modelId: data.model_id,
-    };
+    });
+    return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error('Fehlerdetails:', error.response?.data ?? error.message);
-      throw new Error('Fehler beim Hochladen der Datei');
+      if (error.response?.status === 400) {
+        throw new Error(messages.model.upload.onlyZip);
+      }
+      if (error.response?.status === 409) {
+        throw new Error(messages.model.upload.alreadyExists);
+      }
+      // Use backend error message if available, otherwise fallback to messages
+      const data = error.response?.data as
+        | undefined
+        | { detail?: string; message?: string };
+      const backendMessage =
+        data?.detail ?? data?.message ?? messages.model.upload.error;
+      throw new Error(backendMessage);
     }
-    throw error;
+    throw new Error(messages.model.upload.error);
   }
 };

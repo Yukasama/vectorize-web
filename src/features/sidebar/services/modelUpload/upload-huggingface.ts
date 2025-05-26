@@ -1,28 +1,37 @@
+import { messages } from '@/lib/messages';
 import axios from 'axios';
 
-interface HuggingFaceUploadResponse {
-  message: string;
-  modelId: string;
-  tag?: string;
-}
-
+/**
+ * Upload a model from Hugging Face by model tag and optional revision.
+ */
 export const uploadHuggingFace = async (
-  modelId: string,
-  tag: string,
-): Promise<HuggingFaceUploadResponse> => {
+  modelTag: string,
+  revision: string,
+): Promise<void> => {
   try {
-    const { data } = await axios.post<HuggingFaceUploadResponse>(
-      'http://localhost:8000/v1/uploads/load',
-      {
-        model_id: modelId,
-        tag,
-      },
-    );
-    return data;
+    const payload: { model_tag: string; revision?: string } = {
+      model_tag: modelTag,
+    };
+    if (revision && revision.trim() !== '') {
+      payload.revision = revision;
+    }
+    await axios.post('http://localhost:8000/v1/uploads/huggingface', payload);
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error('Fehlerdetails:', error.response?.data ?? error.message);
+      if (error.response?.status === 409) {
+        throw new Error(messages.model.upload.alreadyExists);
+      }
+      if (error.response?.status === 400) {
+        throw new Error(messages.model.upload.huggingfaceError);
+      }
+      // Use backend error message if available, otherwise fallback to messages
+      const data = error.response?.data as
+        | undefined
+        | { detail?: string; message?: string };
+      const backendMessage =
+        data?.detail ?? data?.message ?? messages.model.upload.huggingfaceError;
+      throw new Error(backendMessage);
     }
-    throw new Error('Fehler beim Hochladen des Hugging Face-Modells');
+    throw new Error(messages.model.upload.huggingfaceError);
   }
 };
