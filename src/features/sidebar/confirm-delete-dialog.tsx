@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import React from 'react';
+import * as React from 'react';
 
 interface ConfirmDeleteDialogProps {
   datasetName: string;
