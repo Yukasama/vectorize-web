@@ -28,6 +28,7 @@ import { toast, Toaster } from 'sonner';
 import { ConfirmDeleteDialog } from './confirm-delete-dialog';
 import { DatasetDetailsDialog } from './dataset-details';
 import { DatasetUpload } from './dataset-upload';
+import { ModelDetailsDialog } from './model-details';
 import { ModelUpload } from './model-upload';
 
 interface Dataset {
@@ -37,6 +38,7 @@ interface Dataset {
 
 interface Model {
   id: string;
+  model_tag: string;
   name: string;
 }
 
@@ -64,12 +66,23 @@ export const Sidebar = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [datasetToDelete, setDatasetToDelete] = useState<Dataset | null>();
 
+  const [selectedModelId, setSelectedModelId] = useState<string | undefined>();
+  const [modelDetailsOpen, setModelDetailsOpen] = useState(false);
+
   /**
    * Opens the dataset details dialog for the selected dataset.
    */
   const openDatasetDetails = (id: string) => {
     setSelectedDatasetId(id);
     setDetailsOpen(true);
+  };
+
+  /**
+   * Opens the model details dialog for the selected model.
+   */
+  const openModelDetails = (model_tag: string) => {
+    setSelectedModelId(model_tag);
+    setModelDetailsOpen(true);
   };
 
   /**
@@ -177,8 +190,16 @@ export const Sidebar = ({
                   .slice(0, showMoreModels ? filteredModels.length : 5)
                   .map((model) => (
                     <div
-                      className="bg-accent flex items-center justify-between rounded p-2 text-sm"
+                      className="bg-accent flex cursor-pointer items-center justify-between rounded p-2 text-sm"
                       key={model.id}
+                      onClick={() => openModelDetails(model.model_tag)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          openModelDetails(model.model_tag);
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
                     >
                       <span>{model.name}</span>
                       <DropdownMenu>
@@ -346,6 +367,13 @@ export const Sidebar = ({
           )}
         </div>
       </ScrollArea>
+
+      {/* Model Details Dialog */}
+      <ModelDetailsDialog
+        modelId={modelDetailsOpen ? selectedModelId : undefined}
+        onClose={() => setModelDetailsOpen(false)}
+        open={modelDetailsOpen}
+      />
 
       {/* Dataset Details Dialog */}
       <DatasetDetailsDialog
