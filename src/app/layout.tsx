@@ -43,7 +43,6 @@ export default async function RootLayout({
         )}
       >
         <Provider nonce={nonce ?? undefined}>
-          {/* Remove AppSidebar from the layout */}
           <div className="flex min-h-screen w-full flex-col">
             <main className="flex flex-col">{children}</main>
           </div>
