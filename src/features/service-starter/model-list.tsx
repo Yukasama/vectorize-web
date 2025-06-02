@@ -10,7 +10,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useEffect, useState } from 'react';
-import { ModelUpload } from '../sidebar/model-upload';
+import { ModelUpload } from '../sidebar/model/model-upload';
 import { fetchModels } from '../sidebar/services/model-service'; // <-- Importiere fetchModels
 import { ListViewToggle } from './list-view-toggle';
 

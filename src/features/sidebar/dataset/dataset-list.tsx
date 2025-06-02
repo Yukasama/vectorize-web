@@ -120,9 +120,8 @@ export const DatasetList = ({ isOpen }: { isOpen: boolean }) => {
           </div>
           {/* List of dataset items */}
           <div
-            className={`mt-4 space-y-2 ${
-              showMoreDatasets ? 'max-h-[calc(100%-4rem)] overflow-y-auto' : ''
-            }`}
+            className={`mt-4 space-y-2 ${showMoreDatasets ? 'overflow-y-auto' : ''}`}
+            style={showMoreDatasets ? { maxHeight: '20rem' } : {}}
           >
             {renderDatasetListItems(visibleDatasets)}
           </div>

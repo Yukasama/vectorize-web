@@ -2,10 +2,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ChevronDown, ChevronUp, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { fetchModels } from '../services/model-service';
 import { ModelDetailsDialog } from './model-details';
 import { ModelListItem } from './model-options';
 import { ModelUpload } from './model-upload';
-import { fetchModels } from './services/model-service';
 
 interface Model {
   id: string;
@@ -82,9 +82,8 @@ export const ModelList = ({ isOpen }: { isOpen: boolean }) => {
           </div>
           {/* Model list */}
           <div
-            className={`mt-4 space-y-2 ${
-              showMoreModels ? 'max-h-[calc(100%-4rem)] overflow-y-auto' : ''
-            }`}
+            className={`mt-4 space-y-2 ${showMoreModels ? 'overflow-y-auto' : ''}`}
+            style={showMoreModels ? { maxHeight: '20rem' } : {}}
           >
             {filteredModels
               .slice(0, showMoreModels ? filteredModels.length : 5)

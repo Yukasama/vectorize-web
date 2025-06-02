@@ -9,8 +9,8 @@ import { messages } from '@/lib/messages';
 import { MoreVertical } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { deleteDataset } from '../services/dataset-service';
 import { ConfirmDeleteDialog } from './confirm-delete-dialog';
-import { deleteDataset } from './services/dataset-service';
 
 interface Dataset {
   id: string;
@@ -48,7 +48,7 @@ export const DatasetListItem = ({
     <>
       {/* Clicking the row opens the details dialog */}
       <div
-        className="flex w-full cursor-pointer items-center justify-between rounded bg-gray-700 p-2 text-sm hover:bg-gray-600"
+        className="hover:bg-muted/70 flex w-full cursor-pointer items-center justify-between rounded p-2 text-sm"
         onClick={() => onDetails(dataset.id)}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {

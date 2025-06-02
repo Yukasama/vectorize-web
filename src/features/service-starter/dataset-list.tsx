@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/table';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { DatasetUpload } from '../sidebar/dataset-upload';
+import { DatasetUpload } from '../sidebar/dataset/dataset-upload';
 import { ListViewToggle } from './list-view-toggle';
 
 interface Dataset {

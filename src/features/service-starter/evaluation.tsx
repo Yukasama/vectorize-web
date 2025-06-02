@@ -1,8 +1,8 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { DatasetUpload } from '@/features/sidebar/dataset-upload';
-import { ModelUpload } from '@/features/sidebar/model-upload';
+import { DatasetUpload } from '@/features/sidebar/dataset/dataset-upload';
+import { ModelUpload } from '@/features/sidebar/model/model-upload';
 import React, { useState } from 'react';
 
 export const EvaluationBox = () => {
