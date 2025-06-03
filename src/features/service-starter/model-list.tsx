@@ -10,7 +10,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useEffect, useState } from 'react';
-import { ModelUpload } from '../sidebar/model/model-upload';
 import { fetchModels } from '../sidebar/services/model-service'; // <-- Importiere fetchModels
 import { ListViewToggle } from './list-view-toggle';
 
@@ -26,7 +25,7 @@ export const ModelList = () => {
   useEffect(() => {
     const loadModels = async () => {
       try {
-        const data = await fetchModels(); // <-- Nutze den Service
+        const data = await fetchModels();
         setModels(data);
       } catch (error) {
         console.error('Fehler beim Abrufen der Modelle:', error);
@@ -40,8 +39,7 @@ export const ModelList = () => {
     <div>
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold">Modelle</h2>
-          <ModelUpload />
+          <h2 className="text-lg font-semibold">Models</h2>
         </div>
         <ListViewToggle setView={setView} view={view} />
       </div>

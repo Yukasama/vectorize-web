@@ -15,6 +15,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/features/sidebar/app-sidebar';
+import { ModelList } from '../features/service-starter/model-list';
 import { ThemeToggle } from '../features/theme/theme-toggle';
 
 export default function Page() {
@@ -49,7 +50,9 @@ export default function Page() {
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4">
           <div className="grid gap-4 md:grid-cols-[2fr_1fr]">
-            <div className="bg-muted/50 min-h-[60vh] rounded-xl" />
+            <div className="bg-muted/50 min-h-[60vh] rounded-xl p-4">
+              <ModelList />
+            </div>
             <div className="bg-muted/50 min-h-[60vh] rounded-xl" />
           </div>
         </div>

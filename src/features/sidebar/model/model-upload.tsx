@@ -1,14 +1,6 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { uploadGithub } from '@/features/sidebar/services/modelUpload/upload-github';
 import { uploadHuggingFace } from '@/features/sidebar/services/modelUpload/upload-huggingface';
@@ -26,10 +18,9 @@ export const ModelUpload = () => {
   // Reference for the hidden file input
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // State for drag-and-drop, selected files, dialog, and upload form fields
+  // State for drag-and-drop, selected files, and upload form fields
   const [dragActive, setDragActive] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [githubUrl, setGithubUrl] = useState('');
   const [huggingFaceModelId, setHuggingFaceModelId] = useState('');
@@ -56,10 +47,9 @@ export const ModelUpload = () => {
   };
 
   /**
-   * Resets dialog state and clears all fields.
+   * Resets all fields.
    */
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
+  const handleReset = () => {
     setSelectedFiles([]);
     setGithubUrl('');
     setHuggingFaceModelId('');
@@ -107,6 +97,7 @@ export const ModelUpload = () => {
           messages.model.upload.huggingfaceSuccess(huggingFaceModelId),
         );
       }
+      handleReset();
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -115,119 +106,97 @@ export const ModelUpload = () => {
       }
     } finally {
       setUploading(false);
-      handleDialogClose();
     }
   };
 
   return (
-    <>
+    <div>
       {/* Toast notifications for upload status */}
       <Toaster position="bottom-right" />
-      <Dialog
-        onOpenChange={(open) =>
-          open ? setIsDialogOpen(true) : handleDialogClose()
-        }
-        open={isDialogOpen}
+
+      {/* GitHub upload section */}
+      <div className="mb-4 flex items-center space-x-4">
+        <Image
+          alt="GitHub Logo"
+          className="h-8 w-8"
+          height={32}
+          src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+          width={32}
+        />
+        <Input
+          onChange={(e) => setGithubUrl(e.target.value)}
+          placeholder={messages.model.upload.githubPlaceholder}
+          value={githubUrl}
+        />
+      </div>
+
+      {/* Hugging Face upload section */}
+      <div className="mb-4 flex items-center space-x-4">
+        <Image
+          alt="Hugging Face Logo"
+          className="h-8 w-8"
+          height={32}
+          src="/images/huggingface_logo.svg"
+          width={32}
+        />
+        <div className="flex-1">
+          <Input
+            onChange={(e) => setHuggingFaceModelId(e.target.value)}
+            placeholder={messages.model.upload.huggingfaceIdPlaceholder}
+            value={huggingFaceModelId}
+          />
+          <Input
+            className="mt-2"
+            onChange={(e) => setHuggingFaceTag(e.target.value)}
+            placeholder={messages.model.upload.huggingfaceTagPlaceholder}
+            value={huggingFaceTag}
+          />
+        </div>
+      </div>
+
+      {/* Local file upload section with drag-and-drop */}
+      <div
+        className={`flex h-32 cursor-pointer items-center justify-center rounded border-2 border-dashed transition ${
+          dragActive ? 'border-primary bg-muted' : 'border-muted'
+        }`}
+        onClick={() => fileInputRef.current?.click()}
+        onDragLeave={() => setDragActive(false)}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragActive(true);
+        }}
+        onDrop={handleDrop}
       >
-        {/* Upload button to open dialog */}
-        <DialogTrigger asChild>
-          <Button className="h-10 w-10 p-0" variant="ghost">
-            <Upload className="h-5 w-5" />
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{messages.model.upload.uploadDialogTitle}</DialogTitle>
-            <DialogDescription>
-              {messages.model.upload.uploadDialogDescription}
-            </DialogDescription>
-          </DialogHeader>
+        {selectedFiles.length > 0 ? (
+          <ul className="text-sm">
+            {selectedFiles.map((file, index) => (
+              <li key={index}>{file.name}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-muted-foreground text-sm">
+            {messages.model.upload.localDropText}
+          </p>
+        )}
+        <Input
+          className="hidden"
+          multiple
+          onChange={handleChange}
+          ref={fileInputRef}
+          type="file"
+        />
+      </div>
 
-          {/* GitHub upload section */}
-          <div className="mb-4 flex items-center space-x-4">
-            <Image
-              alt="GitHub Logo"
-              className="h-8 w-8"
-              height={32}
-              src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-              width={32}
-            />
-            <Input
-              onChange={(e) => setGithubUrl(e.target.value)}
-              placeholder={messages.model.upload.githubPlaceholder}
-              value={githubUrl}
-            />
-          </div>
-
-          {/* Hugging Face upload section */}
-          <div className="mb-4 flex items-center space-x-4">
-            <Image
-              alt="Hugging Face Logo"
-              className="h-8 w-8"
-              height={32}
-              src="/images/huggingface_logo.svg"
-              width={32}
-            />
-            <div className="flex-1">
-              <Input
-                onChange={(e) => setHuggingFaceModelId(e.target.value)}
-                placeholder={messages.model.upload.huggingfaceIdPlaceholder}
-                value={huggingFaceModelId}
-              />
-              <Input
-                className="mt-2"
-                onChange={(e) => setHuggingFaceTag(e.target.value)}
-                placeholder={messages.model.upload.huggingfaceTagPlaceholder}
-                value={huggingFaceTag}
-              />
-            </div>
-          </div>
-
-          {/* Local file upload section with drag-and-drop */}
-          <div
-            className={`flex h-32 cursor-pointer items-center justify-center rounded border-2 border-dashed transition ${
-              dragActive ? 'border-primary bg-muted' : 'border-muted'
-            }`}
-            onClick={() => fileInputRef.current?.click()}
-            onDragLeave={() => setDragActive(false)}
-            onDragOver={(e) => {
-              e.preventDefault();
-              setDragActive(true);
-            }}
-            onDrop={handleDrop}
-          >
-            {selectedFiles.length > 0 ? (
-              <ul className="text-sm">
-                {selectedFiles.map((file, index) => (
-                  <li key={index}>{file.name}</li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-muted-foreground text-sm">
-                {messages.model.upload.localDropText}
-              </p>
-            )}
-            <Input
-              className="hidden"
-              multiple
-              onChange={handleChange}
-              ref={fileInputRef}
-              type="file"
-            />
-          </div>
-
-          {/* Upload button */}
-          <Button
-            className="mt-4 w-full"
-            disabled={uploading}
-            onClick={handleUpload}
-          >
-            {uploading
-              ? messages.model.upload.uploading
-              : messages.model.upload.upload}
-          </Button>
-        </DialogContent>
-      </Dialog>
-    </>
+      {/* Upload button */}
+      <Button
+        className="mt-4 w-full"
+        disabled={uploading}
+        onClick={handleUpload}
+      >
+        {uploading
+          ? messages.model.upload.uploading
+          : messages.model.upload.upload}
+      </Button>
+    </div>
   );
 };

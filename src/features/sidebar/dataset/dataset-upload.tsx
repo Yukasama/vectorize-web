@@ -1,14 +1,6 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { uploadLocalDataset } from '@/features/sidebar/services/datasetUpload/upload-local-dataset';
@@ -57,7 +49,6 @@ export const DatasetUpload = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
   const [fileStates, setFileStates] = useState<FileUploadState[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   // Add files to state and start upload
@@ -95,12 +86,6 @@ export const DatasetUpload = () => {
     setFileStates((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Close dialog and reset state
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-    setFileStates([]);
-  };
-
   // Check if upload button should be enabled
   const canUpload = (): boolean => {
     if (uploading) {
@@ -136,7 +121,7 @@ export const DatasetUpload = () => {
     toast.success(messages.dataset.upload.allSuccess, {
       duration: 4000,
     });
-    handleDialogClose();
+    setFileStates([]);
   };
 
   // Upload a single file and update progress
@@ -158,107 +143,88 @@ export const DatasetUpload = () => {
   };
 
   return (
-    <Dialog
-      onOpenChange={(open) =>
-        open ? setIsDialogOpen(true) : handleDialogClose()
-      }
-      open={isDialogOpen}
-    >
-      <DialogTrigger asChild>
-        <Button className="h-10 w-10 p-0" variant="ghost">
-          <Upload className="h-5 w-5" />
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="scrollbar-none max-h-[80vh] overflow-y-auto sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{messages.dataset.upload.uploadDialogTitle}</DialogTitle>
-          <DialogDescription>
-            {messages.dataset.upload.uploadDialogDescription}
-          </DialogDescription>
-        </DialogHeader>
+    <div>
+      {/* Drag-and-Drop Area */}
+      <div
+        className={`flex h-32 cursor-pointer items-center justify-center rounded border-2 border-dashed transition ${
+          dragActive ? 'border-primary bg-muted' : 'border-muted'
+        }`}
+        onClick={() => fileInputRef.current?.click()}
+        onDragLeave={() => setDragActive(false)}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragActive(true);
+        }}
+        onDrop={handleDrop}
+      >
+        <p className="text-muted-foreground text-sm">
+          {messages.dataset.upload.localDropText}
+        </p>
+        <Input
+          className="hidden"
+          multiple
+          onChange={handleChange}
+          ref={fileInputRef}
+          type="file"
+        />
+      </div>
 
-        {/* Drag-and-Drop Area */}
-        <div
-          className={`flex h-32 cursor-pointer items-center justify-center rounded border-2 border-dashed transition ${
-            dragActive ? 'border-primary bg-muted' : 'border-muted'
-          }`}
-          onClick={() => fileInputRef.current?.click()}
-          onDragLeave={() => setDragActive(false)}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragActive(true);
-          }}
-          onDrop={handleDrop}
-        >
-          <p className="text-muted-foreground text-sm">
-            {messages.dataset.upload.localDropText}
-          </p>
-          <Input
-            className="hidden"
-            multiple
-            onChange={handleChange}
-            ref={fileInputRef}
-            type="file"
-          />
-        </div>
-
-        {/* File List with Progress */}
-        <div className="bg-muted mt-4 rounded p-4">
-          {fileStates.length > 0 ? (
-            fileStates.map((state, index) => (
-              <div
-                className="mb-2 flex items-center justify-between rounded border p-2"
-                key={index}
-              >
-                <div className="flex-1">
-                  <p className="text-muted-foreground truncate text-sm">
-                    {state.file.name}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Progress className="flex-1" value={state.progress} />
-                    <span className="w-10 text-right text-xs">
-                      {state.progress}%
+      {/* File List with Progress */}
+      <div className="bg-muted mt-4 rounded p-4">
+        {fileStates.length > 0 ? (
+          fileStates.map((state, index) => (
+            <div
+              className="mb-2 flex items-center justify-between rounded border p-2"
+              key={index}
+            >
+              <div className="flex-1">
+                <p className="text-muted-foreground truncate text-sm">
+                  {state.file.name}
+                </p>
+                <div className="flex items-center gap-2">
+                  <Progress className="flex-1" value={state.progress} />
+                  <span className="w-10 text-right text-xs">
+                    {state.progress}%
+                  </span>
+                  {state.done && !state.error && (
+                    <span className="ml-2 text-xs text-green-600">
+                      {messages.dataset.upload.done}
                     </span>
-                    {state.done && !state.error && (
-                      <span className="ml-2 text-xs text-green-600">
-                        {messages.dataset.upload.done}
-                      </span>
-                    )}
-                    {state.error && (
-                      <span className="ml-2 text-xs text-red-600">
-                        {messages.dataset.upload.error}
-                      </span>
-                    )}
-                  </div>
+                  )}
+                  {state.error && (
+                    <span className="ml-2 text-xs text-red-600">
+                      {messages.dataset.upload.error}
+                    </span>
+                  )}
                 </div>
-                {/* Remove file button */}
-                <button
-                  className="ml-2 text-red-500 hover:text-red-700"
-                  disabled={uploading}
-                  onClick={() => handleRemoveFile(index)}
-                  title={messages.dataset.upload.remove}
-                  type="button"
-                >
-                  <X className="h-4 w-4" />
-                </button>
               </div>
-            ))
-          ) : (
-            <p className="text-muted-foreground text-sm">
-              {messages.dataset.upload.noFiles}
-            </p>
-          )}
-        </div>
+              {/* Remove file button */}
+              <button
+                className="ml-2 text-red-500 hover:text-red-700"
+                disabled={uploading}
+                onClick={() => handleRemoveFile(index)}
+                title={messages.dataset.upload.remove}
+                type="button"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ))
+        ) : (
+          <p className="text-muted-foreground text-sm">
+            {messages.dataset.upload.noFiles}
+          </p>
+        )}
+      </div>
 
-        {/* Upload/Save button */}
-        <Button
-          className="mt-4 w-full"
-          disabled={!canUpload()}
-          onClick={handleUpload}
-        >
-          {getButtonLabel()}
-        </Button>
-      </DialogContent>
-    </Dialog>
+      {/* Upload/Save button */}
+      <Button
+        className="mt-4 w-full"
+        disabled={!canUpload()}
+        onClick={handleUpload}
+      >
+        {getButtonLabel()}
+      </Button>
+    </div>
   );
 };

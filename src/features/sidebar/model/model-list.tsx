@@ -1,5 +1,12 @@
-import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+} from '@/components/ui/sidebar';
 import { ChevronDown, ChevronUp, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { fetchModels } from '../services/model-service';
@@ -14,15 +21,14 @@ interface Model {
 }
 
 export const ModelList = ({ isOpen }: { isOpen: boolean }) => {
-  // Local state for models and UI logic
+  // State for models and UI logic
   const [models, setModels] = useState<Model[]>([]);
   const [modelSearch, setModelSearch] = useState('');
-  const [modelsDropdownOpen, setModelsDropdownOpen] = useState(false);
-  const [showMoreModels, setShowMoreModels] = useState(false);
+  const [open, setOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedModelId, setSelectedModelId] = useState<string | undefined>();
 
-  // Load models on first render
+  // Fetch models on mount
   useEffect(() => {
     const loadModels = async () => {
       const data = await fetchModels();
@@ -31,88 +37,96 @@ export const ModelList = ({ isOpen }: { isOpen: boolean }) => {
     void loadModels();
   }, []);
 
-  // Filter models by search term
+  // Filter models by search input
   const filteredModels = models.filter((model) =>
     model.name.toLowerCase().includes(modelSearch.toLowerCase()),
   );
+  // Show only 5 by default, show all if showMoreModels is true
+  const [showMoreModels, setShowMoreModels] = useState(false);
+  const visibleModels = filteredModels.slice(
+    0,
+    showMoreModels ? filteredModels.length : 5,
+  );
 
-  // Open the model details dialog
+  // Open model details dialog
   const openModelDetails = (model_tag: string) => {
     setSelectedModelId(model_tag);
     setDetailsOpen(true);
   };
 
   return (
-    <div className="border-b border-gray-700 p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h3
-            className={`text-md font-semibold transition-opacity duration-300 ${
-              isOpen ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-            Models
-          </h3>
-          {/* Show upload button only if sidebar is open */}
-          {isOpen && <ModelUpload />}
-        </div>
-        {/* Dropdown toggle button */}
-        <Button
-          onClick={() => setModelsDropdownOpen(!modelsDropdownOpen)}
-          variant="ghost"
-        >
-          {modelsDropdownOpen ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-        </Button>
-      </div>
-      {/* Dropdown content */}
-      {modelsDropdownOpen && isOpen && (
-        <div className="mt-2">
-          {/* Search input */}
-          <div className="flex items-center gap-2">
-            <Search className="h-4 w-4" />
-            <Input
-              onChange={(e) => setModelSearch(e.target.value)}
-              placeholder="Search models"
-              value={modelSearch}
-            />
-          </div>
-          {/* Model list */}
-          <div
-            className={`mt-4 space-y-2 ${showMoreModels ? 'overflow-y-auto' : ''}`}
-            style={showMoreModels ? { maxHeight: '20rem' } : {}}
-          >
-            {filteredModels
-              .slice(0, showMoreModels ? filteredModels.length : 5)
-              .map((model) => (
-                <ModelListItem
-                  key={model.id}
-                  model={model}
-                  onDetails={openModelDetails}
-                />
-              ))}
-          </div>
-          {/* Show More/Less button */}
-          {filteredModels.length > 5 && (
-            <Button
-              className="mt-2 w-full"
-              onClick={() => setShowMoreModels(!showMoreModels)}
-              variant="ghost"
-            >
-              {showMoreModels ? 'Show Less' : 'Show More'}
-            </Button>
-          )}
-        </div>
-      )}
+    <SidebarMenu>
+      {/* Collapsible section for models */}
+      <Collapsible
+        defaultOpen={open}
+        onOpenChange={(open) => {
+          setOpen(open);
+          if (!open) {
+            setShowMoreModels(false);
+          }
+        }}
+        className="group/collapsible"
+      >
+        <SidebarMenuItem>
+          <CollapsibleTrigger asChild>
+            <SidebarMenuButton className="flex items-center w-full gap-2 sticky top-0 z-10 bg-[var(--sidebar)]">
+              <span className="text-md font-semibold">Models</span>
+              <span className="ml-auto flex flex-row items-center gap-2">
+                {open ? (
+                  <ChevronUp className="h-5 w-5" />
+                ) : (
+                  <ChevronDown className="h-5 w-5" />
+                )}
+              </span>
+            </SidebarMenuButton>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            {/* Search input */}
+            <div className="mt-2 flex items-center gap-2">
+              <Search className="h-4 w-4" />
+              <Input
+                onChange={(e) => setModelSearch(e.target.value)}
+                placeholder="Search models"
+                value={modelSearch}
+              />
+            </div>
+            {/* SidebarMenuSub */}
+            {showMoreModels ? (
+              <SidebarMenuSub>
+                {visibleModels.map((model) => (
+                  <SidebarMenuSubItem key={model.id}>
+                    <ModelListItem model={model} onDetails={openModelDetails} />
+                  </SidebarMenuSubItem>
+                ))}
+              </SidebarMenuSub>
+            ) : (
+              <SidebarMenuSub>
+                {visibleModels.map((model) => (
+                  <SidebarMenuSubItem key={model.id}>
+                    <ModelListItem model={model} onDetails={openModelDetails} />
+                  </SidebarMenuSubItem>
+                ))}
+              </SidebarMenuSub>
+            )}
+            {/* Show More/Less button */}
+            {filteredModels.length > 5 && (
+              <button
+                className="mt-2 w-full text-xs text-muted-foreground hover:underline"
+                onClick={() => setShowMoreModels((v) => !v)}
+                type="button"
+              >
+                {showMoreModels ? 'Show Less' : 'Show More'}
+              </button>
+            )}
+          </CollapsibleContent>
+        </SidebarMenuItem>
+      </Collapsible>
       {/* Model details dialog */}
       <ModelDetailsDialog
         modelId={detailsOpen ? selectedModelId : undefined}
         onClose={() => setDetailsOpen(false)}
         open={detailsOpen}
       />
-    </div>
+    </SidebarMenu>
   );
 };

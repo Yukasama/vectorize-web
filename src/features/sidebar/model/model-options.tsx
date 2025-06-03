@@ -15,7 +15,7 @@ interface ModelListItemProps {
 // ModelListItem displays a single model entry with options menu
 export const ModelListItem = ({ model, onDetails }: ModelListItemProps) => (
   <div
-    className="hover:bg-muted/70 flex cursor-pointer items-center justify-between rounded p-2 text-sm"
+    className="hover:bg-muted/70 flex cursor-pointer items-center justify-between rounded h-8 px-2 text-sm"
     // Clicking the row opens the details dialog for this model
     onClick={() => onDetails(model.model_tag)}
     onKeyDown={(e) => {
