@@ -9,9 +9,8 @@ import { useEffect, useState } from 'react';
 import { fetchModels } from '../services/model-service';
 import { ModelDetailsDialog } from './model-details';
 import { ModelListItem } from './model-options';
-
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubItem } from '@/components/ui/sidebar';
 import type { Model } from '../services/model-service';
+import { SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuSub, SidebarMenuSubItem } from '@/components/ui/sidebar';
 
 export const ModelList = () => {
   // State for models and UI logic

@@ -58,7 +58,7 @@ export const messages = {
       huggingfaceIdPlaceholder: 'Enter Hugging Face model ID',
       huggingfaceSuccess: (id: string) =>
         `Model from Hugging Face ID "${id}" will be uploaded.`,
-      huggingfaceTagPlaceholder: 'Tag (optional)',
+      huggingfaceTagPlaceholder: 'Tag',
       localDropText: 'Drop model files here or click to select.',
       onlyZip: 'Only ZIP archives are supported for models.',
       selectOne:
