@@ -14,7 +14,6 @@ import { uploadGithub } from '@/features/sidebar/services/modelUpload/upload-git
 import { uploadHuggingFace } from '@/features/sidebar/services/modelUpload/upload-huggingface';
 import { uploadLocalFile } from '@/features/sidebar/services/modelUpload/upload-local-file';
 import { messages } from '@/lib/messages';
-import { Upload } from 'lucide-react';
 import Image from 'next/image';
 import React, { useRef, useState } from 'react';
 import { toast, Toaster } from 'sonner';

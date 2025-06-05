@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { uploadLocalDataset } from '@/features/sidebar/services/datasetUpload/upload-local-dataset';
 import { messages } from '@/lib/messages';
-import { Upload, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
