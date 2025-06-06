@@ -3,12 +3,23 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card';
 import { Input } from '@/components/ui/input';
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubItem } from '@/components/ui/sidebar';
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+} from '@/components/ui/sidebar';
 import { fetchDatasets } from '@/features/sidebar/services/dataset-service';
 import { ChevronDown, ChevronUp, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { DatasetDetailsDialog } from './dataset-details';
+import { DatasetDetailsHoverCard } from './dataset-details';
 import { DatasetListItem } from './dataset-options';
 
 interface Dataset {
@@ -19,12 +30,7 @@ interface Dataset {
 export const DatasetList = () => {
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [datasetSearch, setDatasetSearch] = useState('');
-  const [datasetsDropdownOpen, setDatasetsDropdownOpen] = useState(false);
   const [showMoreDatasets, setShowMoreDatasets] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const [selectedDatasetId, setSelectedDatasetId] = useState<
-    string | undefined
-  >();
   const [open, setOpen] = useState(false);
 
   // Fetch datasets from API on first render
@@ -48,23 +54,6 @@ export const DatasetList = () => {
   // Helper to remove dataset by id
   const removeDatasetById = (id: string) => (prev: Dataset[]) =>
     prev.filter((d) => d.id !== id);
-
-  // Open the details dialog for a dataset
-  const openDatasetDetails = (id: string) => {
-    setSelectedDatasetId(id);
-    setDetailsOpen(true);
-  };
-
-  // Render all visible dataset items
-  const renderDatasetListItems = (datasets: Dataset[]) =>
-    datasets.map((dataset) => (
-      <DatasetListItem
-        dataset={dataset}
-        key={dataset.id}
-        onDeleted={handleDeleted}
-        onDetails={openDatasetDetails}
-      />
-    ));
 
   // Filter and slice datasets for display
   const filteredDatasets = datasets.filter((element) => filterDataset(element));
@@ -110,13 +99,19 @@ export const DatasetList = () => {
             </div>
             <SidebarMenuSub>
               {visibleDatasets.map((dataset) => (
-                <SidebarMenuSubItem key={dataset.id}>
-                  <DatasetListItem
-                    dataset={dataset}
-                    onDeleted={handleDeleted}
-                    onDetails={openDatasetDetails}
-                  />
-                </SidebarMenuSubItem>
+                <HoverCard key={dataset.id}>
+                  <HoverCardTrigger asChild>
+                    <SidebarMenuSubItem>
+                      <DatasetListItem
+                        dataset={dataset}
+                        onDeleted={handleDeleted}
+                      />
+                    </SidebarMenuSubItem>
+                  </HoverCardTrigger>
+                  <HoverCardContent align="start" className="w-96" side="right">
+                    <DatasetDetailsHoverCard datasetId={dataset.id} />
+                  </HoverCardContent>
+                </HoverCard>
               ))}
             </SidebarMenuSub>
             {/* Show More/Less */}
@@ -132,11 +127,6 @@ export const DatasetList = () => {
           </CollapsibleContent>
         </SidebarMenuItem>
       </Collapsible>
-      <DatasetDetailsDialog
-        datasetId={detailsOpen ? selectedDatasetId : undefined}
-        onClose={() => setDetailsOpen(false)}
-        open={detailsOpen}
-      />
     </SidebarMenu>
   );
 };

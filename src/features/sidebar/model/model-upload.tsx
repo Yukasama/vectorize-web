@@ -22,7 +22,6 @@ export const ModelUpload = () => {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [githubUrl, setGithubUrl] = useState('');
   const [huggingFaceModelId, setHuggingFaceModelId] = useState('');
   const [huggingFaceTag, setHuggingFaceTag] = useState('');
 
@@ -50,7 +49,6 @@ export const ModelUpload = () => {
   // Resets all fields.
   const resetForm = () => {
     setSelectedFiles([]);
-    setGithubUrl('');
     setHuggingFaceModelId('');
     setHuggingFaceTag('');
     setGithubOwner('');
@@ -116,9 +114,12 @@ export const ModelUpload = () => {
   };
 
   return (
-    <form onSubmit={handleUpload} className="flex flex-col min-h-[350px] max-h-[520px] overflow-y-auto">
+    <form
+      className="flex max-h-[520px] min-h-[350px] flex-col overflow-y-auto"
+      onSubmit={handleUpload}
+    >
       {/* GitHub upload section */}
-      <div className="mb-6 mt-2 flex items-center gap-x-1 gap-y-0">
+      <div className="mt-2 mb-6 flex items-center gap-x-1 gap-y-0">
         <Image
           alt="GitHub Logo"
           className="h-8 w-8"
@@ -148,7 +149,7 @@ export const ModelUpload = () => {
       </div>
 
       {/* Hugging Face upload section */}
-      <div className="mb-6 mt-2 flex items-center gap-x-1 gap-y-0">
+      <div className="mt-2 mb-6 flex items-center gap-x-1 gap-y-0">
         <Image
           alt="Hugging Face Logo"
           className="h-8 w-8"
@@ -209,8 +210,8 @@ export const ModelUpload = () => {
       <Button
         className="mt-4 w-full"
         disabled={uploading}
+        style={{ marginTop: 'auto' }}
         type="submit"
-        style={{ marginTop: "auto" }}
       >
         {uploading
           ? messages.model.upload.uploading

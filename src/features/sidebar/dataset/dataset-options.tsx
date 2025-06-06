@@ -20,13 +20,11 @@ interface Dataset {
 interface DatasetListItemProps {
   dataset: Dataset;
   onDeleted?: (id: string) => void;
-  onDetails: (id: string) => void;
 }
 
 export const DatasetListItem = ({
   dataset,
   onDeleted,
-  onDetails,
 }: DatasetListItemProps) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const recentlyDeleted = useRef(false);
@@ -52,20 +50,6 @@ export const DatasetListItem = ({
   return (
     <div
       className="hover:bg-muted/70 flex h-8 cursor-pointer items-center justify-between rounded px-2 text-sm"
-      onClick={() => {
-        if (!deleteDialogOpen && !recentlyDeleted.current) {
-          onDetails(dataset.id);
-        }
-      }}
-      onKeyDown={(e) => {
-        if (
-          (e.key === 'Enter' || e.key === ' ') &&
-          !deleteDialogOpen &&
-          !recentlyDeleted.current
-        ) {
-          onDetails(dataset.id);
-        }
-      }}
       role="button"
       tabIndex={0}
     >

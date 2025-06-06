@@ -3,23 +3,32 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card';
 import { Input } from '@/components/ui/input';
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+} from '@/components/ui/sidebar';
 import { ChevronDown, ChevronUp, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { fetchModels } from '../services/model-service';
-import { ModelDetailsDialog } from './model-details';
-import { ModelListItem } from './model-options';
 import type { Model } from '../services/model-service';
-import { SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuSub, SidebarMenuSubItem } from '@/components/ui/sidebar';
+import { fetchModels } from '../services/model-service';
+
+import { ModelDetailsHoverCardContent } from './model-details';
+import { ModelListItem } from './model-options';
 
 export const ModelList = () => {
   // State for models and UI logic
   const [models, setModels] = useState<Model[]>([]);
   const [modelSearch, setModelSearch] = useState('');
-  const [modelsDropdownOpen, setModelsDropdownOpen] = useState(false);
   const [showMoreModels, setShowMoreModels] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const [selectedModelId, setSelectedModelId] = useState<string | undefined>();
   const [open, setOpen] = useState(false);
 
   // Load models on first render
@@ -31,7 +40,6 @@ export const ModelList = () => {
     void loadModels();
   }, []);
 
-
   // Filter models by search term
   const filteredModels = models.filter((model) =>
     model.name.toLowerCase().includes(modelSearch.toLowerCase()),
@@ -42,12 +50,6 @@ export const ModelList = () => {
     0,
     showMoreModels ? filteredModels.length : 5,
   );
-
-  // Open the model details dialog
-  const openModelDetails = (model_tag: string) => {
-    setSelectedModelId(model_tag);
-    setDetailsOpen(true);
-  };
 
   // Remove deleted model from list
   const handleModelDeleted = (id: string) => {
@@ -63,7 +65,7 @@ export const ModelList = () => {
         onOpenChange={(open) => {
           setOpen(open);
           if (!open) {
-            setShowMoreModels(false); // oder setShowMoreDatasets(false)
+            setShowMoreModels(false);
           }
         }}
       >
@@ -93,13 +95,19 @@ export const ModelList = () => {
             {/* SidebarMenuSub */}
             <SidebarMenuSub>
               {visibleModels.map((model) => (
-                <SidebarMenuSubItem key={model.id}>
-                  <ModelListItem
-                    model={model}
-                    onDeleted={handleModelDeleted}
-                    onDetails={openModelDetails}
-                  />
-                </SidebarMenuSubItem>
+                <HoverCard key={model.id}>
+                  <HoverCardTrigger asChild>
+                    <SidebarMenuSubItem>
+                      <ModelListItem
+                        model={model}
+                        onDeleted={handleModelDeleted}
+                      />
+                    </SidebarMenuSubItem>
+                  </HoverCardTrigger>
+                  <HoverCardContent align="start" className="w-96" side="right">
+                    <ModelDetailsHoverCardContent modelId={model.model_tag} />
+                  </HoverCardContent>
+                </HoverCard>
               ))}
             </SidebarMenuSub>
             {/* Show More/Less button */}
@@ -115,12 +123,6 @@ export const ModelList = () => {
           </CollapsibleContent>
         </SidebarMenuItem>
       </Collapsible>
-      {/* Model details dialog */}
-      <ModelDetailsDialog
-        modelId={detailsOpen ? selectedModelId : undefined}
-        onClose={() => setDetailsOpen(false)}
-        open={detailsOpen}
-      />
     </SidebarMenu>
   );
 };

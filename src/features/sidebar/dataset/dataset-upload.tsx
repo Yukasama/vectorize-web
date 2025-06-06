@@ -149,7 +149,10 @@ export const DatasetUpload = () => {
   };
 
   return (
-    <form onSubmit={handleUpload} className="flex flex-col min-h-[350px] max-h-[520px] overflow-y-auto">
+    <form
+      className="flex max-h-[520px] min-h-[350px] flex-col overflow-y-auto"
+      onSubmit={handleUpload}
+    >
       {/* Drag-and-Drop Area */}
       <div
         className={`flex h-44 min-h-[176px] w-full min-w-0 cursor-pointer items-center justify-center rounded border-2 border-dashed transition ${
@@ -176,7 +179,7 @@ export const DatasetUpload = () => {
       </div>
 
       {/* File List with Progress */}
-      <div className="bg-muted mt-4 rounded p-4 flex-shrink-0">
+      <div className="bg-muted mt-4 flex-shrink-0 rounded p-4">
         {fileStates.length > 0 ? (
           fileStates.map((state, index) => (
             <div
@@ -228,8 +231,8 @@ export const DatasetUpload = () => {
       <Button
         className="mt-4 w-full"
         disabled={!canUpload()}
+        style={{ marginTop: 'auto' }}
         type="submit"
-        style={{ marginTop: "auto" }}
       >
         {getButtonLabel()}
       </Button>

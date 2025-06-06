@@ -16,7 +16,7 @@ import { ConfirmDeleteDialog } from './confirm-delete-dialog';
 interface ModelListItemProps {
   model: Model;
   onDeleted?: (id: string) => void;
-  onDetails: (model_tag: string) => void;
+  onDetails?: (model_tag: string) => void;
 }
 
 // ModelListItem displays a single model entry with options menu
@@ -76,7 +76,7 @@ export const ModelListItem = ({
       className="hover:bg-muted/70 flex h-8 cursor-pointer items-center justify-between rounded px-2 text-sm"
       onClick={() => {
         if (!deleteDialogOpen && !recentlyDeleted.current) {
-          onDetails(model.model_tag);
+          onDetails?.(model.model_tag);
         }
       }}
       onKeyDown={(e) => {
@@ -85,7 +85,7 @@ export const ModelListItem = ({
           !deleteDialogOpen &&
           !recentlyDeleted.current
         ) {
-          onDetails(model.model_tag);
+          onDetails?.(model.model_tag);
         }
       }}
       role="button"
