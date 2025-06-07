@@ -103,7 +103,7 @@ export const DatasetList = () => {
                       />
                     </SidebarMenuSubItem>
                   </HoverCardTrigger>
-                  <HoverCardContent align="start" className="w-96" side="right">
+                  <HoverCardContent align="start" className="w-96" side="top">
                     <DatasetDetailsHoverCard datasetId={dataset.id} />
                   </HoverCardContent>
                 </HoverCard>

@@ -104,7 +104,7 @@ export const ModelList = () => {
                       />
                     </SidebarMenuSubItem>
                   </HoverCardTrigger>
-                  <HoverCardContent align="start" className="w-96" side="right">
+                  <HoverCardContent align="start" className="w-96" side="top">
                     <ModelDetailsHoverCardContent modelId={model.model_tag} />
                   </HoverCardContent>
                 </HoverCard>
