@@ -50,7 +50,9 @@ export const ModelList = () => {
         <div className="grid grid-cols-4 gap-4">
           {models.map((model) => (
             <Card className="p-4" key={model.id}>
-              <p className="text-sm font-medium">{model.name}</p>
+              <p className="hover:text-foreground cursor-pointer text-sm font-medium transition-colors">
+                {model.name}
+              </p>
             </Card>
           ))}
         </div>

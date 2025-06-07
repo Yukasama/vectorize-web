@@ -12,7 +12,37 @@ export interface Dataset {
   id: string;
   name: string;
   rows?: number;
+  version?: number;
 }
+
+export interface Dataset {
+  classification?: string;
+  created_at?: string;
+  file_name?: string;
+  id: string;
+  name: string;
+  rows?: number;
+  version?: number;
+}
+
+/**
+ * Update (rename) a dataset by its ID.
+ */
+export const updateDataset = async (
+  id: string,
+  name: string,
+  version: number,
+): Promise<void> => {
+  await axios.put(
+    `http://localhost:8000/v1/datasets/${id}`,
+    { name },
+    {
+      headers: {
+        'If-Match': `"${String(version)}"`,
+      },
+    },
+  );
+};
 
 /**
  * Fetch all datasets from the backend API.

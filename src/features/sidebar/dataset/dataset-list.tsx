@@ -25,6 +25,7 @@ import { DatasetListItem } from './dataset-options';
 interface Dataset {
   id: string;
   name: string;
+  version?: number;
 }
 
 export const DatasetList = () => {
@@ -33,7 +34,6 @@ export const DatasetList = () => {
   const [showMoreDatasets, setShowMoreDatasets] = useState(false);
   const [open, setOpen] = useState(false);
 
-  // Fetch datasets from API on first render
   useEffect(() => {
     const loadDatasets = async () => {
       const data = await fetchDatasets();
@@ -42,25 +42,19 @@ export const DatasetList = () => {
     void loadDatasets();
   }, []);
 
-  // Returns true if dataset matches the search term
   const filterDataset = (dataset: Dataset): boolean =>
     dataset.name.toLowerCase().includes(datasetSearch.toLowerCase());
 
-  // Remove a dataset from the list after deletion
-  const handleDeleted = (id: string) => {
-    setDatasets(removeDatasetById(id));
-  };
-
-  // Helper to remove dataset by id
-  const removeDatasetById = (id: string) => (prev: Dataset[]) =>
-    prev.filter((d) => d.id !== id);
-
-  // Filter and slice datasets for display
   const filteredDatasets = datasets.filter((element) => filterDataset(element));
   const visibleDatasets = filteredDatasets.slice(
     0,
     showMoreDatasets ? filteredDatasets.length : 5,
   );
+
+  // Remove a dataset from the list after deletion
+  const handleDeleted = (id: string) => {
+    setDatasets((prev) => prev.filter((d) => d.id !== id));
+  };
 
   return (
     <SidebarMenu>
@@ -97,6 +91,7 @@ export const DatasetList = () => {
                 value={datasetSearch}
               />
             </div>
+            {/* SidebarMenuSub */}
             <SidebarMenuSub>
               {visibleDatasets.map((dataset) => (
                 <HoverCard key={dataset.id}>

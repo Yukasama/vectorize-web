@@ -7,10 +7,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { messages } from '@/lib/messages';
 import { MoreVertical } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import type { Model } from '../services/model-service';
-import { deleteModel } from '../services/model-service';
+import { deleteModel, updateModelName } from '../services/model-service';
 import { ConfirmDeleteDialog } from './confirm-delete-dialog';
 
 interface ModelListItemProps {
@@ -21,12 +21,13 @@ interface ModelListItemProps {
 
 // ModelListItem displays a single model entry with options menu
 export const ModelListItem = ({
+  hideName,
   model,
   onDeleted,
-  onDetails,
-}: ModelListItemProps) => {
+}: ModelListItemProps & { hideName?: boolean }) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [edit, setEdit] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [newName, setNewName] = useState(model.name);
   const [saving, setSaving] = useState(false);
   const recentlyDeleted = useRef(false);
@@ -58,10 +59,7 @@ export const ModelListItem = ({
     }
     setSaving(true);
     try {
-      await import('../services/model-service').then(async (svc) => {
-        await svc.updateModelName(model.id, newName.trim(), model.version);
-        return true;
-      });
+      await updateModelName(model.id, newName.trim(), model.version);
       toast.success('Model name updated', { position: 'bottom-right' });
       setEdit(false);
     } catch {
@@ -71,30 +69,73 @@ export const ModelListItem = ({
     }
   };
 
+  useEffect(() => {
+    if (edit) {
+      inputRef.current?.focus();
+    }
+  }, [edit]);
+
   return (
-    <div
-      className="hover:bg-muted/70 flex h-8 cursor-pointer items-center justify-between rounded px-2 text-sm"
-      onClick={() => {
-        if (!deleteDialogOpen && !recentlyDeleted.current) {
-          onDetails?.(model.model_tag);
-        }
-      }}
-      onKeyDown={(e) => {
-        if (
-          (e.key === 'Enter' || e.key === ' ') &&
-          !deleteDialogOpen &&
-          !recentlyDeleted.current
-        ) {
-          onDetails?.(model.model_tag);
-        }
-      }}
-      role="button"
-      tabIndex={0}
-    >
-      {/* Name only, no inline edit */}
-      <span className="flex items-center gap-2">
-        <span>{model.name}</span>
-      </span>
+    <div className="hover:bg-muted/70 flex h-8 items-center justify-between rounded px-2 text-sm">
+      {!hideName && (
+        <span className="group flex items-center gap-2">
+          {edit ? (
+            <div className="relative flex w-full items-center">
+              <input
+                className="w-32 rounded border px-1 py-0.5 pr-8 text-sm"
+                disabled={saving}
+                onBlur={handleSave}
+                onChange={(e) => setNewName(e.target.value)}
+                onKeyDown={async (e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (!saving) {
+                      await handleSave();
+                    }
+                  }
+                  if (e.key === 'Escape') {
+                    setEdit(false);
+                    setNewName(model.name);
+                  }
+                }}
+                ref={inputRef}
+                value={newName}
+              />
+              <button
+                aria-label="Save"
+                className="text-muted-foreground hover:text-primary absolute top-1/2 right-1 -translate-y-1/2 p-1"
+                disabled={saving}
+                onClick={handleSave}
+                tabIndex={-1}
+                type="button"
+              >
+                {/* Floppy Disk Icon */}
+                <svg
+                  fill="none"
+                  height="16"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4z" />
+                  <path d="M17 3v4H7V3" />
+                  <rect height="4" rx="1" width="6" x="9" y="13" />
+                </svg>
+              </button>
+            </div>
+          ) : (
+            <span
+              className="group-hover:text-sidebar-accent-foreground hover:text-sidebar-accent-foreground cursor-text transition-colors"
+              onDoubleClick={() => setEdit(true)}
+              title="double-click to edit name"
+            >
+              {model.name}
+            </span>
+          )}
+        </span>
+      )}
       {/* Dropdown menu for model actions */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -107,7 +148,7 @@ export const ModelListItem = ({
             <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent align="start" side="right">
           <DropdownMenuItem onClick={() => setEdit(true)}>
             Rename
           </DropdownMenuItem>
@@ -129,52 +170,6 @@ export const ModelListItem = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Rename Dialog */}
-      {edit && (
-        <div className="absolute top-0 left-0 z-50 flex h-full w-full items-center justify-center bg-black/30">
-          <div className="flex min-w-[260px] flex-col gap-2 rounded bg-white p-4 shadow-lg">
-            <label className="text-sm font-medium" htmlFor="model-rename-input">
-              Rename model
-            </label>
-            <input
-              autoFocus
-              className="rounded border px-2 py-1 text-sm"
-              disabled={saving}
-              id="model-rename-input"
-              onChange={(e) => setNewName(e.target.value)}
-              onKeyDown={async (e) => {
-                if (e.key === 'Enter') {
-                  await handleSave();
-                }
-                if (e.key === 'Escape') {
-                  setEdit(false);
-                  setNewName(model.name);
-                }
-              }}
-              value={newName}
-            />
-            <div className="mt-2 flex justify-end gap-2">
-              <button
-                className="bg-muted rounded px-3 py-1 text-xs hover:bg-gray-200"
-                disabled={saving}
-                onClick={() => {
-                  setEdit(false);
-                  setNewName(model.name);
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                className="bg-primary rounded px-3 py-1 text-xs text-white disabled:opacity-60"
-                disabled={saving || !newName.trim() || newName === model.name}
-                onClick={handleSave}
-              >
-                {saving ? 'Saving...' : 'Save'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       {/* Confirm Delete Dialog */}
       <ConfirmDeleteDialog
         modelName={model.name}
