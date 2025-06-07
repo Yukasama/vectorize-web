@@ -3,11 +3,13 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
-import { uploadLocalDataset } from '@/features/sidebar/services/datasetUpload/upload-local-dataset';
+import { uploadHFDataset } from '@/features/sidebar/services/datasetUpload/huggingface-upload';
 import { messages } from '@/lib/messages';
 import { X } from 'lucide-react';
+import Image from 'next/image';
 import React, { useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { uploadLocalDataset } from '../services/datasetUpload/upload-local-dataset';
 
 /**
  * Dialog and logic for uploading one or more dataset files with progress and removal support.
@@ -50,6 +52,11 @@ export const DatasetUpload = () => {
   const [dragActive, setDragActive] = useState(false);
   const [fileStates, setFileStates] = useState<FileUploadState[]>([]);
   const [uploading, setUploading] = useState(false);
+
+  // Hugging Face upload state
+  const [hfId, setHfId] = useState('');
+  const [hfTag, setHfTag] = useState('');
+  const [hfError, setHfError] = useState<null | string>();
 
   // Add files to state and start upload
   const handleFilesSelected = (files: File[] | FileList) => {
@@ -114,8 +121,12 @@ export const DatasetUpload = () => {
   };
 
   // Handle upload/save action
-  const handleUpload = (e: React.FormEvent) => {
+  const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (hfId.trim()) {
+      await handleHuggingFaceUpload();
+      return;
+    }
     if (fileStates.length === 0) {
       toast.error(messages.dataset.upload.selectFile);
       return;
@@ -128,6 +139,28 @@ export const DatasetUpload = () => {
       duration: 4000,
     });
     resetForm();
+  };
+
+  // Hugging Face upload logic
+  const handleHuggingFaceUpload = async () => {
+    setUploading(true);
+    setHfError(undefined);
+    try {
+      const datasetTag = hfTag.trim()
+        ? `${hfId.trim()}:${hfTag.trim()}`
+        : hfId.trim();
+      await uploadHFDataset(datasetTag);
+      toast.success(messages.dataset.upload.success(datasetTag), {
+        duration: 4000,
+      });
+      setHfId('');
+      setHfTag('');
+    } catch (error) {
+      setHfError(error instanceof Error ? error.message : String(error));
+      toast.error(error instanceof Error ? error.message : String(error));
+    } finally {
+      setUploading(false);
+    }
   };
 
   // Upload a single file and update progress
@@ -153,6 +186,34 @@ export const DatasetUpload = () => {
       className="flex max-h-[520px] min-h-[350px] flex-col overflow-y-auto"
       onSubmit={handleUpload}
     >
+      {/* Hugging Face upload section */}
+      <div className="mt-2 mb-6 flex items-center gap-x-1 gap-y-0">
+        <Image
+          alt="Hugging Face Logo"
+          className="h-8 w-8"
+          height={32}
+          src="/images/huggingface_logo.svg"
+          width={32}
+        />
+        <Input
+          className="w-80 min-w-0"
+          disabled={uploading}
+          onChange={(e) => setHfId(e.target.value)}
+          placeholder={'Enter Hugging Face dataset ID'}
+          value={hfId}
+        />
+        <Input
+          className="ml-2 w-20 min-w-0"
+          disabled={uploading}
+          maxLength={16}
+          onChange={(e) => setHfTag(e.target.value)}
+          placeholder={'Tag'}
+          value={hfTag}
+        />
+        {hfError && (
+          <span className="ml-2 text-xs text-red-600">{hfError}</span>
+        )}
+      </div>
       {/* Drag-and-Drop Area */}
       <div
         className={`flex h-44 min-h-[176px] w-full min-w-0 cursor-pointer items-center justify-center rounded border-2 border-dashed transition ${
