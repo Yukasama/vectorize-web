@@ -9,80 +9,135 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import axios from 'axios';
+
 import { useEffect, useState } from 'react';
-import { DatasetUpload } from '../sidebar/dataset/dataset-upload';
+import type { Dataset } from '../sidebar/services/dataset-service';
+import { fetchDatasets } from '../sidebar/services/dataset-service';
 import { ListViewToggle } from './list-view-toggle';
 
-interface Dataset {
-  id: string;
-  name: string;
+interface DatasetListProps {
+  onBack?: () => void;
+  onNext?: () => void;
+  selectedDatasets: Dataset[];
+  setSelectedDatasets: (datasets: Dataset[]) => void;
 }
 
-/**
- * Component to display the list of datasets in grid or table view.
- */
-export const DatasetList = () => {
-  // State for datasets and current view mode
+export const DatasetList = ({
+  onBack,
+  onNext,
+  selectedDatasets,
+  setSelectedDatasets,
+}: DatasetListProps) => {
   const [datasets, setDatasets] = useState<Dataset[]>([]);
+  const [loading, setLoading] = useState(false);
   const [view, setView] = useState<'grid' | 'table'>('grid');
 
-  /**
-   * Fetch datasets from the backend API on component mount.
-   */
   useEffect(() => {
-    const fetchDatasets = async () => {
+    const loadDatasets = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get<Dataset[]>(
-          'http://localhost:8000/v1/datasets',
-        );
-        setDatasets(response.data);
+        const data = await fetchDatasets();
+        setDatasets(data);
       } catch (error) {
-        // Log error and reset datasets if fetch fails
         console.error('Error fetching datasets:', error);
         setDatasets([]);
+      } finally {
+        setLoading(false);
       }
     };
-
-    void fetchDatasets();
+    void loadDatasets();
   }, []);
+
+  const toggleDataset = (dataset: Dataset) => {
+    if (selectedDatasets.some((d) => d.id === dataset.id)) {
+      setSelectedDatasets(selectedDatasets.filter((d) => d.id !== dataset.id));
+    } else {
+      setSelectedDatasets([...selectedDatasets, dataset]);
+    }
+  };
+
+  let content;
+  if (loading) {
+    content = <div>Loading...</div>;
+  } else if (view === 'grid') {
+    content = (
+      <div className="grid grid-cols-2 gap-4">
+        {datasets.map((dataset) => {
+          const isSelected = selectedDatasets.some((d) => d.id === dataset.id);
+          return (
+            <Card
+              className={`cursor-pointer border-2 p-4 ${isSelected ? 'border-primary' : 'border-transparent'}`}
+              key={dataset.id}
+              onClick={() => toggleDataset(dataset)}
+            >
+              <p className="text-sm font-medium">{dataset.name}</p>
+              {isSelected && (
+                <span className="text-primary text-xs">Selected</span>
+              )}
+            </Card>
+          );
+        })}
+      </div>
+    );
+  } else {
+    content = (
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Select</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {datasets.map((dataset) => {
+            const isSelected = selectedDatasets.some(
+              (d) => d.id === dataset.id,
+            );
+            return (
+              <TableRow key={dataset.id}>
+                <TableCell>{dataset.name}</TableCell>
+                <TableCell>
+                  <input
+                    aria-checked={isSelected}
+                    checked={isSelected}
+                    onChange={() => toggleDataset(dataset)}
+                    type="checkbox"
+                  />
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    );
+  }
 
   return (
     <div>
-      {/* Header with title, upload button, and view toggle */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-semibold">Datasets</h2>
-          <DatasetUpload />
         </div>
         <ListViewToggle setView={setView} view={view} />
       </div>
-
-      {/* Render datasets as grid or table based on selected view */}
-      {view === 'grid' ? (
-        <div className="grid grid-cols-2 gap-4">
-          {datasets.map((dataset) => (
-            <Card className="p-4" key={dataset.id}>
-              <p className="text-sm font-medium">{dataset.name}</p>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {datasets.map((dataset) => (
-              <TableRow key={dataset.id}>
-                <TableCell>{dataset.name}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
+      {content}
+      <div className="mt-6 flex gap-2">
+        {onBack && (
+          <button className="btn" onClick={onBack} type="button">
+            Back
+          </button>
+        )}
+        {onNext && (
+          <button
+            className="btn btn-primary"
+            disabled={selectedDatasets.length === 0}
+            onClick={onNext}
+            type="button"
+          >
+            Next
+          </button>
+        )}
+      </div>
     </div>
   );
 };

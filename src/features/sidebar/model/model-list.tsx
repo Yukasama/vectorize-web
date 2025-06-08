@@ -20,7 +20,6 @@ import { ChevronDown, ChevronUp, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { Model } from '../services/model-service';
 import { fetchModels } from '../services/model-service';
-
 import { ModelDetailsHoverCardContent } from './model-details';
 import { ModelListItem } from './model-options';
 
@@ -72,7 +71,7 @@ export const ModelList = () => {
         <SidebarMenuItem>
           <CollapsibleTrigger asChild>
             <SidebarMenuButton className="sticky top-0 z-10 flex w-full items-center gap-2 bg-[var(--sidebar)]">
-              <span className="text-md font-semibold">Models</span>
+              <span className="text-md">Models</span>
               <span className="ml-auto flex flex-row items-center gap-2">
                 {open ? (
                   <ChevronUp className="h-5 w-5" />

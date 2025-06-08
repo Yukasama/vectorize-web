@@ -127,7 +127,7 @@ export const ModelListItem = ({
             </div>
           ) : (
             <span
-              className="group-hover:text-sidebar-accent-foreground hover:text-sidebar-accent-foreground cursor-text transition-colors"
+              className="cursor-text"
               onDoubleClick={() => setEdit(true)}
               title="double-click to edit name"
             >

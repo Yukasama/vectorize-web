@@ -77,7 +77,7 @@ export const AppSidebar = () => {
         </DialogContent>
       </Dialog>
       <SidebarContent className="flex-1 overflow-y-auto">
-        <SidebarGroup className="mb-0">
+        <SidebarGroup>
           <ModelList />
         </SidebarGroup>
         <SidebarGroup>

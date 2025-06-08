@@ -3,9 +3,7 @@
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { Separator } from '@/components/ui/separator';
@@ -15,9 +13,16 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/features/sidebar/app-sidebar';
-import { ThemeToggle } from '../features/theme/theme-toggle';
+import { ThemeToggle } from '@/features/theme/theme-toggle';
+import { useState } from 'react';
+import { ServiceStarter } from '../features/service-starter/service-starter';
 
 export default function Page() {
+  const [step, setStep] = useState(0);
+  // Breadcrumbs: 0 = model, 1 = dataset, 2 = service
+  const getBreadcrumbColor = (idx: number) =>
+    step === idx ? 'text-foreground font-semibold' : 'text-muted-foreground';
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -32,15 +37,15 @@ export default function Page() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="#">Select model</BreadcrumbLink>
+                  <span className={getBreadcrumbColor(0)}>Select model</span>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="#">Select dataset</BreadcrumbLink>
+                  <span className={getBreadcrumbColor(1)}>Select dataset</span>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Start service</BreadcrumbPage>
+                  <span className={getBreadcrumbColor(2)}>Start service</span>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -49,7 +54,9 @@ export default function Page() {
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4">
           <div className="grid gap-4 md:grid-cols-[2fr_1fr]">
-            <div className="bg-muted/50 min-h-[60vh] rounded-xl" />
+            <div className="bg-muted/50 min-h-[60vh] rounded-xl p-4">
+              <ServiceStarter setStep={setStep} step={step} />
+            </div>
             <div className="bg-muted/50 min-h-[60vh] rounded-xl" />
           </div>
         </div>
