@@ -52,12 +52,12 @@ export default function Page() {
           </div>
           <ThemeToggle />
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">
-          <div className="grid gap-4 md:grid-cols-[2fr_1fr]">
-            <div className="bg-muted/50 min-h-[60vh] rounded-xl p-4">
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="grid h-[calc(100dvh-4rem)] min-h-0 w-full flex-1 gap-4 p-4 md:grid-cols-[1fr_320px]">
+            <div className="bg-muted/50 flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border-2 border-transparent shadow-lg transition-colors">
               <ServiceStarter setStep={setStep} step={step} />
             </div>
-            <div className="bg-muted/50 min-h-[60vh] rounded-xl" />
+            <div className="bg-muted/50 hidden h-full min-h-0 w-full rounded-xl md:block" />
           </div>
         </div>
       </SidebarInset>

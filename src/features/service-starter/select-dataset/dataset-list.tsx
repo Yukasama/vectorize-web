@@ -9,48 +9,51 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useEffect, useState } from 'react';
-import type { Model } from '../sidebar/services/model-service';
-import { fetchModels } from '../sidebar/services/model-service';
-import { ListViewToggle } from './list-view-toggle';
 
-interface ModelListProps {
+import { useEffect, useState } from 'react';
+import type { Dataset } from '../../sidebar/services/dataset-service';
+import { fetchDatasets } from '../../sidebar/services/dataset-service';
+import { ListViewToggle } from '../list-view-toggle';
+
+interface DatasetListProps {
   onBack?: () => void;
   onNext?: () => void;
-  selectedModel?: Model;
-  setSelectedModel: (model?: Model) => void;
+  selectedDatasets: Dataset[];
+  setSelectedDatasets: (datasets: Dataset[]) => void;
 }
 
-export const ModelList = ({
+export const DatasetList = ({
   onBack,
   onNext,
-  selectedModel,
-  setSelectedModel,
-}: ModelListProps) => {
-  const [models, setModels] = useState<Model[]>([]);
-  const [view, setView] = useState<'grid' | 'table'>('grid');
+  selectedDatasets,
+  setSelectedDatasets,
+}: DatasetListProps) => {
+  const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [loading, setLoading] = useState(false);
+  const [view, setView] = useState<'grid' | 'table'>('grid');
 
   useEffect(() => {
-    const loadModels = async () => {
+    const loadDatasets = async () => {
       setLoading(true);
       try {
-        const data = await fetchModels();
-        setModels(data);
+        const data = await fetchDatasets();
+        setDatasets(data);
       } catch (error) {
-        console.error('Error fetching models:', error);
-        setModels([]);
+        console.error('Error fetching datasets:', error);
+        setDatasets([]);
       } finally {
         setLoading(false);
       }
     };
-    void loadModels();
+    void loadDatasets();
   }, []);
 
-  const handleSelect = (model: Model) => {
-    setSelectedModel(
-      selectedModel && selectedModel.id === model.id ? undefined : model,
-    );
+  const toggleDataset = (dataset: Dataset) => {
+    if (selectedDatasets.some((d) => d.id === dataset.id)) {
+      setSelectedDatasets(selectedDatasets.filter((d) => d.id !== dataset.id));
+    } else {
+      setSelectedDatasets([...selectedDatasets, dataset]);
+    }
   };
 
   let content;
@@ -58,16 +61,16 @@ export const ModelList = ({
     content = <div>Loading...</div>;
   } else if (view === 'grid') {
     content = (
-      <div className="grid grid-cols-4 gap-4">
-        {models.map((model) => {
-          const isSelected = selectedModel?.id === model.id;
+      <div className="grid grid-cols-2 gap-4">
+        {datasets.map((dataset) => {
+          const isSelected = selectedDatasets.some((d) => d.id === dataset.id);
           return (
             <Card
               className={`cursor-pointer border-2 p-4 ${isSelected ? 'border-primary' : 'border-transparent'}`}
-              key={model.id}
-              onClick={() => handleSelect(model)}
+              key={dataset.id}
+              onClick={() => toggleDataset(dataset)}
             >
-              <p className="text-sm font-medium">{model.name}</p>
+              <p className="text-sm font-medium">{dataset.name}</p>
               {isSelected && (
                 <span className="text-primary text-xs">Selected</span>
               )}
@@ -86,18 +89,19 @@ export const ModelList = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {models.map((model) => {
-            const isSelected = selectedModel?.id === model.id;
+          {datasets.map((dataset) => {
+            const isSelected = selectedDatasets.some(
+              (d) => d.id === dataset.id,
+            );
             return (
-              <TableRow key={model.id}>
-                <TableCell>{model.name}</TableCell>
+              <TableRow key={dataset.id}>
+                <TableCell>{dataset.name}</TableCell>
                 <TableCell>
                   <input
                     aria-checked={isSelected}
                     checked={isSelected}
-                    name="model-select"
-                    onChange={() => handleSelect(model)}
-                    type="radio"
+                    onChange={() => toggleDataset(dataset)}
+                    type="checkbox"
                   />
                 </TableCell>
               </TableRow>
@@ -112,7 +116,7 @@ export const ModelList = ({
     <div>
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold">Modelle</h2>
+          <h2 className="text-lg font-semibold">Datasets</h2>
         </div>
         <ListViewToggle setView={setView} view={view} />
       </div>
@@ -126,7 +130,7 @@ export const ModelList = ({
         {onNext && (
           <button
             className="btn btn-primary"
-            disabled={!selectedModel}
+            disabled={selectedDatasets.length === 0}
             onClick={onNext}
             type="button"
           >

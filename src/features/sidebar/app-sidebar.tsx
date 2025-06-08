@@ -28,7 +28,7 @@ export const AppSidebar = () => {
 
   return (
     <Sidebar className="bg-[var(--sidebar)] text-[var(--sidebar-foreground)] transition-all duration-200">
-      <SidebarHeader className="mb-6 w-full pt-4">
+      <SidebarHeader className="header-bg mb-6 w-full pt-4">
         <div className="flex w-full items-center justify-between">
           <span className="pl-4 text-lg font-semibold">Vectorize</span>
           <div className="flex gap-2">
