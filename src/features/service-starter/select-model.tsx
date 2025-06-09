@@ -10,18 +10,20 @@ export const SelectModel = ({
   initialSelectedModel,
   onBack,
   onNext,
+  setSelectedModel,
 }: {
   initialSelectedModel?: Model;
   onBack?: () => void;
   onNext?: () => void;
+  setSelectedModel: (model: Model | undefined) => void;
 }) => {
   const [models, setModels] = useState<Model[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [view, setView] = useState<'grid' | 'table'>('grid');
-  const [selectedModel, setSelectedModel] = useState<Model | undefined>(
-    initialSelectedModel,
-  );
+  const [localSelectedModel, setLocalSelectedModel] = useState<
+    Model | undefined
+  >(initialSelectedModel);
 
   useEffect(() => {
     const loadModels = async () => {
@@ -45,12 +47,18 @@ export const SelectModel = ({
   );
 
   const handleSelect = (model: Model) => {
-    setSelectedModel(
-      selectedModel && selectedModel.id === model.id ? undefined : model,
-    );
+    const newModel =
+      localSelectedModel && localSelectedModel.id === model.id
+        ? undefined
+        : model;
+    setLocalSelectedModel(newModel);
+    setSelectedModel(newModel);
   };
 
-  const handleClearSelected = () => setSelectedModel(undefined);
+  const handleClearSelected = () => {
+    setLocalSelectedModel(undefined);
+    setSelectedModel(undefined);
+  };
 
   return (
     <div className="relative flex h-full min-h-0 w-full flex-col p-0">
@@ -66,7 +74,7 @@ export const SelectModel = ({
             loading={loading}
             models={filteredModels}
             onSelect={handleSelect}
-            selectedModel={selectedModel}
+            selectedModel={localSelectedModel}
             view={view}
           />
         </div>
@@ -75,7 +83,7 @@ export const SelectModel = ({
         onBack={onBack}
         onClearSelected={handleClearSelected}
         onNext={onNext}
-        selectedModel={selectedModel}
+        selectedModel={localSelectedModel}
       />
     </div>
   );

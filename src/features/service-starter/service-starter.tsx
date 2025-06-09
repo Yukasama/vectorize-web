@@ -12,7 +12,7 @@ export const ServiceStarter = ({
   setStep: (step: number) => void;
   step: number;
 }) => {
-  const [selectedModel] = useState<Model | undefined>();
+  const [selectedModel, setSelectedModel] = useState<Model | undefined>();
   const [selectedDatasets, setSelectedDatasets] = useState<Dataset[]>([]);
   const [trainingParams, setTrainingParams] = useState<{
     batchSize: number;
@@ -25,6 +25,7 @@ export const ServiceStarter = ({
         <SelectModel
           initialSelectedModel={selectedModel}
           onNext={() => setStep(1)}
+          setSelectedModel={setSelectedModel}
         />
       )}
       {step === 1 && (

@@ -23,7 +23,6 @@ export const TrainingParamsStep = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
 
-  // Example: Add more params as needed
   const [epochs, setEpochs] = useState(trainingParams.epochs || 3);
   const [batchSize, setBatchSize] = useState(trainingParams.batchSize || 16);
 
@@ -31,11 +30,12 @@ export const TrainingParamsStep = ({
     setIsSubmitting(true);
     setError(undefined);
     try {
-      await axios.post('http://localhost:8000/v1/train', {
+      await axios.post('http://localhost:8000/v1/training/train', {
         batch_size: batchSize,
-        dataset_ids: selectedDatasets.map((d) => d.id),
         epochs,
-        model_tag: selectedModel?.id,
+        model_tag: selectedModel?.model_tag,
+        train_dataset_ids: selectedDatasets.map((d) => d.id),
+        val_dataset_id: undefined,
       });
       alert('Training started!');
     } catch (error_) {
