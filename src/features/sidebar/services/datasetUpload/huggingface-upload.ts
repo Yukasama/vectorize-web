@@ -18,19 +18,32 @@ export interface UploadDatasetTask {
  */
 export const uploadHFDataset = async (
   datasetTag: string,
-): Promise<HFUploadResponse> => {
+  revision?: string,
+): Promise<void> => {
   try {
-    const { data } = await axios.post<HFUploadResponse>(
-      'http://localhost:8000/v1/datasets/upload/huggingface',
-      { dataset_tag: datasetTag },
-    );
-    return data;
+    const payload: { dataset_tag: string; revision?: string } = {
+      dataset_tag: datasetTag,
+    };
+    if (revision && revision.trim() !== '') {
+      payload.revision = revision;
+    }
+    await axios.post('http://localhost:8000/v1/datasets/huggingface', payload);
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error(
-        messages.dataset.upload.errorFile(datasetTag),
-        error.response?.data ?? error.message,
-      );
+      if (error.response?.status === 409) {
+        throw new Error(messages.dataset.upload.alreadyExists);
+      }
+      if (error.response?.status === 400) {
+        throw new Error(messages.dataset.upload.error);
+      }
+      const data = error.response?.data as
+        | undefined
+        | { detail?: string; message?: string };
+      const backendMessage =
+        data?.detail ??
+        data?.message ??
+        messages.dataset.upload.errorFile(datasetTag);
+      throw new Error(backendMessage);
     }
     throw new Error(messages.dataset.upload.errorFile(datasetTag));
   }

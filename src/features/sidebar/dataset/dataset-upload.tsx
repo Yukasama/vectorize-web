@@ -103,6 +103,11 @@ export const DatasetUpload = () => {
     if (uploading) {
       return false;
     }
+    // Enable if Hugging Face ID is set (ignore fileStates)
+    if (hfId.trim()) {
+      return true;
+    }
+    // Otherwise, require at least one file and all uploads done
     if (fileStates.length === 0) {
       return false;
     }
