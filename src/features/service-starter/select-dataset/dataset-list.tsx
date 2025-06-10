@@ -9,66 +9,40 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-
-import { useEffect, useState } from 'react';
 import type { Dataset } from '../../sidebar/services/dataset-service';
-import { fetchDatasets } from '../../sidebar/services/dataset-service';
-import { ListViewToggle } from '../list-view-toggle';
 
 interface DatasetListProps {
-  onBack?: () => void;
-  onNext?: () => void;
+  datasets: Dataset[];
+  loading?: boolean;
+  onSelect: (dataset: Dataset) => void;
   selectedDatasets: Dataset[];
-  setSelectedDatasets: (datasets: Dataset[]) => void;
+  view: 'grid' | 'table';
 }
 
 export const DatasetList = ({
-  onBack,
-  onNext,
+  datasets,
+  loading = false,
+  onSelect,
   selectedDatasets,
-  setSelectedDatasets,
+  view,
 }: DatasetListProps) => {
-  const [datasets, setDatasets] = useState<Dataset[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [view, setView] = useState<'grid' | 'table'>('grid');
-
-  useEffect(() => {
-    const loadDatasets = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchDatasets();
-        setDatasets(data);
-      } catch (error) {
-        console.error('Error fetching datasets:', error);
-        setDatasets([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    void loadDatasets();
-  }, []);
-
-  const toggleDataset = (dataset: Dataset) => {
-    if (selectedDatasets.some((d) => d.id === dataset.id)) {
-      setSelectedDatasets(selectedDatasets.filter((d) => d.id !== dataset.id));
-    } else {
-      setSelectedDatasets([...selectedDatasets, dataset]);
-    }
-  };
-
   let content;
   if (loading) {
-    content = <div>Loading...</div>;
+    content = (
+      <div className="flex items-center justify-center py-8">Loading...</div>
+    );
   } else if (view === 'grid') {
     content = (
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-4 gap-4 px-0 py-3">
         {datasets.map((dataset) => {
           const isSelected = selectedDatasets.some((d) => d.id === dataset.id);
           return (
             <Card
-              className={`cursor-pointer border-2 p-4 ${isSelected ? 'border-primary' : 'border-transparent'}`}
+              className={`cursor-pointer border-2 p-4 ${
+                isSelected ? 'border-primary' : 'border-transparent'
+              }`}
               key={dataset.id}
-              onClick={() => toggleDataset(dataset)}
+              onClick={() => onSelect(dataset)}
             >
               <p className="text-sm font-medium">{dataset.name}</p>
               {isSelected && (
@@ -81,7 +55,7 @@ export const DatasetList = ({
     );
   } else {
     content = (
-      <Table>
+      <Table className="px-0 py-3">
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
@@ -100,7 +74,7 @@ export const DatasetList = ({
                   <input
                     aria-checked={isSelected}
                     checked={isSelected}
-                    onChange={() => toggleDataset(dataset)}
+                    onChange={() => onSelect(dataset)}
                     type="checkbox"
                   />
                 </TableCell>
@@ -112,32 +86,5 @@ export const DatasetList = ({
     );
   }
 
-  return (
-    <div>
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold">Datasets</h2>
-        </div>
-        <ListViewToggle setView={setView} view={view} />
-      </div>
-      {content}
-      <div className="mt-6 flex gap-2">
-        {onBack && (
-          <button className="btn" onClick={onBack} type="button">
-            Back
-          </button>
-        )}
-        {onNext && (
-          <button
-            className="btn btn-primary"
-            disabled={selectedDatasets.length === 0}
-            onClick={onNext}
-            type="button"
-          >
-            Next
-          </button>
-        )}
-      </div>
-    </div>
-  );
+  return <div className="relative">{content}</div>;
 };

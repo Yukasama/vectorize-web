@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { Dataset } from '../sidebar/services/dataset-service';
 import type { Model } from '../sidebar/services/model-service';
 import { TrainingParamsStep } from './params-list';
-import { DatasetList } from './select-dataset/dataset-list';
+import { SelectDataset } from './select-dataset';
 import { SelectModel } from './select-model';
 
 export const ServiceStarter = ({
@@ -29,10 +29,10 @@ export const ServiceStarter = ({
         />
       )}
       {step === 1 && (
-        <DatasetList
+        <SelectDataset
+          initialSelectedDatasets={selectedDatasets}
           onBack={() => setStep(0)}
           onNext={() => setStep(2)}
-          selectedDatasets={selectedDatasets}
           setSelectedDatasets={setSelectedDatasets}
         />
       )}
