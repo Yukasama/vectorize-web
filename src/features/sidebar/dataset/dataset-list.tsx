@@ -98,7 +98,13 @@ export const DatasetList = () => {
                   <HoverCardTrigger asChild>
                     <SidebarMenuSubItem>
                       <DatasetListItem
-                        dataset={dataset}
+                        dataset={{
+                          ...dataset,
+                          name:
+                            dataset.name.length > 12
+                              ? dataset.name.slice(0, 12) + '...'
+                              : dataset.name,
+                        }}
                         onDeleted={handleDeleted}
                       />
                     </SidebarMenuSubItem>

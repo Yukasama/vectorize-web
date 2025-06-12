@@ -33,7 +33,7 @@ export const DatasetList = ({
     );
   } else if (view === 'grid') {
     content = (
-      <div className="grid grid-cols-4 gap-4 px-0 py-3">
+      <div className="grid grid-cols-4 gap-4 px-4 py-3">
         {datasets.map((dataset) => {
           const isSelected = selectedDatasets.some((d) => d.id === dataset.id);
           return (
@@ -44,7 +44,11 @@ export const DatasetList = ({
               key={dataset.id}
               onClick={() => onSelect(dataset)}
             >
-              <p className="text-sm font-medium">{dataset.name}</p>
+              <p className="text-sm font-medium">
+                {dataset.name.length > 17
+                  ? dataset.name.slice(0, 17) + '...'
+                  : dataset.name}
+              </p>
               {isSelected && (
                 <span className="text-primary text-xs">Selected</span>
               )}
@@ -55,7 +59,7 @@ export const DatasetList = ({
     );
   } else {
     content = (
-      <Table className="px-0 py-3">
+      <Table className="py-3">
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>

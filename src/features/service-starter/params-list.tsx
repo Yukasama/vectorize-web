@@ -1,7 +1,8 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import axios from 'axios';
+import { Separator } from '@/components/ui/separator';
+import { Toaster } from '@/components/ui/sonner';
 import React, { useState } from 'react';
 import { Dataset } from '../sidebar/services/dataset-service';
 import { Model } from '../sidebar/services/model-service';
@@ -18,15 +19,16 @@ export const TrainingParamsStep = ({
   selectedDatasets,
   selectedModel,
   setTrainingParams,
-  trainingParams,
 }: TrainingParamsStepProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
 
-  // All training parameters
-  const [epochs, setEpochs] = useState(trainingParams.epochs || 1);
-  const [perDeviceTrainBatchSize, setPerDeviceTrainBatchSize] = useState(8);
-  const [learningRate, setLearningRate] = useState(2e-5);
+  // All training parameters (initially empty)
+  const [epochs, setEpochs] = useState<'' | number>('');
+  const [perDeviceTrainBatchSize, setPerDeviceTrainBatchSize] = useState<
+    '' | number
+  >('');
+  const [learningRate, setLearningRate] = useState<'' | number>('');
   const [warmupSteps, setWarmupSteps] = useState<'' | number>('');
   const [optimizerName, setOptimizerName] = useState('');
   const [scheduler, setScheduler] = useState('');
@@ -38,7 +40,7 @@ export const TrainingParamsStep = ({
   const [outputPath, setOutputPath] = useState('');
   const [saveBestModel, setSaveBestModel] = useState(true);
   const [saveEachEpoch, setSaveEachEpoch] = useState(false);
-  const [saveOptimizerState, setSaveOptimizerState] = useState(false);
+  const [saveOptimizerState] = useState(false);
   const [dataloaderNumWorkers, setDataloaderNumWorkers] = useState<'' | number>(
     '',
   );
@@ -49,21 +51,25 @@ export const TrainingParamsStep = ({
     setIsSubmitting(true);
     setError(undefined);
     try {
-      await axios.post('http://localhost:8000/v1/training/train', {
+      const { startTraining } = await import('./training-service');
+      await startTraining({
         dataloader_num_workers:
           dataloaderNumWorkers === ''
             ? undefined
             : Number(dataloaderNumWorkers),
         device: device || undefined,
-        epochs,
+        epochs: epochs === '' ? undefined : Number(epochs),
         evaluation_steps:
           evaluationSteps === '' ? undefined : Number(evaluationSteps),
-        learning_rate: learningRate,
+        learning_rate: learningRate === '' ? undefined : Number(learningRate),
         max_grad_norm: maxGradNorm === '' ? undefined : Number(maxGradNorm),
-        model_tag: selectedModel?.model_tag,
+        model_tag: selectedModel?.model_tag ?? '',
         optimizer_name: optimizerName || undefined,
         output_path: outputPath || undefined,
-        per_device_train_batch_size: perDeviceTrainBatchSize,
+        per_device_train_batch_size:
+          perDeviceTrainBatchSize === ''
+            ? undefined
+            : Number(perDeviceTrainBatchSize),
         save_best_model: saveBestModel,
         save_each_epoch: saveEachEpoch,
         save_optimizer_state: saveOptimizerState,
@@ -73,11 +79,11 @@ export const TrainingParamsStep = ({
           timeoutSeconds === '' ? undefined : Number(timeoutSeconds),
         train_dataset_ids: selectedDatasets.map((d) => d.id),
         use_amp: useAmp,
-        val_dataset_id: undefined,
         warmup_steps: warmupSteps === '' ? undefined : Number(warmupSteps),
         weight_decay: weightDecay === '' ? undefined : Number(weightDecay),
       });
-      alert('Training started!');
+      const { toast } = await import('sonner');
+      toast.success('Training started!');
     } catch (error_) {
       const err: {
         message?: string;
@@ -94,204 +100,299 @@ export const TrainingParamsStep = ({
 
   // Update parent state on param change
   React.useEffect(() => {
-    setTrainingParams({ batchSize: perDeviceTrainBatchSize, epochs });
+    setTrainingParams({
+      batchSize:
+        perDeviceTrainBatchSize === '' ? 0 : Number(perDeviceTrainBatchSize),
+      epochs: epochs === '' ? 0 : Number(epochs),
+    });
   }, [epochs, perDeviceTrainBatchSize, setTrainingParams]);
 
   return (
-    <div>
-      <h2 className="mb-4 text-lg font-semibold">Training parameters</h2>
-      <div className="mb-2">
-        <label className="block text-sm font-medium">Epochs</label>
-        <input
-          className="input input-bordered w-32"
-          min={1}
-          onChange={(e) => setEpochs(Number(e.target.value))}
-          type="number"
-          value={epochs}
-        />
+    <div className="px-8 py-6">
+      <h2 className="mb-6 text-lg font-semibold">Training Parameters</h2>
+      <div className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2 lg:grid-cols-3">
+        {/* Erste Reihe: Epochs, Batch Size, Learning Rate */}
+        <div>
+          <label className="mb-1 block text-sm font-medium">Epochs</label>
+          <input
+            autoComplete="off"
+            className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            min={1}
+            onChange={(e) =>
+              setEpochs(e.target.value === '' ? '' : Number(e.target.value))
+            }
+            placeholder="e.g. 3"
+            type="number"
+            value={epochs === '' ? '' : epochs}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium">
+            Batch size per device
+          </label>
+          <input
+            autoComplete="off"
+            className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            min={1}
+            onChange={(e) =>
+              setPerDeviceTrainBatchSize(
+                e.target.value === '' ? '' : Number(e.target.value),
+              )
+            }
+            placeholder="e.g. 16"
+            type="number"
+            value={
+              perDeviceTrainBatchSize === '' ? '' : perDeviceTrainBatchSize
+            }
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium">
+            Learning rate
+          </label>
+          <input
+            autoComplete="off"
+            className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            onChange={(e) =>
+              setLearningRate(
+                e.target.value === '' ? '' : Number(e.target.value),
+              )
+            }
+            placeholder="e.g. 0.0001"
+            step="any"
+            type="number"
+            value={learningRate === '' ? '' : learningRate}
+          />
+        </div>
+        <div className="col-span-full">
+          <Separator className="my-2" />
+        </div>
+        {/* Zweite Reihe: Warmup Steps, Optimizer, Scheduler */}
+        <div>
+          <label className="mb-1 block text-sm font-medium">Warmup steps</label>
+          <input
+            autoComplete="off"
+            className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            min={0}
+            onChange={(e) =>
+              setWarmupSteps(
+                e.target.value === '' ? '' : Number(e.target.value),
+              )
+            }
+            placeholder="e.g. 100"
+            type="number"
+            value={warmupSteps === '' ? '' : warmupSteps}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium">Optimizer</label>
+          <input
+            autoComplete="off"
+            className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            onChange={(e) => setOptimizerName(e.target.value)}
+            placeholder="e.g. AdamW"
+            type="text"
+            value={optimizerName}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium">Scheduler</label>
+          <input
+            autoComplete="off"
+            className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            onChange={(e) => setScheduler(e.target.value)}
+            placeholder="e.g. linear"
+            type="text"
+            value={scheduler}
+          />
+        </div>
+        <div className="col-span-full">
+          <Separator className="my-2" />
+        </div>
+        {/* Dritte Reihe: Weight Decay, Max Grad Norm, Evaluation Steps */}
+        <div>
+          <label className="mb-1 block text-sm font-medium">Weight decay</label>
+          <input
+            autoComplete="off"
+            className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            onChange={(e) =>
+              setWeightDecay(
+                e.target.value === '' ? '' : Number(e.target.value),
+              )
+            }
+            placeholder="e.g. 0.01"
+            step="any"
+            type="number"
+            value={weightDecay === '' ? '' : weightDecay}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium">
+            Max grad norm
+          </label>
+          <input
+            autoComplete="off"
+            className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            onChange={(e) =>
+              setMaxGradNorm(
+                e.target.value === '' ? '' : Number(e.target.value),
+              )
+            }
+            placeholder="e.g. 1.0"
+            step="any"
+            type="number"
+            value={maxGradNorm === '' ? '' : maxGradNorm}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium">
+            Evaluation steps
+          </label>
+          <input
+            autoComplete="off"
+            className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            min={0}
+            onChange={(e) =>
+              setEvaluationSteps(
+                e.target.value === '' ? '' : Number(e.target.value),
+              )
+            }
+            placeholder="e.g. 100"
+            type="number"
+            value={evaluationSteps === '' ? '' : evaluationSteps}
+          />
+        </div>
+        <div className="col-span-full">
+          <Separator className="my-2" />
+        </div>
+        {/* Vierte Reihe: Output Path, Dataloader Workers, Device */}
+        <div>
+          <label className="mb-1 block text-sm font-medium">Output path</label>
+          <input
+            autoComplete="off"
+            className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            onChange={(e) => setOutputPath(e.target.value)}
+            placeholder="path/to/output"
+            type="text"
+            value={outputPath}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium">
+            Dataloader workers
+          </label>
+          <input
+            autoComplete="off"
+            className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            min={0}
+            onChange={(e) =>
+              setDataloaderNumWorkers(
+                e.target.value === '' ? '' : Number(e.target.value),
+              )
+            }
+            placeholder="e.g. 4"
+            type="number"
+            value={dataloaderNumWorkers === '' ? '' : dataloaderNumWorkers}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium">Device</label>
+          <input
+            autoComplete="off"
+            className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            onChange={(e) => setDevice(e.target.value)}
+            placeholder="cpu, cuda, ..."
+            type="text"
+            value={device}
+          />
+        </div>
+        <div className="col-span-full">
+          <Separator className="my-2" />
+        </div>
+        {/* Fünfte Reihe: Timeout, Checkboxen */}
+        <div>
+          <label className="mb-1 block text-sm font-medium">
+            Timeout (seconds)
+          </label>
+          <input
+            autoComplete="off"
+            className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            min={0}
+            onChange={(e) =>
+              setTimeoutSeconds(
+                e.target.value === '' ? '' : Number(e.target.value),
+              )
+            }
+            placeholder="e.g. 3600"
+            type="number"
+            value={timeoutSeconds === '' ? '' : timeoutSeconds}
+          />
+        </div>
+        <div className="col-span-2 flex flex-col gap-2 lg:col-span-1">
+          <div className="flex items-center gap-3">
+            <input
+              checked={!!useAmp}
+              className="accent-primary focus:ring-primary/30 rounded border border-white/80 focus:ring-2"
+              id="use-amp"
+              onChange={(e) => setUseAmp(e.target.checked)}
+              type="checkbox"
+            />
+            <label
+              className="cursor-pointer text-sm font-medium select-none"
+              htmlFor="use-amp"
+            >
+              Use AMP
+            </label>
+          </div>
+          <div className="flex items-center gap-3">
+            <input
+              checked={!!showProgressBar}
+              className="accent-primary focus:ring-primary/30 rounded border border-white/80 focus:ring-2"
+              id="show-progress-bar"
+              onChange={(e) => setShowProgressBar(e.target.checked)}
+              type="checkbox"
+            />
+            <label
+              className="cursor-pointer text-sm font-medium select-none"
+              htmlFor="show-progress-bar"
+            >
+              Show progress bar
+            </label>
+          </div>
+          <div className="flex items-center gap-3">
+            <input
+              checked={!!saveBestModel}
+              className="accent-primary focus:ring-primary/30 rounded border border-white/80 focus:ring-2"
+              id="save-best-model"
+              onChange={(e) => setSaveBestModel(e.target.checked)}
+              type="checkbox"
+            />
+            <label
+              className="cursor-pointer text-sm font-medium select-none"
+              htmlFor="save-best-model"
+            >
+              Save best model
+            </label>
+          </div>
+          <div className="flex items-center gap-3">
+            <input
+              checked={!!saveEachEpoch}
+              className="accent-primary focus:ring-primary/30 rounded border border-white/80 focus:ring-2"
+              id="save-each-epoch"
+              onChange={(e) => setSaveEachEpoch(e.target.checked)}
+              type="checkbox"
+            />
+            <label
+              className="cursor-pointer text-sm font-medium select-none"
+              htmlFor="save-each-epoch"
+            >
+              Save each epoch
+            </label>
+          </div>
+        </div>
       </div>
-      <div className="mb-2">
-        <label className="block text-sm font-medium">
-          Batch size per device
-        </label>
-        <input
-          className="input input-bordered w-32"
-          min={1}
-          onChange={(e) => setPerDeviceTrainBatchSize(Number(e.target.value))}
-          type="number"
-          value={perDeviceTrainBatchSize}
-        />
-      </div>
-      <div className="mb-2">
-        <label className="block text-sm font-medium">Learning rate</label>
-        <input
-          className="input input-bordered w-32"
-          onChange={(e) => setLearningRate(Number(e.target.value))}
-          step="any"
-          type="number"
-          value={learningRate}
-        />
-      </div>
-      <div className="mb-2">
-        <label className="block text-sm font-medium">Warmup steps</label>
-        <input
-          className="input input-bordered w-32"
-          min={0}
-          onChange={(e) =>
-            setWarmupSteps(e.target.value === '' ? '' : Number(e.target.value))
-          }
-          type="number"
-          value={warmupSteps}
-        />
-      </div>
-      <div className="mb-2">
-        <label className="block text-sm font-medium">Optimizer</label>
-        <input
-          className="input input-bordered w-32"
-          onChange={(e) => setOptimizerName(e.target.value)}
-          type="text"
-          value={optimizerName}
-        />
-      </div>
-      <div className="mb-2">
-        <label className="block text-sm font-medium">Scheduler</label>
-        <input
-          className="input input-bordered w-32"
-          onChange={(e) => setScheduler(e.target.value)}
-          type="text"
-          value={scheduler}
-        />
-      </div>
-      <div className="mb-2">
-        <label className="block text-sm font-medium">Weight decay</label>
-        <input
-          className="input input-bordered w-32"
-          onChange={(e) =>
-            setWeightDecay(e.target.value === '' ? '' : Number(e.target.value))
-          }
-          step="any"
-          type="number"
-          value={weightDecay}
-        />
-      </div>
-      <div className="mb-2">
-        <label className="block text-sm font-medium">Max grad norm</label>
-        <input
-          className="input input-bordered w-32"
-          onChange={(e) =>
-            setMaxGradNorm(e.target.value === '' ? '' : Number(e.target.value))
-          }
-          step="any"
-          type="number"
-          value={maxGradNorm}
-        />
-      </div>
-      <div className="mb-2 flex items-center gap-2">
-        <label className="block text-sm font-medium">Use AMP</label>
-        <input
-          checked={useAmp}
-          onChange={(e) => setUseAmp(e.target.checked)}
-          type="checkbox"
-        />
-      </div>
-      <div className="mb-2 flex items-center gap-2">
-        <label className="block text-sm font-medium">Show progress bar</label>
-        <input
-          checked={showProgressBar}
-          onChange={(e) => setShowProgressBar(e.target.checked)}
-          type="checkbox"
-        />
-      </div>
-      <div className="mb-2">
-        <label className="block text-sm font-medium">Evaluation steps</label>
-        <input
-          className="input input-bordered w-32"
-          min={0}
-          onChange={(e) =>
-            setEvaluationSteps(
-              e.target.value === '' ? '' : Number(e.target.value),
-            )
-          }
-          type="number"
-          value={evaluationSteps}
-        />
-      </div>
-      <div className="mb-2">
-        <label className="block text-sm font-medium">Output path</label>
-        <input
-          className="input input-bordered w-32"
-          onChange={(e) => setOutputPath(e.target.value)}
-          type="text"
-          value={outputPath}
-        />
-      </div>
-      <div className="mb-2 flex items-center gap-2">
-        <label className="block text-sm font-medium">Save best model</label>
-        <input
-          checked={saveBestModel}
-          onChange={(e) => setSaveBestModel(e.target.checked)}
-          type="checkbox"
-        />
-      </div>
-      <div className="mb-2 flex items-center gap-2">
-        <label className="block text-sm font-medium">Save each epoch</label>
-        <input
-          checked={saveEachEpoch}
-          onChange={(e) => setSaveEachEpoch(e.target.checked)}
-          type="checkbox"
-        />
-      </div>
-      <div className="mb-2 flex items-center gap-2">
-        <label className="block text-sm font-medium">
-          Save optimizer state
-        </label>
-        <input
-          checked={saveOptimizerState}
-          onChange={(e) => setSaveOptimizerState(e.target.checked)}
-          type="checkbox"
-        />
-      </div>
-      <div className="mb-2">
-        <label className="block text-sm font-medium">
-          Dataloader num workers
-        </label>
-        <input
-          className="input input-bordered w-32"
-          min={0}
-          onChange={(e) =>
-            setDataloaderNumWorkers(
-              e.target.value === '' ? '' : Number(e.target.value),
-            )
-          }
-          type="number"
-          value={dataloaderNumWorkers}
-        />
-      </div>
-      <div className="mb-2">
-        <label className="block text-sm font-medium">Device</label>
-        <input
-          className="input input-bordered w-32"
-          onChange={(e) => setDevice(e.target.value)}
-          type="text"
-          value={device}
-        />
-      </div>
-      <div className="mb-2">
-        <label className="block text-sm font-medium">Timeout seconds</label>
-        <input
-          className="input input-bordered w-32"
-          min={0}
-          onChange={(e) =>
-            setTimeoutSeconds(
-              e.target.value === '' ? '' : Number(e.target.value),
-            )
-          }
-          type="number"
-          value={timeoutSeconds}
-        />
-      </div>
-      {error && <div className="mb-2 text-sm text-red-600">{error}</div>}
-      <div className="mt-4 flex gap-2">
+      {error && <div className="mt-4 text-red-500">{error}</div>}
+      <div className="mt-6 flex gap-2">
         <Button disabled={isSubmitting} onClick={onBack} variant="outline">
           Back
         </Button>
@@ -303,6 +404,9 @@ export const TrainingParamsStep = ({
         >
           {isSubmitting ? 'Starting...' : 'Start training'}
         </Button>
+      </div>
+      <div style={{ bottom: 0, position: 'fixed', right: 0, zIndex: 9999 }}>
+        <Toaster position="bottom-right" />
       </div>
     </div>
   );

@@ -98,7 +98,13 @@ export const ModelList = () => {
                   <HoverCardTrigger asChild>
                     <SidebarMenuSubItem>
                       <ModelListItem
-                        model={model}
+                        model={{
+                          ...model,
+                          name:
+                            model.name.length > 12
+                              ? model.name.slice(0, 12) + '...'
+                              : model.name,
+                        }}
                         onDeleted={handleModelDeleted}
                       />
                     </SidebarMenuSubItem>

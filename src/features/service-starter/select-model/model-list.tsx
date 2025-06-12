@@ -32,7 +32,7 @@ export const ModelList = ({
 
   if (view === 'grid') {
     return (
-      <div className="grid grid-cols-4 gap-4 px-0 py-3">
+      <div className="grid grid-cols-4 gap-4 px-4 py-3">
         {models.map((model) => {
           const isSelected = selectedModel?.id === model.id;
           return (
@@ -41,7 +41,11 @@ export const ModelList = ({
               key={model.id}
               onClick={() => onSelect(model)}
             >
-              <p className="text-sm font-medium">{model.name}</p>
+              <p className="text-sm font-medium">
+                {model.name.length > 17
+                  ? model.name.slice(0, 17) + '...'
+                  : model.name}
+              </p>
               {isSelected && (
                 <span className="text-primary text-xs">Selected</span>
               )}
@@ -65,7 +69,11 @@ export const ModelList = ({
           const isSelected = selectedModel?.id === model.id;
           return (
             <TableRow key={model.id}>
-              <TableCell>{model.name}</TableCell>
+              <TableCell>
+                {model.name.length > 17
+                  ? model.name.slice(0, 17) + '...'
+                  : model.name}
+              </TableCell>
               <TableCell>
                 <input
                   aria-checked={isSelected}
