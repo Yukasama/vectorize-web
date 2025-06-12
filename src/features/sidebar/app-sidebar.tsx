@@ -21,10 +21,12 @@ import { DatasetList } from './dataset/dataset-list';
 import { DatasetUpload } from './dataset/dataset-upload';
 import { ModelList } from './model/model-list';
 import { ModelUpload } from './model/model-upload';
+import { SyntheticGenerateDialog } from './synthetic/synthetic-generate-dialog';
 
 export const AppSidebar = () => {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [tab, setTab] = useState<'dataset' | 'model'>('model');
+  const [syntheticOpen, setSyntheticOpen] = useState(false);
 
   return (
     <Sidebar className="bg-[var(--sidebar)] text-[var(--sidebar-foreground)] transition-all duration-200">
@@ -34,11 +36,16 @@ export const AppSidebar = () => {
           <div className="flex gap-2">
             <button
               className="hover:bg-muted rounded p-2"
-              title="Neu"
+              onClick={() => setSyntheticOpen(true)}
+              title="Generate synthetic dataset"
               type="button"
             >
               <Plus className="h-5 w-5" />
             </button>
+            <SyntheticGenerateDialog
+              onOpenChange={setSyntheticOpen}
+              open={syntheticOpen}
+            />
             <button
               className="hover:bg-muted rounded p-2"
               onClick={() => setUploadOpen(true)}

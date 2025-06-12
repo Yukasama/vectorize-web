@@ -151,7 +151,7 @@ export const DatasetListItem = ({
             <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent align="start" side="right">
           <DropdownMenuItem onClick={() => setEdit(true)}>
             Rename
           </DropdownMenuItem>
