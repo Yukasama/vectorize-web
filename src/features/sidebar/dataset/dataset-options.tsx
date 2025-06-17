@@ -130,13 +130,7 @@ export const DatasetListItem = ({
             </button>
           </div>
         ) : (
-          <span
-            className="cursor-text"
-            onDoubleClick={() => setEdit(true)}
-            title="double-click to edit name"
-          >
-            {dataset.name}
-          </span>
+          <span>{dataset.name}</span>
         )}
       </span>
       {/* Dropdown menu for dataset actions */}

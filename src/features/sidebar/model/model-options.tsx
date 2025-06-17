@@ -126,13 +126,7 @@ export const ModelListItem = ({
               </button>
             </div>
           ) : (
-            <span
-              className="cursor-text"
-              onDoubleClick={() => setEdit(true)}
-              title="double-click to edit name"
-            >
-              {model.name}
-            </span>
+            <span>{model.name}</span>
           )}
         </span>
       )}

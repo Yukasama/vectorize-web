@@ -17,6 +17,7 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { ChevronDown, ChevronUp, Search } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type { Model } from '../services/model-service';
 import { fetchModels } from '../services/model-service';
@@ -96,18 +97,20 @@ export const ModelList = () => {
               {visibleModels.map((model) => (
                 <HoverCard key={model.id}>
                   <HoverCardTrigger asChild>
-                    <SidebarMenuSubItem>
-                      <ModelListItem
-                        model={{
-                          ...model,
-                          name:
-                            model.name.length > 12
-                              ? model.name.slice(0, 12) + '...'
-                              : model.name,
-                        }}
-                        onDeleted={handleModelDeleted}
-                      />
-                    </SidebarMenuSubItem>
+                    <Link href={`/model/${model.id}`}>
+                      <SidebarMenuSubItem>
+                        <ModelListItem
+                          model={{
+                            ...model,
+                            name:
+                              model.name.length > 12
+                                ? model.name.slice(0, 12) + '...'
+                                : model.name,
+                          }}
+                          onDeleted={handleModelDeleted}
+                        />
+                      </SidebarMenuSubItem>
+                    </Link>
                   </HoverCardTrigger>
                   <HoverCardContent align="start" className="w-96" side="top">
                     <ModelDetailsHoverCardContent modelId={model.model_tag} />

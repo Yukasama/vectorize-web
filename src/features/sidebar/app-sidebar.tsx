@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Upload } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import { DatasetList } from './dataset/dataset-list';
 import { DatasetUpload } from './dataset/dataset-upload';
@@ -32,7 +33,11 @@ export const AppSidebar = () => {
     <Sidebar className="bg-[var(--sidebar)] text-[var(--sidebar-foreground)] transition-all duration-200">
       <SidebarHeader className="header-bg mb-6 w-full pt-4">
         <div className="flex w-full items-center justify-between">
-          <span className="pl-4 text-lg font-semibold">Vectorize</span>
+          <Link className="pl-4" href="/" title="Go to homepage">
+            <span className="focus:ring-primary hover:bg-muted inline-block min-w-[120px] rounded bg-transparent p-2 text-center text-lg font-semibold text-[var(--sidebar-foreground)] shadow transition-colors focus:ring-2 focus:outline-none">
+              Vectorize
+            </span>
+          </Link>
           <div className="flex gap-2">
             <button
               className="hover:bg-muted rounded p-2"
