@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/sidebar';
 import { fetchDatasets } from '@/features/sidebar/services/dataset-service';
 import { ChevronDown, ChevronUp, Search } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { DatasetDetailsHoverCard } from './dataset-details';
 import { DatasetListItem } from './dataset-options';
@@ -96,18 +97,20 @@ export const DatasetList = () => {
               {visibleDatasets.map((dataset) => (
                 <HoverCard key={dataset.id}>
                   <HoverCardTrigger asChild>
-                    <SidebarMenuSubItem>
-                      <DatasetListItem
-                        dataset={{
-                          ...dataset,
-                          name:
-                            dataset.name.length > 12
-                              ? dataset.name.slice(0, 12) + '...'
-                              : dataset.name,
-                        }}
-                        onDeleted={handleDeleted}
-                      />
-                    </SidebarMenuSubItem>
+                    <Link href={`/dataset/${dataset.id}`}>
+                      <SidebarMenuSubItem className="cursor-pointer">
+                        <DatasetListItem
+                          dataset={{
+                            ...dataset,
+                            name:
+                              dataset.name.length > 12
+                                ? dataset.name.slice(0, 12) + '...'
+                                : dataset.name,
+                          }}
+                          onDeleted={handleDeleted}
+                        />
+                      </SidebarMenuSubItem>
+                    </Link>
                   </HoverCardTrigger>
                   <HoverCardContent align="start" className="w-96" side="top">
                     <DatasetDetailsHoverCard datasetId={dataset.id} />
