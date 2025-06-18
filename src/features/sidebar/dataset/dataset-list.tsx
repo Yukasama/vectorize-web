@@ -1,4 +1,13 @@
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card';
 import { Input } from '@/components/ui/input';
 import {
   SidebarMenu,
@@ -8,27 +17,24 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { fetchDatasets } from '@/features/sidebar/services/dataset-service';
-import { messages } from '@/lib/messages';
-import { ChevronDown, ChevronUp, Plus, Search } from 'lucide-react';
+import { ChevronDown, ChevronUp, Search } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { DatasetDetailsDialog } from './dataset-details';
+import { DatasetDetailsHoverCard } from './dataset-details';
 import { DatasetListItem } from './dataset-options';
-import { DatasetUpload } from './dataset-upload';
 
 interface Dataset {
   id: string;
   name: string;
+  version?: number;
 }
 
-export const DatasetList = ({ isOpen }: { isOpen: boolean }) => {
+export const DatasetList = () => {
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [datasetSearch, setDatasetSearch] = useState('');
-  const [open, setOpen] = useState(false);
   const [showMoreDatasets, setShowMoreDatasets] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const [selectedDatasetId, setSelectedDatasetId] = useState<string | undefined>();
+  const [open, setOpen] = useState(false);
 
-  // Fetch datasets from API on first render
   useEffect(() => {
     const loadDatasets = async () => {
       const data = await fetchDatasets();
@@ -37,10 +43,10 @@ export const DatasetList = ({ isOpen }: { isOpen: boolean }) => {
     void loadDatasets();
   }, []);
 
-  // Filter datasets by search input
-  const filteredDatasets = datasets.filter((dataset) =>
-    dataset.name.toLowerCase().includes(datasetSearch.toLowerCase()),
-  );
+  const filterDataset = (dataset: Dataset): boolean =>
+    dataset.name.toLowerCase().includes(datasetSearch.toLowerCase());
+
+  const filteredDatasets = datasets.filter((element) => filterDataset(element));
   const visibleDatasets = filteredDatasets.slice(
     0,
     showMoreDatasets ? filteredDatasets.length : 5,
@@ -51,24 +57,21 @@ export const DatasetList = ({ isOpen }: { isOpen: boolean }) => {
     setDatasets((prev) => prev.filter((d) => d.id !== id));
   };
 
-  // Open the details dialog for a dataset
-  const openDatasetDetails = (id: string) => {
-    setSelectedDatasetId(id);
-    setDetailsOpen(true);
-  };
-
   return (
     <SidebarMenu>
-      {/* Upload und Plus Button entfernt */}
-      <Collapsible defaultOpen={open} onOpenChange={(open) => {
-        setOpen(open);
-        if (!open) {
-          setShowMoreDatasets(false);
-        }
-      }} className="group/collapsible">
+      <Collapsible
+        className="group/collapsible"
+        defaultOpen={open}
+        onOpenChange={(open) => {
+          setOpen(open);
+          if (!open) {
+            setShowMoreDatasets(false);
+          }
+        }}
+      >
         <SidebarMenuItem>
           <CollapsibleTrigger asChild>
-            <SidebarMenuButton className="flex items-center w-full gap-2 sticky top-0 z-10 bg-[var(--sidebar)]">
+            <SidebarMenuButton className="sticky top-0 z-10 flex w-full items-center gap-2 bg-[var(--sidebar)]">
               <span className="text-md">Datasets</span>
               <span className="ml-auto flex flex-row items-center gap-2">
                 {open ? (
@@ -89,21 +92,36 @@ export const DatasetList = ({ isOpen }: { isOpen: boolean }) => {
                 value={datasetSearch}
               />
             </div>
+            {/* SidebarMenuSub */}
             <SidebarMenuSub>
               {visibleDatasets.map((dataset) => (
-                <SidebarMenuSubItem key={dataset.id}>
-                  <DatasetListItem
-                    dataset={dataset}
-                    onDeleted={handleDeleted}
-                    onDetails={openDatasetDetails}
-                  />
-                </SidebarMenuSubItem>
+                <HoverCard key={dataset.id}>
+                  <HoverCardTrigger asChild>
+                    <Link href={`/dataset/${dataset.id}`}>
+                      <SidebarMenuSubItem className="cursor-pointer">
+                        <DatasetListItem
+                          dataset={{
+                            ...dataset,
+                            name:
+                              dataset.name.length > 12
+                                ? dataset.name.slice(0, 12) + '...'
+                                : dataset.name,
+                          }}
+                          onDeleted={handleDeleted}
+                        />
+                      </SidebarMenuSubItem>
+                    </Link>
+                  </HoverCardTrigger>
+                  <HoverCardContent align="start" className="w-96" side="top">
+                    <DatasetDetailsHoverCard datasetId={dataset.id} />
+                  </HoverCardContent>
+                </HoverCard>
               ))}
             </SidebarMenuSub>
             {/* Show More/Less */}
             {filteredDatasets.length > 5 && (
               <button
-                className="mt-2 w-full text-xs text-muted-foreground hover:underline"
+                className="text-muted-foreground mt-2 w-full text-xs hover:underline"
                 onClick={() => setShowMoreDatasets((v) => !v)}
                 type="button"
               >
@@ -113,11 +131,6 @@ export const DatasetList = ({ isOpen }: { isOpen: boolean }) => {
           </CollapsibleContent>
         </SidebarMenuItem>
       </Collapsible>
-      <DatasetDetailsDialog
-        datasetId={detailsOpen ? selectedDatasetId : undefined}
-        onClose={() => setDetailsOpen(false)}
-        open={detailsOpen}
-      />
     </SidebarMenu>
   );
 };

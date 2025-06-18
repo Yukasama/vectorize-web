@@ -18,7 +18,7 @@ export const uploadLocalFile = async (
   const formData = new FormData();
   formData.append('file', file);
 
-  let url = 'http://localhost:8000/v1/uploads/local_models';
+  let url = 'http://localhost:8000/v1/uploads/local';
   if (modelName) {
     url += '?model_name=' + encodeURIComponent(modelName);
   }

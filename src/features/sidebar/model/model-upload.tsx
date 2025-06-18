@@ -6,14 +6,14 @@ import { uploadGithub } from '@/features/sidebar/services/modelUpload/upload-git
 import { uploadHuggingFace } from '@/features/sidebar/services/modelUpload/upload-huggingface';
 import { uploadLocalFile } from '@/features/sidebar/services/modelUpload/upload-local-file';
 import { messages } from '@/lib/messages';
-import { Upload } from 'lucide-react';
 import Image from 'next/image';
 import React, { useRef, useState } from 'react';
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
 
 /**
  * Component for uploading models from local files, GitHub, or Hugging Face.
  */
+
 export const ModelUpload = () => {
   // Reference for the hidden file input
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -22,13 +22,15 @@ export const ModelUpload = () => {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [githubUrl, setGithubUrl] = useState('');
   const [huggingFaceModelId, setHuggingFaceModelId] = useState('');
   const [huggingFaceTag, setHuggingFaceTag] = useState('');
 
-  /**
-   * Handles file drop event for local file upload.
-   */
+  // State
+  const [githubOwner, setGithubOwner] = useState('');
+  const [githubRepo, setGithubRepo] = useState('');
+  const [githubRevision, setGithubRevision] = useState('');
+
+  // Handles file drop event for local file upload.
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragActive(false);
@@ -36,9 +38,7 @@ export const ModelUpload = () => {
     setSelectedFiles(files);
   };
 
-  /**
-   * Handles file input change event for local file upload.
-   */
+  // Handles file input change event for local file upload.
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = [...e.target.files];
@@ -46,25 +46,23 @@ export const ModelUpload = () => {
     }
   };
 
-  /**
-   * Resets all fields.
-   */
-  const handleReset = () => {
+  // Resets all fields.
+  const resetForm = () => {
     setSelectedFiles([]);
-    setGithubUrl('');
     setHuggingFaceModelId('');
     setHuggingFaceTag('');
+    setGithubOwner('');
+    setGithubRepo('');
+    setGithubRevision('');
   };
 
-  /**
-   * Handles the upload logic for local files, GitHub, or Hugging Face.
-   * Shows appropriate toast messages for success or error.
-   */
-  const handleUpload = async () => {
+  // Handles the upload logic for local files, GitHub, or Hugging Face.
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
     // Only one upload source can be selected at a time
     const optionsSelected = [
       selectedFiles.length > 0 ? 1 : 0,
-      githubUrl ? 1 : 0,
+      githubOwner && githubRepo ? 1 : 0,
       huggingFaceModelId ? 1 : 0,
     ].reduce((a, b) => a + b, 0);
 
@@ -86,10 +84,16 @@ export const ModelUpload = () => {
           duration: 4000,
           id: toastId,
         });
-      } else if (githubUrl) {
+      } else if (githubOwner && githubRepo) {
         // GitHub upload
-        await uploadGithub(githubUrl);
-        toast.success(messages.model.upload.githubSuccess(githubUrl));
+        await uploadGithub(githubOwner, githubRepo, githubRevision);
+        toast.success(
+          messages.model.upload.githubSuccess(
+            `${githubOwner}/${githubRepo}${
+              githubRevision ? '@' + githubRevision : ''
+            }`,
+          ),
+        );
       } else if (huggingFaceModelId) {
         // Hugging Face upload
         await uploadHuggingFace(huggingFaceModelId, huggingFaceTag);
@@ -97,7 +101,7 @@ export const ModelUpload = () => {
           messages.model.upload.huggingfaceSuccess(huggingFaceModelId),
         );
       }
-      handleReset();
+      resetForm();
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -110,12 +114,12 @@ export const ModelUpload = () => {
   };
 
   return (
-    <div>
-      {/* Toast notifications for upload status */}
-      <Toaster position="bottom-right" />
-
+    <form
+      className="flex max-h-[520px] min-h-[350px] flex-col overflow-y-auto"
+      onSubmit={handleUpload}
+    >
       {/* GitHub upload section */}
-      <div className="mb-4 flex items-center space-x-4">
+      <div className="mt-2 mb-6 flex items-center gap-x-1 gap-y-0">
         <Image
           alt="GitHub Logo"
           className="h-8 w-8"
@@ -124,14 +128,28 @@ export const ModelUpload = () => {
           width={32}
         />
         <Input
-          onChange={(e) => setGithubUrl(e.target.value)}
-          placeholder={messages.model.upload.githubPlaceholder}
-          value={githubUrl}
+          className="w-27"
+          onChange={(e) => setGithubOwner(e.target.value)}
+          placeholder="owner"
+          value={githubOwner}
+        />
+        <span className="text-muted-foreground">/</span>
+        <Input
+          className="w-27"
+          onChange={(e) => setGithubRepo(e.target.value)}
+          placeholder="repo"
+          value={githubRepo}
+        />
+        <Input
+          className="w-20"
+          onChange={(e) => setGithubRevision(e.target.value)}
+          placeholder="branch"
+          value={githubRevision}
         />
       </div>
 
       {/* Hugging Face upload section */}
-      <div className="mb-4 flex items-center space-x-4">
+      <div className="mt-2 mb-6 flex items-center gap-x-1 gap-y-0">
         <Image
           alt="Hugging Face Logo"
           className="h-8 w-8"
@@ -139,19 +157,19 @@ export const ModelUpload = () => {
           src="/images/huggingface_logo.svg"
           width={32}
         />
-        <div className="flex-1">
-          <Input
-            onChange={(e) => setHuggingFaceModelId(e.target.value)}
-            placeholder={messages.model.upload.huggingfaceIdPlaceholder}
-            value={huggingFaceModelId}
-          />
-          <Input
-            className="mt-2"
-            onChange={(e) => setHuggingFaceTag(e.target.value)}
-            placeholder={messages.model.upload.huggingfaceTagPlaceholder}
-            value={huggingFaceTag}
-          />
-        </div>
+        <Input
+          className="w-80 min-w-0"
+          onChange={(e) => setHuggingFaceModelId(e.target.value)}
+          placeholder={messages.model.upload.huggingfaceIdPlaceholder}
+          value={huggingFaceModelId}
+        />
+        <Input
+          className="w-15"
+          maxLength={8}
+          onChange={(e) => setHuggingFaceTag(e.target.value)}
+          placeholder={messages.model.upload.huggingfaceTagPlaceholder}
+          value={huggingFaceTag}
+        />
       </div>
 
       {/* Local file upload section with drag-and-drop */}
@@ -188,15 +206,17 @@ export const ModelUpload = () => {
       </div>
 
       {/* Upload button */}
+      <div className="flex-1" />
       <Button
         className="mt-4 w-full"
         disabled={uploading}
-        onClick={handleUpload}
+        style={{ marginTop: 'auto' }}
+        type="submit"
       >
         {uploading
           ? messages.model.upload.uploading
           : messages.model.upload.upload}
       </Button>
-    </div>
+    </form>
   );
 };

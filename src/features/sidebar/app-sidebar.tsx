@@ -1,6 +1,11 @@
 'use client';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   Sidebar,
   SidebarContent,
@@ -8,54 +13,71 @@ import {
   SidebarGroup,
   SidebarHeader,
   SidebarRail,
-  useSidebar,
 } from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Upload } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import { DatasetList } from './dataset/dataset-list';
 import { DatasetUpload } from './dataset/dataset-upload';
 import { ModelList } from './model/model-list';
 import { ModelUpload } from './model/model-upload';
+import { SyntheticGenerateDialog } from './synthetic/synthetic-generate-dialog';
 
-export function AppSidebar() {
-  const { open } = useSidebar();
+export const AppSidebar = () => {
   const [uploadOpen, setUploadOpen] = useState(false);
-  const [tab, setTab] = useState<'model' | 'dataset'>('model');
+  const [tab, setTab] = useState<'dataset' | 'model'>('model');
+  const [syntheticOpen, setSyntheticOpen] = useState(false);
 
   return (
     <Sidebar className="bg-[var(--sidebar)] text-[var(--sidebar-foreground)] transition-all duration-200">
-      <SidebarHeader className="w-full mb-6 pt-4">
-        <div className="flex items-center justify-between w-full">
-          <span className="text-lg font-semibold pl-4">Vectorize</span>
+      <SidebarHeader className="header-bg mb-6 w-full pt-4">
+        <div className="flex w-full items-center justify-between">
+          <Link className="pl-4" href="/" title="Go to homepage">
+            <span className="focus:ring-primary hover:bg-muted inline-block min-w-[120px] rounded bg-transparent p-2 text-center text-lg font-semibold text-[var(--sidebar-foreground)] shadow transition-colors focus:ring-2 focus:outline-none">
+              Vectorize
+            </span>
+          </Link>
           <div className="flex gap-2">
             <button
-              className="rounded p-2 hover:bg-muted"
-              title="Neu"
+              className="hover:bg-muted rounded p-2"
+              onClick={() => setSyntheticOpen(true)}
+              title="Generate synthetic dataset"
               type="button"
             >
               <Plus className="h-5 w-5" />
             </button>
+            <SyntheticGenerateDialog
+              onOpenChange={setSyntheticOpen}
+              open={syntheticOpen}
+            />
             <button
-              className="rounded p-2 hover:bg-muted"
+              className="hover:bg-muted rounded p-2"
+              onClick={() => setUploadOpen(true)}
               title="Upload"
               type="button"
-              onClick={() => setUploadOpen(true)}
             >
               <Upload className="h-5 w-5" />
             </button>
           </div>
         </div>
       </SidebarHeader>
-      <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
+      <Dialog onOpenChange={setUploadOpen} open={uploadOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Upload</DialogTitle>
           </DialogHeader>
-          <Tabs value={tab} onValueChange={v => setTab(v as 'model' | 'dataset')}>
-            <TabsList className="w-full mb-4">
-              <TabsTrigger value="model" className="flex-1">Model</TabsTrigger>
-              <TabsTrigger value="dataset" className="flex-1">Dataset</TabsTrigger>
+          <Tabs
+            onValueChange={(v) => setTab(v as 'dataset' | 'model')}
+            value={tab}
+          >
+            <TabsList className="mb-4 w-full">
+              <TabsTrigger className="flex-1" value="model">
+                Model
+              </TabsTrigger>
+              <TabsTrigger className="flex-1" value="dataset">
+                Dataset
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="model">
               <ModelUpload />
@@ -67,16 +89,15 @@ export function AppSidebar() {
         </DialogContent>
       </Dialog>
       <SidebarContent className="flex-1 overflow-y-auto">
-        <SidebarGroup className="mb-0">
-          <ModelList isOpen={open} />
+        <SidebarGroup>
+          <ModelList />
         </SidebarGroup>
         <SidebarGroup>
-          <DatasetList isOpen={open} />
+          <DatasetList />
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-      </SidebarFooter>
+      <SidebarFooter></SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
-}
+};

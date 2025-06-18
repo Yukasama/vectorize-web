@@ -1,138 +1,129 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import {
   fetchModelById,
   Model,
-  updateModelName,
 } from '@/features/sidebar/services/model-service';
-import { Pencil, Save } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { formatRelativeDate } from '@/lib/utils';
+import Image from 'next/image';
+import * as React from 'react';
 
-interface Props {
-  modelId: string | undefined;
-  onClose: () => void;
-  open: boolean;
-}
-
-export const ModelDetailsDialog: React.FC<Props> = ({
+export const ModelDetailsHoverCardContent = ({
   modelId,
-  onClose,
-  open,
+}: {
+  modelId: string;
 }) => {
-  const [model, setModel] = useState<Model | null>();
-  const [loading, setLoading] = useState(false);
-  const [edit, setEdit] = useState(false);
-  const [newName, setNewName] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [model, setModel] = React.useState<Model | null>();
+  const [loading, setLoading] = React.useState(false);
 
-  useEffect(() => {
-    if (open && modelId) {
+  React.useEffect(() => {
+    if (modelId) {
       setLoading(true);
-      setEdit(false);
-      void (async () => {
-        const m = await fetchModelById(modelId);
-        setModel(m);
-        setNewName(m?.name ?? '');
-        setLoading(false);
-      })();
+      void fetchModelById(modelId)
+        .then((result) => setModel(result ?? undefined))
+        .finally(() => setLoading(false));
     }
-  }, [open, modelId]);
+  }, [modelId]);
 
-  const handleSave = async () => {
-    if (!model || !newName.trim()) {
-      return;
-    }
-    setSaving(true);
-    try {
-      await updateModelName(model.id, newName.trim(), model.version);
-      const updated = await fetchModelById(model.model_tag);
-      setModel(updated);
-      setEdit(false);
-    } finally {
-      setSaving(false);
-    }
+  const [copied, setCopied] = React.useState(false);
+
+  const handleCopy = (id: string) => {
+    void navigator.clipboard.writeText(id);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1200);
   };
 
   return (
-    <Dialog onOpenChange={onClose} open={open}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Model Details</DialogTitle>
-          <DialogDescription>{loading && 'Loading data...'}</DialogDescription>
-          {!loading && model && (
-            <div className="mt-2 space-y-2">
-              <div className="flex items-center gap-2">
-                {edit ? (
-                  <>
-                    <Input
-                      className="w-auto"
-                      disabled={saving}
-                      onChange={(e) => setNewName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          void handleSave();
-                        }
-                      }}
-                      value={newName}
-                    />
-                    <Button
-                      aria-label="Save"
-                      disabled={saving}
-                      onClick={handleSave}
-                      size="icon"
-                      variant="ghost"
-                    >
-                      <Save className="h-4 w-4" />
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <span>
-                      <b>Name:</b> {model.name}
-                    </span>
-                    <Button
-                      aria-label="Edit"
-                      onClick={() => setEdit(true)}
-                      size="icon"
-                      variant="ghost"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  </>
-                )}
-              </div>
-              <div>
-                <b>ID:</b> {model.id}
-              </div>
-              <div>
-                <b>Tag:</b> {model.model_tag}
-              </div>
-              <div>
-                <b>Source:</b> {model.source}
-              </div>
-              <div>
-                <b>Version:</b> {model.version}
-              </div>
-              <div>
-                <b>Created at:</b> {new Date(model.created_at).toLocaleString()}
-              </div>
-              <div>
-                <b>Updated at:</b> {new Date(model.updated_at).toLocaleString()}
-              </div>
-            </div>
-          )}
-          {!loading && !model && <div>No data found.</div>}
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
+    <div className="bg-background relative min-w-[180px] rounded-lg p-1 shadow-md">
+      {loading && <div>Loading data...</div>}
+      {!loading && model && (
+        <div className="space-y-2 text-sm">
+          <div className="flex items-center gap-2 text-base font-semibold">
+            {model.name}
+            {model.source === 'github' && (
+              <Image
+                alt="GitHub Logo"
+                className="inline-block align-middle"
+                height={18}
+                src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                title="GitHub"
+                width={18}
+              />
+            )}
+            {model.source === 'huggingface' && (
+              <Image
+                alt="Hugging Face Logo"
+                className="inline-block align-middle"
+                height={18}
+                src="/images/huggingface_logo.svg"
+                title="Hugging Face"
+                width={18}
+              />
+            )}
+            {model.source === 'local' && (
+              <span
+                className="text-muted-foreground inline-block align-middle text-lg"
+                title="Local file"
+              >
+                📄
+              </span>
+            )}
+          </div>
+          <div className="text-muted-foreground flex items-center gap-1 text-xs">
+            <b>ID:</b> {model.id}
+            <button
+              className="hover:bg-accent focus:ring-accent ml-1 rounded px-1 py-0.5 focus:ring-2 focus:outline-none"
+              onClick={() => handleCopy(model.id)}
+              title="Copy ID"
+              type="button"
+            >
+              <svg
+                className="inline align-middle"
+                fill="none"
+                height="14"
+                viewBox="0 0 20 20"
+                width="14"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  fill="none"
+                  height="14"
+                  rx="2"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  width="10"
+                  x="7"
+                  y="3"
+                />
+                <rect
+                  fill="none"
+                  height="10"
+                  rx="2"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  width="10"
+                  x="3"
+                  y="7"
+                />
+              </svg>
+            </button>
+            {copied && (
+              <span className="ml-1 text-green-600 transition-opacity duration-200">
+                Copied
+              </span>
+            )}
+          </div>
+          <div className="text-muted-foreground text-xs">
+            <b>Created:</b>{' '}
+            {model.created_at ? formatRelativeDate(model.created_at) : ''}
+          </div>
+          <div className="text-muted-foreground absolute right-4 bottom-2 text-right text-xs select-none">
+            Updated{' '}
+            {model.updated_at ? formatRelativeDate(model.updated_at) : ''}
+          </div>
+        </div>
+      )}
+      {!loading && !model && <div>No data found.</div>}
+    </div>
   );
 };

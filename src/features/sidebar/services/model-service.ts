@@ -1,3 +1,4 @@
+import { messages } from '@/lib/messages';
 import axios from 'axios';
 
 export interface Model {
@@ -16,6 +17,19 @@ interface PagedResponse<T> {
   size: number;
   totalpages: number;
 }
+
+/**
+ * Delete a model by its ID.
+ */
+export const deleteModel = async (id: string): Promise<boolean> => {
+  try {
+    await axios.delete(`http://localhost:8000/v1/models/${id}`);
+    return true;
+  } catch (error) {
+    console.error(messages.model.delete.error, error);
+    return false;
+  }
+};
 
 /**
  * Fetch multiple models

@@ -1,4 +1,13 @@
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card';
 import { Input } from '@/components/ui/input';
 import {
   SidebarMenu,
@@ -8,27 +17,21 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { ChevronDown, ChevronUp, Search } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import type { Model } from '../services/model-service';
 import { fetchModels } from '../services/model-service';
-import { ModelDetailsDialog } from './model-details';
+import { ModelDetailsHoverCardContent } from './model-details';
 import { ModelListItem } from './model-options';
-import { ModelUpload } from './model-upload';
 
-interface Model {
-  id: string;
-  model_tag: string;
-  name: string;
-}
-
-export const ModelList = ({ isOpen }: { isOpen: boolean }) => {
+export const ModelList = () => {
   // State for models and UI logic
   const [models, setModels] = useState<Model[]>([]);
   const [modelSearch, setModelSearch] = useState('');
+  const [showMoreModels, setShowMoreModels] = useState(false);
   const [open, setOpen] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const [selectedModelId, setSelectedModelId] = useState<string | undefined>();
 
-  // Fetch models on mount
+  // Load models on first render
   useEffect(() => {
     const loadModels = async () => {
       const data = await fetchModels();
@@ -37,27 +40,27 @@ export const ModelList = ({ isOpen }: { isOpen: boolean }) => {
     void loadModels();
   }, []);
 
-  // Filter models by search input
+  // Filter models by search term
   const filteredModels = models.filter((model) =>
     model.name.toLowerCase().includes(modelSearch.toLowerCase()),
   );
+
   // Show only 5 by default, show all if showMoreModels is true
-  const [showMoreModels, setShowMoreModels] = useState(false);
   const visibleModels = filteredModels.slice(
     0,
     showMoreModels ? filteredModels.length : 5,
   );
 
-  // Open model details dialog
-  const openModelDetails = (model_tag: string) => {
-    setSelectedModelId(model_tag);
-    setDetailsOpen(true);
+  // Remove deleted model from list
+  const handleModelDeleted = (id: string) => {
+    setModels((prev) => prev.filter((m) => m.id !== id));
   };
 
   return (
     <SidebarMenu>
       {/* Collapsible section for models */}
       <Collapsible
+        className="group/collapsible"
         defaultOpen={open}
         onOpenChange={(open) => {
           setOpen(open);
@@ -65,12 +68,11 @@ export const ModelList = ({ isOpen }: { isOpen: boolean }) => {
             setShowMoreModels(false);
           }
         }}
-        className="group/collapsible"
       >
         <SidebarMenuItem>
           <CollapsibleTrigger asChild>
-            <SidebarMenuButton className="flex items-center w-full gap-2 sticky top-0 z-10 bg-[var(--sidebar)]">
-              <span className="text-md font-semibold">Models</span>
+            <SidebarMenuButton className="sticky top-0 z-10 flex w-full items-center gap-2 bg-[var(--sidebar)]">
+              <span className="text-md">Models</span>
               <span className="ml-auto flex flex-row items-center gap-2">
                 {open ? (
                   <ChevronUp className="h-5 w-5" />
@@ -91,27 +93,35 @@ export const ModelList = ({ isOpen }: { isOpen: boolean }) => {
               />
             </div>
             {/* SidebarMenuSub */}
-            {showMoreModels ? (
-              <SidebarMenuSub>
-                {visibleModels.map((model) => (
-                  <SidebarMenuSubItem key={model.id}>
-                    <ModelListItem model={model} onDetails={openModelDetails} />
-                  </SidebarMenuSubItem>
-                ))}
-              </SidebarMenuSub>
-            ) : (
-              <SidebarMenuSub>
-                {visibleModels.map((model) => (
-                  <SidebarMenuSubItem key={model.id}>
-                    <ModelListItem model={model} onDetails={openModelDetails} />
-                  </SidebarMenuSubItem>
-                ))}
-              </SidebarMenuSub>
-            )}
+            <SidebarMenuSub>
+              {visibleModels.map((model) => (
+                <HoverCard key={model.id}>
+                  <HoverCardTrigger asChild>
+                    <Link href={`/model/${model.id}`}>
+                      <SidebarMenuSubItem>
+                        <ModelListItem
+                          model={{
+                            ...model,
+                            name:
+                              model.name.length > 12
+                                ? model.name.slice(0, 12) + '...'
+                                : model.name,
+                          }}
+                          onDeleted={handleModelDeleted}
+                        />
+                      </SidebarMenuSubItem>
+                    </Link>
+                  </HoverCardTrigger>
+                  <HoverCardContent align="start" className="w-96" side="top">
+                    <ModelDetailsHoverCardContent modelId={model.model_tag} />
+                  </HoverCardContent>
+                </HoverCard>
+              ))}
+            </SidebarMenuSub>
             {/* Show More/Less button */}
             {filteredModels.length > 5 && (
               <button
-                className="mt-2 w-full text-xs text-muted-foreground hover:underline"
+                className="text-muted-foreground mt-2 w-full text-xs hover:underline"
                 onClick={() => setShowMoreModels((v) => !v)}
                 type="button"
               >
@@ -121,12 +131,6 @@ export const ModelList = ({ isOpen }: { isOpen: boolean }) => {
           </CollapsibleContent>
         </SidebarMenuItem>
       </Collapsible>
-      {/* Model details dialog */}
-      <ModelDetailsDialog
-        modelId={detailsOpen ? selectedModelId : undefined}
-        onClose={() => setDetailsOpen(false)}
-        open={detailsOpen}
-      />
     </SidebarMenu>
   );
 };

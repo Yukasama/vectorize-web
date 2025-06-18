@@ -2,12 +2,18 @@ import { messages } from '@/lib/messages';
 import axios from 'axios';
 
 /**
- * Upload a model from a GitHub repository URL.
+ * Upload a model from a GitHub repository by owner, repo, and optional revision (branch/tag).
  */
-export const uploadGithub = async (githubUrl: string): Promise<void> => {
+export const uploadGithub = async (
+  owner: string,
+  repo: string,
+  revision?: string,
+): Promise<void> => {
   try {
     await axios.post('http://localhost:8000/v1/uploads/github', {
-      github_url: githubUrl,
+      owner,
+      repo_name: repo,
+      revision: revision ?? undefined,
     });
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -19,7 +25,10 @@ export const uploadGithub = async (githubUrl: string): Promise<void> => {
       }
       if (error.response?.status === 404) {
         throw new Error(
-          messages.model.upload.githubNotFound(githubUrl, 'main'),
+          messages.model.upload.githubNotFound(
+            `${owner}/${repo}`,
+            revision ?? 'main',
+          ),
         );
       }
       // Use backend error message if available, otherwise fallback to messages
