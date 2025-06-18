@@ -16,18 +16,94 @@ import {
   SidebarMenuSub,
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
-import { fetchDatasets } from '@/features/sidebar/services/dataset-service';
+import { SidebarListItemName } from '@/components/ui/sidebar-list-item';
 import { ChevronDown, ChevronUp, Search } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { fetchDatasets, updateDataset } from '../services/dataset-service';
 import { DatasetDetailsHoverCard } from './dataset-details';
-import { DatasetListItem } from './dataset-options';
+import { DatasetListOptions } from './dataset-options';
 
 interface Dataset {
   id: string;
   name: string;
   version?: number;
 }
+
+const DatasetListItem = ({
+  dataset,
+  onDeleted,
+}: {
+  dataset: Dataset;
+  onDeleted?: (id: string) => void;
+}) => {
+  const [edit, setEdit] = useState(false);
+  const [newName, setNewName] = useState(dataset.name);
+  const [saving, setSaving] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleSave = async () => {
+    if (!newName.trim() || newName === dataset.name) {
+      setEdit(false);
+      setNewName(dataset.name);
+      return;
+    }
+    setSaving(true);
+    try {
+      if (dataset.version === undefined) {
+        throw new Error('Missing dataset version');
+      }
+      await updateDataset(dataset.id, newName.trim(), dataset.version);
+      setEdit(false);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <SidebarMenuSubItem key={dataset.id}>
+      <div className="flex w-full min-w-0 items-center">
+        <HoverCard>
+          <HoverCardTrigger asChild>
+            {edit ? (
+              <SidebarListItemName
+                edit={edit}
+                handleSave={handleSave}
+                inputRef={inputRef as React.RefObject<HTMLInputElement>}
+                name={dataset.name}
+                newName={newName}
+                saving={saving}
+                setEdit={setEdit}
+                setNewName={setNewName}
+              />
+            ) : (
+              <Link className="min-w-0 flex-1" href={`/dataset/${dataset.id}`}>
+                <SidebarListItemName
+                  edit={edit}
+                  handleSave={handleSave}
+                  inputRef={inputRef as React.RefObject<HTMLInputElement>}
+                  name={dataset.name}
+                  newName={newName}
+                  saving={saving}
+                  setEdit={setEdit}
+                  setNewName={setNewName}
+                />
+              </Link>
+            )}
+          </HoverCardTrigger>
+          <HoverCardContent align="start" className="w-96" side="top">
+            <DatasetDetailsHoverCard datasetId={dataset.id} />
+          </HoverCardContent>
+        </HoverCard>
+        <DatasetListOptions
+          dataset={dataset}
+          onDeleted={onDeleted}
+          setEdit={setEdit}
+        />
+      </div>
+    </SidebarMenuSubItem>
+  );
+};
 
 export const DatasetList = () => {
   const [datasets, setDatasets] = useState<Dataset[]>([]);
@@ -43,16 +119,15 @@ export const DatasetList = () => {
     void loadDatasets();
   }, []);
 
-  const filterDataset = (dataset: Dataset): boolean =>
-    dataset.name.toLowerCase().includes(datasetSearch.toLowerCase());
+  const filteredDatasets = datasets.filter((dataset) =>
+    dataset.name.toLowerCase().includes(datasetSearch.toLowerCase()),
+  );
 
-  const filteredDatasets = datasets.filter((element) => filterDataset(element));
   const visibleDatasets = filteredDatasets.slice(
     0,
     showMoreDatasets ? filteredDatasets.length : 5,
   );
 
-  // Remove a dataset from the list after deletion
   const handleDeleted = (id: string) => {
     setDatasets((prev) => prev.filter((d) => d.id !== id));
   };
@@ -83,7 +158,6 @@ export const DatasetList = () => {
             </SidebarMenuButton>
           </CollapsibleTrigger>
           <CollapsibleContent>
-            {/* Search input */}
             <div className="mt-2 flex items-center gap-2">
               <Search className="h-4 w-4" />
               <Input
@@ -92,33 +166,15 @@ export const DatasetList = () => {
                 value={datasetSearch}
               />
             </div>
-            {/* SidebarMenuSub */}
             <SidebarMenuSub>
               {visibleDatasets.map((dataset) => (
-                <HoverCard key={dataset.id}>
-                  <HoverCardTrigger asChild>
-                    <Link href={`/dataset/${dataset.id}`}>
-                      <SidebarMenuSubItem className="cursor-pointer">
-                        <DatasetListItem
-                          dataset={{
-                            ...dataset,
-                            name:
-                              dataset.name.length > 12
-                                ? dataset.name.slice(0, 12) + '...'
-                                : dataset.name,
-                          }}
-                          onDeleted={handleDeleted}
-                        />
-                      </SidebarMenuSubItem>
-                    </Link>
-                  </HoverCardTrigger>
-                  <HoverCardContent align="start" className="w-96" side="top">
-                    <DatasetDetailsHoverCard datasetId={dataset.id} />
-                  </HoverCardContent>
-                </HoverCard>
+                <DatasetListItem
+                  dataset={dataset}
+                  key={dataset.id}
+                  onDeleted={handleDeleted}
+                />
               ))}
             </SidebarMenuSub>
-            {/* Show More/Less */}
             {filteredDatasets.length > 5 && (
               <button
                 className="text-muted-foreground mt-2 w-full text-xs hover:underline"
