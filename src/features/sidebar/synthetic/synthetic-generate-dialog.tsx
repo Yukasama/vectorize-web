@@ -8,6 +8,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { DatasetList } from '@/features/service-starter/select-dataset/dataset-list';
+import { useQuery } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import React, { useMemo, useRef, useState } from 'react';
 import { Dataset, fetchDatasets } from '../services/dataset-service';
@@ -258,7 +259,6 @@ export const SyntheticGenerateDialog = ({
 }: SyntheticGenerateDialogProps) => {
   // Mode: 'upload' (drag-and-drop) or 'select' (dataset list)
   const [mode, setMode] = useState<'select' | 'upload'>('upload');
-  const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [selectedDataset, setSelectedDataset] = useState<string>('');
   // For dataset selection mode
   const [search, setSearch] = useState('');
@@ -276,6 +276,26 @@ export const SyntheticGenerateDialog = ({
   const [dragActive, setDragActive] = useState(false);
   const [fileStates, setFileStates] = useState<FileUploadState[]>([]);
   const [uploading, setUploading] = useState(false);
+
+  // --- React Query for datasets ---
+  const { data: datasets = [], isLoading: isDatasetsLoading } = useQuery({
+    enabled: open, // Only fetch when dialog is open
+    queryFn: fetchDatasets,
+    queryKey: ['datasets'],
+  });
+
+  // Reset selection/search/view on open
+  React.useEffect(() => {
+    if (open) {
+      setSelectedDataset('');
+      setTaskId(undefined);
+      setStatus(undefined);
+      setError(undefined);
+      setLocalSelectedDatasets([]);
+      setSearch('');
+      setView('grid');
+    }
+  }, [open]);
 
   // Add files to state and start upload
   const handleFilesSelected = (files: File[] | FileList) => {
@@ -351,23 +371,6 @@ export const SyntheticGenerateDialog = ({
       setUploading(false);
     }
   };
-
-  // Load datasets on open
-  React.useEffect(() => {
-    if (open) {
-      void (async () => {
-        const data = await fetchDatasets();
-        setDatasets(data);
-        setSelectedDataset('');
-        setTaskId(undefined);
-        setStatus(undefined);
-        setError(undefined);
-        setLocalSelectedDatasets([]);
-        setSearch('');
-        setView('grid');
-      })();
-    }
-  }, [open]);
 
   // Filtered datasets for search
   const filteredDatasets = useMemo(
@@ -466,7 +469,7 @@ export const SyntheticGenerateDialog = ({
               filteredDatasets={filteredDatasets}
               handleClearSelected={handleClearSelected}
               handleSelect={handleSelect}
-              loading={loading}
+              loading={isDatasetsLoading}
               localSelectedDatasets={localSelectedDatasets}
               search={search}
               setSearch={setSearch}

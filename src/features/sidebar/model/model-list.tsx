@@ -17,11 +17,11 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { SidebarListItemName } from '@/components/ui/sidebar-list-item';
+import { useQuery } from '@tanstack/react-query';
 import { ChevronDown, ChevronUp, Search } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
-import type { Model } from '../services/model-service';
-import { fetchModels, updateModelName } from '../services/model-service';
+import { useRef, useState } from 'react';
+import { fetchModels, Model, updateModelName } from '../services/model-service';
 import { ModelDetailsHoverCardContent } from './model-details';
 import { ModelListOptions } from './model-options';
 
@@ -93,25 +93,19 @@ const ModelListItem = ({
 };
 
 export const ModelList = () => {
+  const {
+    data: models = [],
+    error,
+    isLoading,
+  } = useQuery({
+    queryFn: fetchModels,
+    queryKey: ['models'],
+  });
+
   // State for models and UI logic
-  const [models, setModels] = useState<Model[]>([]);
   const [modelSearch, setModelSearch] = useState('');
   const [showMoreModels, setShowMoreModels] = useState(false);
   const [open, setOpen] = useState(false);
-
-  // Load models on first render
-  useEffect(() => {
-    const loadModels = async () => {
-      const data = await fetchModels();
-      setModels(data);
-    };
-    void loadModels();
-  }, []);
-
-  // Remove deleted model from list
-  const handleModelDeleted = (id: string) => {
-    setModels((prev) => prev.filter((m) => m.id !== id));
-  };
 
   // Filter models by search term
   const filteredModels = models.filter((model) =>
@@ -123,6 +117,41 @@ export const ModelList = () => {
     0,
     showMoreModels ? filteredModels.length : 5,
   );
+
+  if (isLoading) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <div className="p-4">
+            <div className="space-y-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div className="flex items-center gap-2" key={i}>
+                  <div className="bg-muted h-6 w-6 animate-pulse rounded-full" />
+                  <div className="flex-1">
+                    <div className="bg-muted h-4 w-3/4 animate-pulse rounded" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
+
+  if (error) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <div className="p-4">
+            <div className="bg-destructive/10 border-destructive text-destructive rounded border p-2 text-sm">
+              Error loading models: {error.message || String(error)}
+            </div>
+          </div>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
 
   return (
     <SidebarMenu>
@@ -163,11 +192,7 @@ export const ModelList = () => {
             {/* SidebarMenuSub */}
             <SidebarMenuSub>
               {visibleModels.map((model) => (
-                <ModelListItem
-                  key={model.id}
-                  model={model}
-                  onDeleted={handleModelDeleted}
-                />
+                <ModelListItem key={model.id} model={model} />
               ))}
             </SidebarMenuSub>
             {/* Show More/Less button */}

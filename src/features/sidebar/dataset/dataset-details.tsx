@@ -1,11 +1,9 @@
 'use client';
 
 import { DetailsHoverCard } from '@/components/ui/details-hover-card';
-import {
-  Dataset,
-  fetchDatasetById,
-} from '@/features/sidebar/services/dataset-service';
+import { fetchDatasetById } from '@/features/sidebar/services/dataset-service';
 import { formatRelativeDate } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
 import * as React from 'react';
 
 export const DatasetDetailsHoverCard = ({
@@ -13,18 +11,12 @@ export const DatasetDetailsHoverCard = ({
 }: {
   datasetId: string;
 }) => {
-  const [dataset, setDataset] = React.useState<Dataset | null>();
-  const [loading, setLoading] = React.useState(false);
   const [copied, setCopied] = React.useState(false);
-
-  React.useEffect(() => {
-    if (datasetId) {
-      setLoading(true);
-      void fetchDatasetById(datasetId)
-        .then((result) => setDataset(result ?? undefined))
-        .finally(() => setLoading(false));
-    }
-  }, [datasetId]);
+  const { data: dataset, isLoading: loading } = useQuery({
+    enabled: !!datasetId,
+    queryFn: () => fetchDatasetById(datasetId),
+    queryKey: ['dataset', datasetId],
+  });
 
   const handleCopy = (id: string) => {
     void navigator.clipboard.writeText(id);

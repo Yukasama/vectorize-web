@@ -3,6 +3,7 @@ import {
   SidebarListItemOptions,
 } from '@/components/ui/sidebar-list-item';
 import { messages } from '@/lib/messages';
+import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { toast } from 'sonner';
 import type { Dataset } from '../services/dataset-service';
@@ -20,6 +21,7 @@ export const DatasetListItem = ({
   dataset,
   onDeleted,
 }: DatasetListItemProps) => {
+  const queryClient = useQueryClient();
   const [edit, setEdit] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const [newName, setNewName] = React.useState(dataset.name);
@@ -38,6 +40,7 @@ export const DatasetListItem = ({
       }
       await updateDataset(dataset.id, newName.trim(), dataset.version);
       setEdit(false);
+      void queryClient.invalidateQueries({ queryKey: ['datasets'] });
     } finally {
       setSaving(false);
     }
@@ -75,6 +78,7 @@ export const DatasetListOptions = ({
   onDeleted,
   setEdit,
 }: DatasetListOptionsProps) => {
+  const queryClient = useQueryClient();
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
   const handleDelete = async () => {
@@ -86,6 +90,7 @@ export const DatasetListOptions = ({
       toast.success(messages.dataset.delete.success(dataset.name), {
         position: 'bottom-right',
       });
+      void queryClient.invalidateQueries({ queryKey: ['datasets'] });
       onDeleted?.(dataset.id);
     } else {
       toast.error(messages.dataset.delete.error);

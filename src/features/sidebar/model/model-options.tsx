@@ -1,5 +1,6 @@
 import { SidebarListItemOptions } from '@/components/ui/sidebar-list-item';
 import { messages } from '@/lib/messages';
+import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { toast } from 'sonner';
 import type { Model } from '../services/model-service';
@@ -20,6 +21,7 @@ export const ModelListOptions = ({
   setEdit,
 }: ModelListOptionsProps) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const queryClient = useQueryClient();
 
   const handleDelete = async () => {
     const success = await deleteModel(model.id);
@@ -29,6 +31,7 @@ export const ModelListOptions = ({
         position: 'bottom-right',
       });
       onDeleted?.(model.id);
+      void queryClient.invalidateQueries({ queryKey: ['models'] });
     } else {
       toast.error(messages.model.delete.error);
     }

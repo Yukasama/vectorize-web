@@ -1,5 +1,6 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
 import type { Model } from '../sidebar/services/model-service';
 import { fetchModels } from '../sidebar/services/model-service';
 import { ModelList } from './select-model/model-list';
@@ -17,28 +18,19 @@ export const SelectModel = ({
   onNext?: () => void;
   setSelectedModel: (model: Model | undefined) => void;
 }) => {
-  const [models, setModels] = useState<Model[]>([]);
-  const [loading, setLoading] = useState(false);
+  const {
+    data: models = [],
+    error,
+    isLoading,
+  } = useQuery({
+    queryFn: fetchModels,
+    queryKey: ['models'],
+  });
   const [search, setSearch] = useState('');
   const [view, setView] = useState<'grid' | 'table'>('grid');
   const [localSelectedModel, setLocalSelectedModel] = useState<
     Model | undefined
   >(initialSelectedModel);
-
-  useEffect(() => {
-    const loadModels = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchModels();
-        setModels(data);
-      } catch {
-        setModels([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    void loadModels();
-  }, []);
 
   const filteredModels = useMemo(
     () =>
@@ -71,12 +63,20 @@ export const SelectModel = ({
       <ScrollArea className="min-h-0 flex-1">
         <div className="px-0 py-3">
           <ModelList
-            loading={loading}
+            loading={isLoading}
             models={filteredModels}
             onSelect={handleSelect}
             selectedModel={localSelectedModel}
             view={view}
           />
+          {isLoading && (
+            <div className="p-4 text-center">Loading models...</div>
+          )}
+          {error && (
+            <div className="text-destructive p-4">
+              Error loading models: {error.message || String(error)}
+            </div>
+          )}
         </div>
       </ScrollArea>
       <ModelListFooter

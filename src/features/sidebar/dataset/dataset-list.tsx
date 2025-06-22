@@ -17,26 +17,19 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { SidebarListItemName } from '@/components/ui/sidebar-list-item';
+import { useQuery } from '@tanstack/react-query';
 import { ChevronDown, ChevronUp, Search } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
-import { fetchDatasets, updateDataset } from '../services/dataset-service';
+import { useRef, useState } from 'react';
+import {
+  Dataset,
+  fetchDatasets,
+  updateDataset,
+} from '../services/dataset-service';
 import { DatasetDetailsHoverCard } from './dataset-details';
 import { DatasetListOptions } from './dataset-options';
 
-interface Dataset {
-  id: string;
-  name: string;
-  version?: number;
-}
-
-const DatasetListItem = ({
-  dataset,
-  onDeleted,
-}: {
-  dataset: Dataset;
-  onDeleted?: (id: string) => void;
-}) => {
+const DatasetListItem = ({ dataset }: { dataset: Dataset }) => {
   const [edit, setEdit] = useState(false);
   const [newName, setNewName] = useState(dataset.name);
   const [saving, setSaving] = useState(false);
@@ -95,29 +88,25 @@ const DatasetListItem = ({
             <DatasetDetailsHoverCard datasetId={dataset.id} />
           </HoverCardContent>
         </HoverCard>
-        <DatasetListOptions
-          dataset={dataset}
-          onDeleted={onDeleted}
-          setEdit={setEdit}
-        />
+        <DatasetListOptions dataset={dataset} setEdit={setEdit} />
       </div>
     </SidebarMenuSubItem>
   );
 };
 
 export const DatasetList = () => {
-  const [datasets, setDatasets] = useState<Dataset[]>([]);
+  const {
+    data: datasets = [],
+    error,
+    isLoading,
+  } = useQuery({
+    queryFn: fetchDatasets,
+    queryKey: ['datasets'],
+  });
+
   const [datasetSearch, setDatasetSearch] = useState('');
   const [showMoreDatasets, setShowMoreDatasets] = useState(false);
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    const loadDatasets = async () => {
-      const data = await fetchDatasets();
-      setDatasets(data);
-    };
-    void loadDatasets();
-  }, []);
 
   const filteredDatasets = datasets.filter((dataset) =>
     dataset.name.toLowerCase().includes(datasetSearch.toLowerCase()),
@@ -128,12 +117,41 @@ export const DatasetList = () => {
     showMoreDatasets ? filteredDatasets.length : 5,
   );
 
-  const handleDeleted = (id: string) => {
-    setDatasets((prev) => prev.filter((d) => d.id !== id));
-  };
+  if (isLoading) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <div className="p-4">
+            <div className="space-y-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div className="flex items-center gap-2" key={i}>
+                  <div className="bg-muted h-6 w-6 animate-pulse rounded-full" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
+
+  if (error) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <div className="p-4">
+            <div className="bg-destructive/10 border-destructive text-destructive rounded border p-2 text-sm">
+              Error loading datasets: {error.message || String(error)}
+            </div>
+          </div>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
 
   return (
     <SidebarMenu>
+      {/* Collapsible section for datasets */}
       <Collapsible
         className="group/collapsible"
         defaultOpen={open}
@@ -168,11 +186,7 @@ export const DatasetList = () => {
             </div>
             <SidebarMenuSub>
               {visibleDatasets.map((dataset) => (
-                <DatasetListItem
-                  dataset={dataset}
-                  key={dataset.id}
-                  onDeleted={handleDeleted}
-                />
+                <DatasetListItem dataset={dataset} key={dataset.id} />
               ))}
             </SidebarMenuSub>
             {filteredDatasets.length > 5 && (
