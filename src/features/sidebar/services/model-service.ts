@@ -23,7 +23,7 @@ interface PagedResponse<T> {
  */
 export const deleteModel = async (id: string): Promise<boolean> => {
   try {
-    await axios.delete(`http://localhost:8000/v1/models/${id}`);
+    await axios.delete(`https://localhost/v1/models/${id}`);
     return true;
   } catch (error) {
     console.error(messages.model.delete.error, error);
@@ -37,7 +37,7 @@ export const deleteModel = async (id: string): Promise<boolean> => {
 export const fetchModels = async (): Promise<Model[]> => {
   try {
     const response = await axios.get<PagedResponse<Model>>(
-      'http://localhost:8000/v1/models?page=1&size=100',
+      'https://localhost/v1/models?page=1&size=100',
     );
     return response.data.items;
   } catch (error) {
@@ -54,7 +54,7 @@ export const fetchModelById = async (
 ): Promise<Model | undefined> => {
   try {
     const response = await axios.get<Model>(
-      `http://localhost:8000/v1/models/${model_tag}`,
+      `https://localhost/v1/models/${model_tag}`,
     );
     return response.data;
   } catch (error: unknown) {
@@ -75,7 +75,7 @@ export const updateModelName = async (
   version: number,
 ): Promise<void> => {
   await axios.put(
-    `http://localhost:8000/v1/models/${id}`,
+    `https://localhost/v1/models/${id}`,
     { name },
     {
       headers: {

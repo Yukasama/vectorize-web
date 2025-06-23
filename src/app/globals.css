@@ -76,11 +76,39 @@
   animation: skeleton 1.8s ease-in-out infinite;
   background-image: linear-gradient(
     105deg,
-    transparent 0%,
-    transparent 40%,
+    transparent 0% 40%,
     var(--color-accent) 50%,
-    transparent 60%,
-    transparent 100%
+    transparent 60% 100%
+  );
+  background-size: 200% auto;
+  background-repeat: no-repeat;
+  background-position-x: -50%;
+}
+
+.skeleton-blue {
+  @apply bg-blue-500/30;
+  will-change: background-position;
+  animation: skeleton 1.8s ease-in-out infinite;
+  background-image: linear-gradient(
+    105deg,
+    transparent 0% 40%,
+    var(--color-blue-500) 50%,
+    transparent 60% 100%
+  );
+  background-size: 200% auto;
+  background-repeat: no-repeat;
+  background-position-x: -50%;
+}
+
+.skeleton-amber {
+  @apply bg-amber-500/30;
+  will-change: background-position;
+  animation: skeleton 1.8s ease-in-out infinite;
+  background-image: linear-gradient(
+    105deg,
+    transparent 0% 40%,
+    var(--color-amber-500) 50%,
+    transparent 60% 100%
   );
   background-size: 200% auto;
   background-repeat: no-repeat;
@@ -88,7 +116,9 @@
 }
 
 @media (prefers-reduced-motion) {
-  .skeleton {
+  .skeleton,
+  .skeleton-blue,
+  .skeleton-amber {
     animation-duration: 15s;
   }
 }

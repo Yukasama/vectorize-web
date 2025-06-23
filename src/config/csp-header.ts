@@ -6,7 +6,7 @@ const isDev = env.NODE_ENV === 'development';
 export const generateCspHeader = ({ nonce }: { nonce: string }) => {
   return `
     default-src 'self';
-    connect-src 'self' https://va.vercel-scripts.com ${isDev ? env.NEXT_PUBLIC_HOST_URL : ''} http://localhost:8000;
+    connect-src 'self' https://va.vercel-scripts.com ${isDev ? env.NEXT_PUBLIC_HOST_URL : ''} http://localhost:8000 https://localhost:*;
     script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' https: http: ${isDev ? "'unsafe-eval'" : ''};
     style-src 'self' 'unsafe-inline';
     img-src 'self' blob: data: ;

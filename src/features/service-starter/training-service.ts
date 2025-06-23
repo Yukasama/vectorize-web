@@ -64,5 +64,5 @@ export const startTraining = async (
       body[key] = params[key as keyof StartTrainingParams];
     }
   }
-  await axios.post('http://localhost:8000/v1/training/train', body);
+  await axios.post('https://localhost/v1/training/train', body);
 };

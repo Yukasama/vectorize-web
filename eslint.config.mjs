@@ -70,6 +70,7 @@ const eslintConfig = tseslint.config(
       '@stylistic/semi': 'off',
       '@typescript-eslint/no-confusing-void-expression': 'off',
       '@typescript-eslint/no-misused-promises': 'off',
+      '@typescript-eslint/restrict-template-expressions': 'off',
       curly: 'warn',
       'n/no-extraneous-import': 'off',
       'n/no-missing-import': 'off',

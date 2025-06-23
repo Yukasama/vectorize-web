@@ -13,6 +13,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/features/sidebar/app-sidebar';
+import { TaskList } from '@/features/tasks/task-list';
 import { ThemeToggle } from '@/features/theme/theme-toggle';
 import { useState } from 'react';
 import { ServiceStarter } from '../features/service-starter/service-starter';
@@ -57,7 +58,7 @@ export default function Page() {
             <div className="bg-muted/50 flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border-2 border-transparent shadow-lg transition-colors">
               <ServiceStarter setStep={setStep} step={step} />
             </div>
-            <div className="bg-muted/50 hidden h-full min-h-0 w-full rounded-xl md:block" />
+            <TaskList />
           </div>
         </div>
       </SidebarInset>

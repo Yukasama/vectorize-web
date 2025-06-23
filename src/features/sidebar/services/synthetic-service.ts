@@ -36,7 +36,7 @@ export const uploadMediaForSynthesis = async (
     formData.append('existing_dataset_id', existingDatasetId);
   }
   const response = await axios.post<SyntheticMediaResponse>(
-    'http://localhost:8000/v1/synthesis/media',
+    'https://localhost/v1/synthesis/media',
     formData,
     {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -52,7 +52,7 @@ export const uploadMediaForSynthesis = async (
  */
 export const listSynthesisTasks = async (limit = 20) => {
   const response = await axios.get<SyntheticTaskResponse[]>(
-    `http://localhost:8000/v1/synthesis/tasks?limit=${String(limit)}`,
+    `https://localhost/v1/synthesis/tasks?limit=${String(limit)}`,
   );
   return response.data;
 };
@@ -66,7 +66,7 @@ export const startSyntheticFromDataset = async (datasetId: string) => {
   const formData = new FormData();
   formData.append('existing_dataset_id', datasetId);
   const response = await axios.post<SyntheticMediaResponse>(
-    'http://localhost:8000/v1/synthesis/media',
+    'https://localhost/v1/synthesis/media',
     formData,
     {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -82,7 +82,7 @@ export const startSyntheticFromDataset = async (datasetId: string) => {
  */
 export const getSyntheticTaskStatus = async (taskId: string) => {
   const response = await axios.get<SyntheticTaskResponse>(
-    `http://localhost:8000/v1/synthesis/tasks/${taskId}`,
+    `https://localhost/v1/synthesis/tasks/${taskId}`,
   );
   return response.data;
 };

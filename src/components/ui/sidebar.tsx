@@ -171,7 +171,7 @@ const Sidebar = ({
     return (
       <div
         className={cn(
-          'bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col',
+          'text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col',
           className,
         )}
         data-slot="sidebar"
