@@ -59,7 +59,7 @@ export const TaskList = () => {
     <div className="space-y-2" data-testid="task-list">
       <div className="flex items-center gap-3">
         <h3 className="text-md font-medium">Tasks</h3>
-        <Separator className="bg-desc/50 max-w-24" />
+        <Separator className="bg-desc/50 flex-1" />
         <p className="text-desc text-xs">Showing 3 of 4 tasks</p>
       </div>
       {/* <div className="flex items-center justify-between">
@@ -84,7 +84,7 @@ export const TaskList = () => {
             value={searchQuery}
           />
         </div>
-        <div className="flex w-full gap-2">
+        <div className="flex gap-2">
           <StatusFilter
             onStatusChange={setSelectedStatuses}
             selectedStatuses={selectedStatuses}
@@ -94,20 +94,16 @@ export const TaskList = () => {
       </div>
 
       {isFetching && !data && (
-        <div className="space-y-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Card className="h-32" key={i}>
-              <CardContent className="p-6">
-                <div className="animate-pulse space-y-3">
-                  <div className="flex justify-between">
-                    <div className="bg-muted h-4 w-1/3 rounded" />
-                    <div className="bg-muted h-6 w-20 rounded" />
-                  </div>
-                  <div className="bg-muted h-3 w-1/4 rounded" />
-                  <div className="bg-muted h-3 w-1/2 rounded" />
-                </div>
-              </CardContent>
-            </Card>
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div className="h-28 space-y-3 rounded-xl border p-5" key={i}>
+              <div className="flex justify-between">
+                <div className="skeleton h-4 w-1/2 rounded" />
+                <div className="skeleton h-6 w-20 rounded" />
+              </div>
+              <div className="skeleton h-3 w-1/4 rounded" />
+              <div className="skeleton h-3 w-1/2 rounded" />
+            </div>
           ))}
         </div>
       )}
@@ -136,7 +132,7 @@ export const TaskList = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4 pt-3">
           {filteredTasks.map((task) => (
             <TaskCard key={task.id} task={task} />
           ))}

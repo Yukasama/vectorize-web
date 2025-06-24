@@ -4,7 +4,7 @@ import { Loader } from '@/components/loader';
 import { Badge } from '@/components/ui/badge';
 import { CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Clock } from 'lucide-react';
+import { Check, Clock, X } from 'lucide-react';
 import { TASKS_TYPE_MAP } from './config/mappers';
 import { IdCopier } from './id-copier';
 import { formatDate, useDuration, useRelativeTime } from './lib/date-helpers';
@@ -20,11 +20,11 @@ export const TaskCard = ({ task }: { task: Task }) => {
 
   return (
     <div className="bg-background relative rounded-xl transition-all duration-200 hover:shadow-md">
-      <CardContent className="p-1.5 pt-3">
+      <CardContent className="p-0.5">
         <div className="mb-3 flex flex-1 items-start justify-between">
           <div className="flex-1 space-y-0.5">
             <div className="flex items-center gap-3">
-              <h3 className="text-md font-semibold">
+              <h3 className="text-md w-[210px] truncate font-semibold">
                 {task.tag ?? 'Synthetic Generation'}
               </h3>
               <IdCopier taskId={task.id} />
@@ -68,14 +68,24 @@ export const TaskCard = ({ task }: { task: Task }) => {
           className={cn(
             task.task_status === 'Q' && 'skeleton-amber',
             task.task_status === 'P' && 'skeleton-blue',
-            task.task_status !== 'Q' && task.task_status !== 'P' && 'bg-accent',
+            task.task_status === 'D' && 'bg-emerald-500',
+            task.task_status === 'F' && 'bg-red-500',
+            task.task_status === 'C' && 'bg-rose-500',
             '-top-1 h-[1px] w-full',
           )}
         />
 
         <div className="text-muted-foreground flex items-center justify-between border-t pt-2 text-sm">
           <div className="flex items-center gap-1">
-            <Clock className="h-4 w-4" />
+            {task.task_status === 'D' && (
+              <Check className="mt-[1px] h-4 w-4 text-emerald-500" />
+            )}
+            {task.task_status === 'F' && (
+              <X className="mt-0.5 h-4 w-4 text-red-500" />
+            )}
+            {(task.task_status === 'Q' || task.task_status === 'P') && (
+              <Clock className="h-4 w-4" />
+            )}
             <span>{duration}</span>
           </div>
           <div className="text-right">
