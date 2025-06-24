@@ -34,13 +34,9 @@ export const updateDataset = async (
   version: number,
 ): Promise<void> => {
   await axios.put(
-    `http://localhost:8000/v1/datasets/${id}`,
+    `https://localhost/v1/datasets/${id}`,
     { name },
-    {
-      headers: {
-        'If-Match': `"${String(version)}"`,
-      },
-    },
+    { headers: { 'If-Match': `"${String(version)}"` } },
   );
 };
 
@@ -50,9 +46,9 @@ export const updateDataset = async (
 export const fetchDatasets = async (): Promise<Dataset[]> => {
   try {
     const response = await axios.get<Dataset[]>(
-      'http://localhost:8000/v1/datasets',
+      'https://localhost/v1/datasets',
     );
-    return response.data;
+    return response.data.items;
   } catch (error) {
     console.error(messages.dataset.general.unknownError, error);
     return [];
@@ -67,7 +63,7 @@ export const fetchDatasetById = async (
 ): Promise<Dataset | undefined> => {
   try {
     const response = await axios.get<Dataset>(
-      `http://localhost:8000/v1/datasets/${id}`,
+      `https://localhost/v1/datasets/${id}`,
     );
     return response.data;
   } catch (error) {
@@ -81,7 +77,7 @@ export const fetchDatasetById = async (
  */
 export const deleteDataset = async (id: string): Promise<boolean> => {
   try {
-    await axios.delete(`http://localhost:8000/v1/datasets/${id}`);
+    await axios.delete(`https://localhost/v1/datasets/${id}`);
     return true;
   } catch (error) {
     console.error(messages.dataset.delete.error, error);

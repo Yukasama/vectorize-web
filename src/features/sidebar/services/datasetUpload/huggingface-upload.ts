@@ -27,7 +27,7 @@ export const uploadHFDataset = async (
     if (revision && revision.trim() !== '') {
       payload.revision = revision;
     }
-    await axios.post('http://localhost:8000/v1/datasets/huggingface', payload);
+    await axios.post('https://localhost/v1/datasets/huggingface', payload);
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 409) {
@@ -57,7 +57,7 @@ export const getHFUploadStatus = async (
 ): Promise<UploadDatasetTask> => {
   try {
     const { data } = await axios.get<UploadDatasetTask>(
-      `http://localhost:8000/v1/datasets/upload/huggingface/status/${taskId}`,
+      `https://localhost/v1/datasets/upload/huggingface/status/${taskId}`,
     );
     return data;
   } catch (error: unknown) {

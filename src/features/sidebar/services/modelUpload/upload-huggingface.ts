@@ -15,7 +15,7 @@ export const uploadHuggingFace = async (
     if (revision && revision.trim() !== '') {
       payload.revision = revision;
     }
-    await axios.post('http://localhost:8000/v1/uploads/huggingface', payload);
+    await axios.post('https://localhost/v1/uploads/huggingface', payload);
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 409) {

@@ -18,7 +18,7 @@ export const uploadLocalDataset = async (
 
   try {
     const { data } = await axios.post<DatasetUploadResponse>(
-      'http://localhost:8000/v1/datasets',
+      'https://localhost/v1/datasets',
       formData,
       {
         onUploadProgress: (progressEvent) => {

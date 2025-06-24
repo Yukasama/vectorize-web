@@ -10,7 +10,7 @@ export const uploadGithub = async (
   revision?: string,
 ): Promise<void> => {
   try {
-    await axios.post('http://localhost:8000/v1/uploads/github', {
+    await axios.post('https://localhost/v1/uploads/github', {
       owner,
       repo_name: repo,
       revision: revision ?? undefined,
