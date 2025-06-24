@@ -1,5 +1,6 @@
+import { client } from '@/lib/client';
 import { messages } from '@/lib/messages';
-import axios from 'axios';
+import { isAxiosError } from 'axios';
 
 /**
  * Upload a model from Hugging Face by model tag and optional revision.
@@ -15,9 +16,9 @@ export const uploadHuggingFace = async (
     if (revision && revision.trim() !== '') {
       payload.revision = revision;
     }
-    await axios.post('https://localhost/v1/uploads/huggingface', payload);
+    await client.post('/uploads/huggingface', payload);
   } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
+    if (isAxiosError(error)) {
       if (error.response?.status === 409) {
         throw new Error(messages.model.upload.alreadyExists);
       }

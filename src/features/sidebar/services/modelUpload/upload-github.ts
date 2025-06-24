@@ -1,3 +1,4 @@
+import { client } from '@/lib/client';
 import { messages } from '@/lib/messages';
 import axios from 'axios';
 
@@ -10,7 +11,7 @@ export const uploadGithub = async (
   revision?: string,
 ): Promise<void> => {
   try {
-    await axios.post('https://localhost/v1/uploads/github', {
+    await client.post('/uploads/github', {
       owner,
       repo_name: repo,
       revision: revision ?? undefined,

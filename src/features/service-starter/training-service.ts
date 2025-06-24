@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { client } from '@/lib/client';
 
 /**
  * Parameters for starting a training job.
@@ -64,5 +64,5 @@ export const startTraining = async (
       body[key] = params[key as keyof StartTrainingParams];
     }
   }
-  await axios.post('https://localhost/v1/training/train', body);
+  await client.post('/training/train', body);
 };

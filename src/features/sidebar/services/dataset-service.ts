@@ -1,5 +1,5 @@
+import { client } from '@/lib/client';
 import { messages } from '@/lib/messages';
-import axios from 'axios';
 
 /**
  * Service functions for fetching and deleting datasets from the backend API.
@@ -15,14 +15,11 @@ export interface Dataset {
   version?: number;
 }
 
-export interface Dataset {
-  classification?: string;
-  created_at?: string;
-  file_name?: string;
-  id: string;
-  name: string;
-  rows?: number;
-  version?: number;
+export interface DatasetResponse {
+  items: Dataset[];
+  limit: number;
+  offset: number;
+  total: number;
 }
 
 /**
@@ -33,11 +30,8 @@ export const updateDataset = async (
   name: string,
   version: number,
 ): Promise<void> => {
-  await axios.put(
-    `https://localhost/v1/datasets/${id}`,
-    { name },
-    { headers: { 'If-Match': `"${String(version)}"` } },
-  );
+  const headers = { 'If-Match': `"${String(version)}"` };
+  await client.put(`/datasets/${id}`, { name }, { headers: headers });
 };
 
 /**
@@ -45,10 +39,8 @@ export const updateDataset = async (
  */
 export const fetchDatasets = async (): Promise<Dataset[]> => {
   try {
-    const response = await axios.get<Dataset[]>(
-      'https://localhost/v1/datasets',
-    );
-    return response.data.items;
+    const { data } = await client.get<DatasetResponse>('/datasets');
+    return data.items;
   } catch (error) {
     console.error(messages.dataset.general.unknownError, error);
     return [];
@@ -62,10 +54,8 @@ export const fetchDatasetById = async (
   id: string,
 ): Promise<Dataset | undefined> => {
   try {
-    const response = await axios.get<Dataset>(
-      `https://localhost/v1/datasets/${id}`,
-    );
-    return response.data;
+    const { data } = await client.get<Dataset>(`/datasets/${id}`);
+    return data;
   } catch (error) {
     console.error(messages.dataset.general.unknownError, error);
     return undefined;
@@ -77,7 +67,7 @@ export const fetchDatasetById = async (
  */
 export const deleteDataset = async (id: string): Promise<boolean> => {
   try {
-    await axios.delete(`https://localhost/v1/datasets/${id}`);
+    await client.delete(`/datasets/${id}`);
     return true;
   } catch (error) {
     console.error(messages.dataset.delete.error, error);

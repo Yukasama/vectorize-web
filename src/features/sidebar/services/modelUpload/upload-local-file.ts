@@ -1,5 +1,6 @@
+import { client } from '@/lib/client';
 import { messages } from '@/lib/messages';
-import axios from 'axios';
+import { isAxiosError } from 'axios';
 
 /**
  * Upload a local model file (ZIP) to the backend API.
@@ -18,23 +19,20 @@ export const uploadLocalFile = async (
   const formData = new FormData();
   formData.append('file', file);
 
-  let url = 'https://localhost/v1/uploads/local';
+  let url = '/uploads/local';
   if (modelName) {
     url += '?model_name=' + encodeURIComponent(modelName);
   }
 
   try {
-    const response = await axios.post<{
+    const { data } = await client.post<{
       message: string;
       models: { directory: string; id: string; name: string; url: string }[];
-    }>(url, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response.data;
+    }>(url, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+
+    return data;
   } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
+    if (isAxiosError(error)) {
       if (error.response?.status === 400) {
         throw new Error(messages.model.upload.onlyZip);
       }
