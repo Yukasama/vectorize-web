@@ -35,11 +35,7 @@ export const TaskList = () => {
       return [];
     }
 
-    return filterTasks(data, {
-      maxHours,
-      searchQuery,
-      selectedStatuses,
-    });
+    return filterTasks(data, { maxHours, searchQuery, selectedStatuses });
   }, [data, selectedStatuses, searchQuery, maxHours]);
 
   if (isError) {
