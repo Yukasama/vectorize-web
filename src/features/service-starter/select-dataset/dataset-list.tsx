@@ -9,28 +9,36 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useQuery } from '@tanstack/react-query';
 import type { Dataset } from '../../sidebar/services/dataset-service';
+import { fetchDatasets } from '../../sidebar/services/dataset-service';
 
 interface DatasetListProps {
-  datasets: Dataset[];
-  loading?: boolean;
   onSelect: (dataset: Dataset) => void;
   selectedDatasets: Dataset[];
   view: 'grid' | 'table';
 }
 
 export const DatasetList = ({
-  datasets,
-  loading = false,
   onSelect,
   selectedDatasets,
   view,
 }: DatasetListProps) => {
+  const {
+    data: datasets = [],
+    error,
+    isLoading,
+  } = useQuery({
+    queryFn: fetchDatasets,
+    queryKey: ['datasets'],
+  });
   let content;
-  if (loading) {
+  if (isLoading) {
     content = (
       <div className="flex items-center justify-center py-8">Loading...</div>
     );
+  } else if (error) {
+    content = <div className="text-red-500">Error loading datasets.</div>;
   } else if (view === 'grid') {
     content = (
       <div className="grid grid-cols-4 gap-4 px-4 py-3">

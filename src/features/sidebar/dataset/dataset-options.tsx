@@ -41,6 +41,7 @@ export const DatasetListItem = ({
       await updateDataset(dataset.id, newName.trim(), dataset.version);
       setEdit(false);
       void queryClient.invalidateQueries({ queryKey: ['datasets'] });
+      await fetch('/api/revalidate-datasets', { method: 'POST' });
     } finally {
       setSaving(false);
     }

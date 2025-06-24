@@ -7,29 +7,37 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useQuery } from '@tanstack/react-query';
 import type { Model } from '../../sidebar/services/model-service';
+import { fetchModels } from '../../sidebar/services/model-service';
 
 interface ModelListProps {
-  loading?: boolean;
-  models: Model[];
   onSelect: (model: Model) => void;
   selectedModel?: Model;
   view: 'grid' | 'table';
 }
 
 export const ModelList = ({
-  loading,
-  models,
   onSelect,
   selectedModel,
   view,
 }: ModelListProps) => {
-  if (loading) {
+  const {
+    data: models = [],
+    error,
+    isLoading,
+  } = useQuery({
+    queryFn: fetchModels,
+    queryKey: ['models'],
+  });
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">Loading...</div>
     );
   }
-
+  if (error) {
+    return <div className="text-red-500">Error loading models.</div>;
+  }
   if (view === 'grid') {
     return (
       <div className="grid grid-cols-4 gap-4 px-4 py-3">
@@ -55,7 +63,6 @@ export const ModelList = ({
       </div>
     );
   }
-
   return (
     <Table className="px-0 py-3">
       <TableHeader>
