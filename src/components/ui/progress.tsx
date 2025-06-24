@@ -21,7 +21,6 @@ const Progress = ({
     <ProgressPrimitive.Indicator
       className="bg-primary h-full w-full flex-1 transition-all"
       data-slot="progress-indicator"
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       style={{ transform: `translateX(-${100 - (value ?? 0)}%)` }}
     />
   </ProgressPrimitive.Root>
