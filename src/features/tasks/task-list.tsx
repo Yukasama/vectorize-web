@@ -112,8 +112,8 @@ const TaskCard = ({ task }: { task: Task }) => {
   const relative = useRelativeTime(task.created_at);
 
   return (
-    <div className="bg-background relative rounded-xl border-none transition-all duration-200 hover:shadow-md">
-      <CardContent className="p-3 px-4">
+    <div className="bg-background relative rounded-xl transition-all duration-200 hover:shadow-md">
+      <CardContent className="p-1.5 pt-3">
         <div className="mb-3 flex flex-1 items-start justify-between">
           <div className="flex-1 space-y-0.5">
             <div className="flex items-center gap-3">
