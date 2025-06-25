@@ -5,14 +5,19 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { client } from '@/lib/client';
 import { useQuery } from '@tanstack/react-query';
-import { AlertCircle, Clock, RefreshCw, Search } from 'lucide-react';
+import {
+  AlertTriangle,
+  Clock,
+  RefreshCw,
+  RotateCcw,
+  Search,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { StatusFilter, TimeFilter } from './filters';
 import { filterTasks } from './lib/filter-tasks';
@@ -27,7 +32,7 @@ export const TaskList = () => {
   const { data, isError, isFetching, refetch } = useQuery({
     queryFn: () => client.get<Task[]>('/tasks').then((r) => r.data),
     queryKey: ['tasks'],
-    refetchInterval: 10_000,
+    refetchInterval: 30_000,
   });
 
   const filteredTasks = useMemo(() => {
@@ -38,51 +43,35 @@ export const TaskList = () => {
     return filterTasks(data, { maxHours, searchQuery, selectedStatuses });
   }, [data, selectedStatuses, searchQuery, maxHours]);
 
-  if (isError) {
-    return (
-      <Card className="text-center">
-        <CardHeader>
-          <CardTitle className="text-destructive flex items-center justify-center gap-2">
-            <AlertCircle className="h-5 w-5" /> Failed to load tasks
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Button onClick={() => refetch()}>
-            <RefreshCw className="mr-2 h-4 w-4" /> Retry
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <div className="space-y-2" data-testid="task-list">
       <div className="flex items-center gap-3">
         <h3 className="text-md font-medium">Tasks</h3>
         <Separator className="bg-desc/50 flex-1" />
-        <p className="text-desc text-xs">Showing 3 of 4 tasks</p>
+        <p className="text-desc text-xs">
+          Showing {filteredTasks.length} of {data?.length ?? 0} tasks
+        </p>
       </div>
-      {/* <div className="flex items-center justify-between">
-        <Button
-          className={cn({ 'animate-spin': isFetching })}
-          onClick={() => refetch()}
-          size="icon"
-          title="Refresh"
-          variant="outline"
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
-      </div> */}
 
       <div className="flex flex-col gap-2">
         <div className="relative flex-1">
-          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
-          <Input
-            className="pl-10"
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by tag, ID, or type..."
-            value={searchQuery}
-          />
+          <div className="flex items-center justify-between gap-2">
+            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
+            <Input
+              className="pl-9"
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by tag, ID, or type..."
+              value={searchQuery}
+            />
+            <Button
+              onClick={() => refetch()}
+              size="icon"
+              title="Refresh"
+              variant="outline"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         <div className="flex gap-2">
           <StatusFilter
@@ -93,7 +82,27 @@ export const TaskList = () => {
         </div>
       </div>
 
-      {isFetching && !data && (
+      {isError && (
+        <Card className="py-12 text-center">
+          <CardContent>
+            <AlertTriangle className="mx-auto mb-4 h-12 w-12 text-rose-500" />
+            <CardTitle className="mb-2">Failed to fetch tasks</CardTitle>
+            <CardDescription>
+              There was an error fetching the task list.
+            </CardDescription>
+            <Button
+              className="mt-4 cursor-pointer"
+              onClick={() => refetch()}
+              variant="outline"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {!isError && isFetching && !data && (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
             <div className="h-28 space-y-3 rounded-xl border p-5" key={i}>
@@ -107,7 +116,7 @@ export const TaskList = () => {
           ))}
         </div>
       )}
-      {!isFetching && filteredTasks.length === 0 ? (
+      {!isError && !isFetching && filteredTasks.length === 0 && (
         <Card className="py-12 text-center">
           <CardContent>
             <Clock className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
@@ -131,7 +140,8 @@ export const TaskList = () => {
             )}
           </CardContent>
         </Card>
-      ) : (
+      )}
+      {!isError && !isFetching && filteredTasks.length > 0 && (
         <div className="space-y-4 pt-3">
           {filteredTasks.map((task) => (
             <TaskCard key={task.id} task={task} />
