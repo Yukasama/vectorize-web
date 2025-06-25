@@ -1,5 +1,6 @@
+import { client } from '@/lib/client';
 import { messages } from '@/lib/messages';
-import axios from 'axios';
+import { isAxiosError } from 'axios';
 
 export interface HFUploadResponse {
   taskId: string;
@@ -27,9 +28,9 @@ export const uploadHFDataset = async (
     if (revision && revision.trim() !== '') {
       payload.revision = revision;
     }
-    await axios.post('https://localhost/v1/datasets/huggingface', payload);
+    await client.post('/datasets/huggingface', payload);
   } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
+    if (isAxiosError(error)) {
       if (error.response?.status === 409) {
         throw new Error(messages.dataset.upload.alreadyExists);
       }
@@ -56,12 +57,12 @@ export const getHFUploadStatus = async (
   taskId: string,
 ): Promise<UploadDatasetTask> => {
   try {
-    const { data } = await axios.get<UploadDatasetTask>(
-      `https://localhost/v1/datasets/upload/huggingface/status/${taskId}`,
+    const { data } = await client.get<UploadDatasetTask>(
+      `/datasets/upload/huggingface/status/${taskId}`,
     );
     return data;
   } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
+    if (isAxiosError(error)) {
       console.error(
         messages.dataset.upload.errorFile(taskId),
         error.response?.data ?? error.message,

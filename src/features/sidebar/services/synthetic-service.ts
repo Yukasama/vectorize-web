@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { client } from '@/lib/client';
 // --- Media Synthesis Endpoints ---
 
 // Response from the /synthetic/media endpoint (media upload for synthesis)
@@ -35,14 +35,12 @@ export const uploadMediaForSynthesis = async (
   if (existingDatasetId) {
     formData.append('existing_dataset_id', existingDatasetId);
   }
-  const response = await axios.post<SyntheticMediaResponse>(
-    'https://localhost/v1/synthesis/media',
+  const { data } = await client.post<SyntheticMediaResponse>(
+    '/synthesis/media',
     formData,
-    {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    },
+    { headers: { 'Content-Type': 'multipart/form-data' } },
   );
-  return response.data;
+  return data;
 };
 
 /**
@@ -51,10 +49,10 @@ export const uploadMediaForSynthesis = async (
  * @returns Array of SyntheticTaskResponse
  */
 export const listSynthesisTasks = async (limit = 20) => {
-  const response = await axios.get<SyntheticTaskResponse[]>(
-    `https://localhost/v1/synthesis/tasks?limit=${String(limit)}`,
+  const { data } = await client.get<SyntheticTaskResponse[]>(
+    `/synthesis/tasks?limit=${String(limit)}`,
   );
-  return response.data;
+  return data;
 };
 
 /**
@@ -65,14 +63,12 @@ export const listSynthesisTasks = async (limit = 20) => {
 export const startSyntheticFromDataset = async (datasetId: string) => {
   const formData = new FormData();
   formData.append('existing_dataset_id', datasetId);
-  const response = await axios.post<SyntheticMediaResponse>(
-    'https://localhost/v1/synthesis/media',
+  const { data } = await client.post<SyntheticMediaResponse>(
+    '/synthesis/media',
     formData,
-    {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    },
+    { headers: { 'Content-Type': 'multipart/form-data' } },
   );
-  return response.data;
+  return data;
 };
 
 /**
@@ -81,8 +77,8 @@ export const startSyntheticFromDataset = async (datasetId: string) => {
  * @returns SyntheticTaskResponse with status and error info
  */
 export const getSyntheticTaskStatus = async (taskId: string) => {
-  const response = await axios.get<SyntheticTaskResponse>(
-    `https://localhost/v1/synthesis/tasks/${taskId}`,
+  const { data } = await client.get<SyntheticTaskResponse>(
+    `/synthesis/tasks/${taskId}`,
   );
-  return response.data;
+  return data;
 };

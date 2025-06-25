@@ -1,3 +1,4 @@
+import { client } from '@/lib/client';
 import { messages } from '@/lib/messages';
 import axios from 'axios';
 
@@ -17,8 +18,8 @@ export const uploadLocalDataset = async (
   formData.append('files', file);
 
   try {
-    const { data } = await axios.post<DatasetUploadResponse>(
-      'https://localhost/v1/datasets',
+    const { data } = await client.post<DatasetUploadResponse>(
+      '/datasets',
       formData,
       {
         onUploadProgress: (progressEvent) => {
