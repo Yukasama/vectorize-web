@@ -40,7 +40,7 @@ export const filterTasks = (
     if (
       ['C', 'D', 'F'].includes(task.task_status) &&
       task.end_date &&
-      selectedStatuses.length === 0
+      selectedStatuses.includes(task.task_status)
     ) {
       const endTime = new Date(task.end_date).getTime();
       const cutoffTime = Date.now() - maxHours * 60 * 60 * 1000;

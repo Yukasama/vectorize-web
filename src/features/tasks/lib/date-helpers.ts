@@ -59,7 +59,7 @@ export const useDuration = (
   endDate?: null | string,
 ) => {
   const getInitialDuration = () => {
-    return status === 'P'
+    return status === 'R'
       ? getDuration(new Date(startDate), new Date())
       : getDuration(new Date(startDate), new Date(endDate ?? startDate));
   };
@@ -68,7 +68,7 @@ export const useDuration = (
   const [initialSeconds, setInitialSeconds] = useState<number | undefined>();
 
   useEffect(() => {
-    if (status !== 'P') {
+    if (status !== 'R') {
       setDuration(getInitialDuration());
       setInitialSeconds(undefined);
       return;

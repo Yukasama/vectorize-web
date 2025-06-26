@@ -8,7 +8,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { client } from '@/lib/client';
 import { useQuery } from '@tanstack/react-query';
@@ -143,11 +142,11 @@ export const TaskList = () => {
         </Card>
       )}
       {!isError && !isFetching && filteredTasks.length > 0 && (
-        <ScrollArea className="space-y-4 scroll-auto pt-3">
+        <div className="space-y-4 scroll-auto pt-3">
           {filteredTasks.map((task) => (
             <TaskCard key={task.id} task={task} />
           ))}
-        </ScrollArea>
+        </div>
       )}
     </div>
   );

@@ -7,7 +7,7 @@ export interface Task {
   task_type: TaskType;
 }
 
-export type TaskStatus = 'C' | 'D' | 'F' | 'P' | 'Q';
+export type TaskStatus = 'C' | 'D' | 'F' | 'R' | 'Q';
 
 export type TaskType =
   | 'dataset_upload'

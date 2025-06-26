@@ -57,7 +57,7 @@ export const TaskCard = ({ task }: { task: Task }) => {
                     <span className="font-medium">Waiting in queue</span>
                   </div>
                 )}
-                {task.task_status === 'P' && (
+                {task.task_status === 'R' && (
                   <div className="flex items-center text-xs text-blue-500">
                     <Loader className="text-blue-500" size={28} />
                     <span className="font-medium">Running...</span>
@@ -71,7 +71,7 @@ export const TaskCard = ({ task }: { task: Task }) => {
         <div
           className={cn(
             task.task_status === 'Q' && 'skeleton-amber',
-            task.task_status === 'P' && 'skeleton-blue',
+            task.task_status === 'R' && 'skeleton-blue',
             task.task_status === 'D' && 'bg-emerald-500',
             task.task_status === 'F' && 'bg-red-500',
             task.task_status === 'C' && 'bg-rose-500',
@@ -87,7 +87,7 @@ export const TaskCard = ({ task }: { task: Task }) => {
             {task.task_status === 'F' && (
               <X className="mt-0.5 h-4 w-4 text-red-500" />
             )}
-            {(task.task_status === 'Q' || task.task_status === 'P') && (
+            {(task.task_status === 'Q' || task.task_status === 'R') && (
               <Clock className="h-4 w-4" />
             )}
             <span>{duration}</span>

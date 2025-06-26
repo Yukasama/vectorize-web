@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import {
   Popover,
+  PopoverClose,
   PopoverContent,
   PopoverTrigger,
 } from '@radix-ui/react-popover';
@@ -113,7 +114,7 @@ export const TimeFilter = ({ maxHours, onMaxHoursChange }: TimeFilterProps) => {
           </Badge>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent className="bg-background w-80">
         <div className="space-y-4">
           <div>
             <h4 className="font-medium">Hide completed tasks after</h4>
@@ -132,9 +133,11 @@ export const TimeFilter = ({ maxHours, onMaxHoursChange }: TimeFilterProps) => {
             />
             <p className="text-muted-foreground text-sm">hours</p>
           </div>
-          <Button className="w-full" onClick={handleApply} size="sm">
-            Apply
-          </Button>
+          <PopoverClose asChild>
+            <Button className="w-full" onClick={handleApply} size="sm">
+              Apply
+            </Button>
+          </PopoverClose>
         </div>
       </PopoverContent>
     </Popover>

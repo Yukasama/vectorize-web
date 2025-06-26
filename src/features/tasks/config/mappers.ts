@@ -39,20 +39,20 @@ export const TASKS_STATUS_MAP: Record<
     Icon: XCircle,
     label: 'Failed',
   },
-  P: {
-    animate: true,
-    badgeColor: 'bg-blue-100 text-blue-700 border-blue-300',
-    color: 'text-blue-600',
-    description: 'Task is currently running',
-    Icon: Loader2,
-    label: 'Running',
-  },
   Q: {
     badgeColor: 'bg-amber-100 text-amber-700 border-amber-300',
     color: 'text-amber-600',
     description: 'Task is waiting to be processed',
     Icon: Clock,
     label: 'Queued',
+  },
+  R: {
+    animate: true,
+    badgeColor: 'bg-blue-100 text-blue-700 border-blue-300',
+    color: 'text-blue-600',
+    description: 'Task is currently running',
+    Icon: Loader2,
+    label: 'Running',
   },
 };
 
