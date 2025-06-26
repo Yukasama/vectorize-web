@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { client } from '@/lib/client';
 
 export interface StartEvaluationParams {
   baseline_model_tag?: string;
@@ -14,18 +14,18 @@ export const startEvaluation = async (
   const body: Record<string, unknown> = {
     model_tag: params.model_tag,
   };
-  if (params.dataset_id) {
-    body.dataset_id = params.dataset_id;
+  for (const key of [
+    'baseline_model_tag',
+    'dataset_id',
+    'max_samples',
+    'training_task_id',
+  ]) {
+    if (
+      params[key as keyof StartEvaluationParams] !== undefined &&
+      params[key as keyof StartEvaluationParams] !== ''
+    ) {
+      body[key] = params[key as keyof StartEvaluationParams];
+    }
   }
-  if (params.max_samples) {
-    body.max_samples = params.max_samples;
-  }
-  if (params.baseline_model_tag) {
-    body.baseline_model_tag = params.baseline_model_tag;
-  }
-  if (params.training_task_id) {
-    body.training_task_id = params.training_task_id;
-  }
-
-  await axios.post('http://localhost:8000/v1/evaluation/evaluate', body);
+  await client.post('/evaluation/evaluate', body);
 };
