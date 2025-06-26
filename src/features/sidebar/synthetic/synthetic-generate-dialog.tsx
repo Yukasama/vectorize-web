@@ -10,7 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { DatasetList } from '@/features/service-starter/select-dataset/dataset-list';
 import { useQuery } from '@tanstack/react-query';
 import { X } from 'lucide-react';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Dataset, fetchDatasets } from '../services/dataset-service';
 import {
   startSyntheticFromDataset,
@@ -122,10 +122,8 @@ const UploadMode = ({
 );
 
 interface SelectModeProps {
-  filteredDatasets: Dataset[];
   handleClearSelected: (id: string) => void;
   handleSelect: (dataset: Dataset) => void;
-  loading: boolean;
   localSelectedDatasets: Dataset[];
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
@@ -134,10 +132,8 @@ interface SelectModeProps {
 }
 
 const SelectMode = ({
-  filteredDatasets,
   handleClearSelected,
   handleSelect,
-  loading,
   localSelectedDatasets,
   search,
   setSearch,
@@ -176,11 +172,9 @@ const SelectMode = ({
       </div>
       <div className="max-h-60 overflow-y-auto">
         <div className="px-0 py-3">
-          {/* DatasetList is a custom component, not a JSX intrinsic element */}
           <DatasetList
-            datasets={filteredDatasets}
-            loading={loading}
             onSelect={handleSelect}
+            search={search}
             selectedDatasets={localSelectedDatasets}
             view={view}
           />
@@ -278,7 +272,7 @@ export const SyntheticGenerateDialog = ({
   const [uploading, setUploading] = useState(false);
 
   // --- React Query for datasets ---
-  const { data: datasets = [], isLoading: isDatasetsLoading } = useQuery({
+  useQuery({
     enabled: open, // Only fetch when dialog is open
     queryFn: fetchDatasets,
     queryKey: ['datasets'],
@@ -372,15 +366,6 @@ export const SyntheticGenerateDialog = ({
     }
   };
 
-  // Filtered datasets for search
-  const filteredDatasets = useMemo(
-    () =>
-      datasets.filter((d) =>
-        d.name.toLowerCase().includes(search.toLowerCase()),
-      ),
-    [datasets, search],
-  );
-
   // Dataset select logic (multi-select)
   const handleSelect = (dataset: Dataset) => {
     if (localSelectedDatasets.some((d) => d.id === dataset.id)) {
@@ -466,10 +451,8 @@ export const SyntheticGenerateDialog = ({
             />
           ) : (
             <SelectMode
-              filteredDatasets={filteredDatasets}
               handleClearSelected={handleClearSelected}
               handleSelect={handleSelect}
-              loading={isDatasetsLoading}
               localSelectedDatasets={localSelectedDatasets}
               search={search}
               setSearch={setSearch}

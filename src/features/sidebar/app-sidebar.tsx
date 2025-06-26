@@ -80,7 +80,7 @@ export const AppSidebar = () => {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="model">
-              <ModelUpload />
+              <ModelUpload onSuccess={() => setUploadOpen(false)} />
             </TabsContent>
             <TabsContent value="dataset">
               <DatasetUpload />

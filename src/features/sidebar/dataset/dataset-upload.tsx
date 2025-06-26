@@ -192,31 +192,33 @@ export const DatasetUpload = () => {
       onSubmit={handleUpload}
     >
       {/* Hugging Face upload section */}
-      <div className="mt-2 mb-6 flex items-center gap-x-1 gap-y-0">
-        <Image
-          alt="Hugging Face Logo"
-          className="h-8 w-8"
-          height={32}
-          src="/images/huggingface_logo.svg"
-          width={32}
-        />
-        <Input
-          className="w-80 min-w-0"
-          disabled={uploading}
-          onChange={(e) => setHfId(e.target.value)}
-          placeholder={'Enter Hugging Face dataset ID'}
-          value={hfId}
-        />
-        <Input
-          className="ml-2 w-20 min-w-0"
-          disabled={uploading}
-          maxLength={16}
-          onChange={(e) => setHfTag(e.target.value)}
-          placeholder={'Tag'}
-          value={hfTag}
-        />
+      <div className="mt-2 mb-6 flex flex-col gap-1">
+        <div className="flex items-center gap-x-1 gap-y-0">
+          <Image
+            alt="Hugging Face Logo"
+            className="h-8 w-8"
+            height={32}
+            src="/images/huggingface_logo.svg"
+            width={32}
+          />
+          <Input
+            className="w-80 min-w-0"
+            disabled={uploading}
+            onChange={(e) => setHfId(e.target.value)}
+            placeholder={'Enter Hugging Face dataset ID'}
+            value={hfId}
+          />
+          <Input
+            className="ml-2 w-20 min-w-0"
+            disabled={uploading}
+            maxLength={16}
+            onChange={(e) => setHfTag(e.target.value)}
+            placeholder={'Tag'}
+            value={hfTag}
+          />
+        </div>
         {hfError && (
-          <span className="ml-2 text-xs text-red-600">{hfError}</span>
+          <span className="mt-1 text-xs text-red-600">{hfError}</span>
         )}
       </div>
       {/* Drag-and-Drop Area */}
