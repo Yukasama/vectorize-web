@@ -9,4 +9,9 @@ export interface Task {
 
 export type TaskStatus = 'C' | 'D' | 'F' | 'P' | 'Q';
 
-export type TaskType = 'dataset_upload' | 'model_upload' | 'synthetis';
+export type TaskType =
+  | 'dataset_upload'
+  | 'evaluation'
+  | 'model_upload'
+  | 'synthetis'
+  | 'training';

@@ -42,7 +42,7 @@ export const StatusFilter = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="gap-2" variant="outline">
+        <Button className="flex-1 gap-2" variant="outline">
           <Filter className="h-4 w-4" />
           Status
           <Badge className="ml-1" variant="secondary">
@@ -105,7 +105,7 @@ export const TimeFilter = ({ maxHours, onMaxHoursChange }: TimeFilterProps) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button className="gap-2" variant="outline">
+        <Button className="flex-1 gap-2" variant="outline">
           <Timer className="h-4 w-4" />
           Finished
           <Badge className="ml-1" variant="secondary">

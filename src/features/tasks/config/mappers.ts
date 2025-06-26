@@ -58,6 +58,8 @@ export const TASKS_STATUS_MAP: Record<
 
 export const TASKS_TYPE_MAP: Record<TaskType, string> = {
   dataset_upload: 'Dataset Upload',
+  evaluation: 'Evaluation',
   model_upload: 'Model Upload',
   synthetis: 'Synthesis',
+  training: 'Training',
 };
