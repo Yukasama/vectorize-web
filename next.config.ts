@@ -37,15 +37,16 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
         hostname: 'github.githubassets.com',
+        protocol: 'https',
       },
       {
-        protocol: 'https',
         hostname: 'huggingface.co',
+        protocol: 'https',
       },
     ],
   },
+  output: 'standalone',
   serverExternalPackages: ['pino', 'pino-pretty'],
 };
 

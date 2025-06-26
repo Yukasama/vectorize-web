@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { Check, Clock, X } from 'lucide-react';
 import { TASKS_TYPE_MAP } from './config/mappers';
 import { IdCopier } from './id-copier';
-import { formatDate, useDuration, useRelativeTime } from './lib/date-helpers';
+import { useDuration, useRelativeTime } from './lib/date-helpers';
 import { Task } from './types/task';
 
 export const TaskCard = ({ task }: { task: Task }) => {
@@ -16,7 +16,11 @@ export const TaskCard = ({ task }: { task: Task }) => {
     task.task_status,
     task.end_date,
   );
-  const relative = useRelativeTime(task.created_at);
+  const relative = useRelativeTime(
+    new Date(task.created_at).toLocaleString('de-DE', {
+      timeZone: 'Europe/Berlin',
+    }),
+  );
 
   return (
     <div className="bg-background relative rounded-xl transition-all duration-200 hover:shadow-md">
@@ -31,7 +35,7 @@ export const TaskCard = ({ task }: { task: Task }) => {
             </div>
             <div className="flex justify-between">
               <Badge
-                className="h-6 p-0 px-1 text-xs opacity-80"
+                className="h-6 p-0 px-1 text-xs opacity-90"
                 variant="secondary"
               >
                 {TASKS_TYPE_MAP[task.task_type]}
@@ -89,7 +93,11 @@ export const TaskCard = ({ task }: { task: Task }) => {
             <span>{duration}</span>
           </div>
           <div className="text-right">
-            <div>{formatDate(task.created_at)}</div>
+            <div>
+              {new Date(task.created_at).toLocaleString('de-DE', {
+                timeZone: 'Europe/Berlin',
+              })}
+            </div>
             <div className="text-xs">({relative})</div>
           </div>
         </div>
