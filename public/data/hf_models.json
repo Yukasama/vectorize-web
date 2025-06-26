@@ -1,0 +1,22 @@
+[
+  {
+    "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+    "tag": "main"
+  },
+  {
+    "model_id": "yahyakhoder/MD2JSON-T5-small-V1",
+    "tag": "main"
+  },
+  {
+    "model_id": "Bytes512/Nugget-Small",
+    "tag": "main"
+  },
+  {
+    "model_id": "medmekk/mini-deepseek-r1",
+    "tag": "main"
+  },
+  {
+    "model_id": "ariG23498/tiny-llama3-test",
+    "tag": "main"
+  }
+]

@@ -17,7 +17,7 @@ pnpm run dev
 ### Build Docker Image
 
 ```bash
-docker build -t vectorize-web:0.1.0 .
+docker build -t vectorize_web:0.1.0 .
 ```
 
 ## Features
