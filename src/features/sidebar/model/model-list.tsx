@@ -168,7 +168,7 @@ export const ModelList = () => {
       >
         <SidebarMenuItem>
           <CollapsibleTrigger asChild>
-            <SidebarMenuButton className="sticky top-0 z-10 flex w-full items-center gap-2 bg-[var(--sidebar)]">
+            <SidebarMenuButton className="sticky top-0 z-10 flex w-full items-center gap-2">
               <span className="text-md">Models</span>
               <span className="ml-auto flex flex-row items-center gap-2">
                 {open ? (
