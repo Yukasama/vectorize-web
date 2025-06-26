@@ -11,16 +11,16 @@ import { useDuration, useRelativeTime } from './lib/date-helpers';
 import { Task } from './types/task';
 
 export const TaskCard = ({ task }: { task: Task }) => {
+  const startUtc = new Date(task.created_at);
+  const startLocal = new Date(startUtc.getTime() + 2 * 3_600_000);
+
+  const isLive = task.task_status === 'R' || task.task_status === 'Q';
   const duration = useDuration(
-    task.created_at,
+    isLive ? startLocal : startUtc,
     task.task_status,
     task.end_date,
   );
-  const relative = useRelativeTime(
-    new Date(task.created_at).toLocaleString('de-DE', {
-      timeZone: 'Europe/Berlin',
-    }),
-  );
+  const relative = useRelativeTime(startLocal);
 
   return (
     <div className="bg-background relative rounded-xl transition-all duration-200 hover:shadow-md">
@@ -74,7 +74,6 @@ export const TaskCard = ({ task }: { task: Task }) => {
             task.task_status === 'R' && 'skeleton-blue',
             task.task_status === 'D' && 'bg-emerald-500',
             task.task_status === 'F' && 'bg-red-500',
-            task.task_status === 'C' && 'bg-rose-500',
             '-top-1 h-[1px] w-full',
           )}
         />
@@ -94,7 +93,7 @@ export const TaskCard = ({ task }: { task: Task }) => {
           </div>
           <div className="text-right">
             <div>
-              {new Date(task.created_at).toLocaleString('de-DE', {
+              {startLocal.toLocaleString('de-DE', {
                 timeZone: 'Europe/Berlin',
               })}
             </div>

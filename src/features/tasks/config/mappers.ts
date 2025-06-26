@@ -1,10 +1,4 @@
-import {
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  Loader2,
-  XCircle,
-} from 'lucide-react';
+import { CheckCircle, Clock, Loader2, XCircle } from 'lucide-react';
 import { TaskStatus, TaskType } from '../types/task';
 
 export const TASKS_STATUS_MAP: Record<
@@ -18,13 +12,6 @@ export const TASKS_STATUS_MAP: Record<
     label: string;
   }
 > = {
-  C: {
-    badgeColor: 'bg-gray-100 text-gray-700 border-gray-300',
-    color: 'text-gray-600',
-    description: 'Task was cancelled',
-    Icon: AlertCircle,
-    label: 'Cancelled',
-  },
   D: {
     badgeColor: 'bg-green-100 text-green-700 border-green-300',
     color: 'text-green-600',

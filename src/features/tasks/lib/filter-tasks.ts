@@ -38,7 +38,7 @@ export const filterTasks = (
     }
 
     if (
-      ['C', 'D', 'F'].includes(task.task_status) &&
+      ['D', 'F'].includes(task.task_status) &&
       task.end_date &&
       selectedStatuses.includes(task.task_status)
     ) {
