@@ -1,3 +1,5 @@
+'use client';
+
 import { Separator } from '@/components/ui/separator';
 import {
   SidebarInset,
@@ -5,9 +7,44 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/features/sidebar/app-sidebar';
+import { fetchDatasetById } from '@/features/sidebar/services/dataset-service';
 import { ThemeToggle } from '@/features/theme/theme-toggle';
+import { useQuery } from '@tanstack/react-query';
+import { useParams } from 'next/navigation';
 
 export default function DatasetDetailPage() {
+  const params = useParams();
+  const datasetId = typeof params.id === 'string' ? params.id : '';
+  const {
+    data: dataset,
+    error,
+    isLoading,
+  } = useQuery({
+    enabled: !!datasetId,
+    queryFn: () => fetchDatasetById(datasetId),
+    queryKey: ['dataset', datasetId],
+  });
+
+  let datasetNameContent;
+  if (isLoading) {
+    datasetNameContent = (
+      <span className="text-muted-foreground text-sm">Loading...</span>
+    );
+  } else if (error) {
+    datasetNameContent = (
+      <span className="text-destructive text-sm">Error loading dataset</span>
+    );
+  } else if (dataset?.name) {
+    datasetNameContent = (
+      <span
+        className="max-w-xs truncate text-lg font-semibold"
+        title={dataset.name}
+      >
+        {dataset.name}
+      </span>
+    );
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -19,7 +56,7 @@ export default function DatasetDetailPage() {
               className="mr-2 data-[orientation=vertical]:h-4"
               orientation="vertical"
             />
-            <span className="text-lg font-semibold">Dataset Details</span>
+            {datasetNameContent}
           </div>
           <ThemeToggle />
         </header>

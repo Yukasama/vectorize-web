@@ -52,13 +52,13 @@ export const ModelList = ({
     return (
       <div className="grid grid-cols-4 gap-4 px-4 py-3">
         {filteredModels.map((model) => {
-          const isSelected = selectedModel?.id === model.id;
+          const isSelected = selectedModel?.model_tag === model.model_tag;
           return (
             <Card
               className={`cursor-pointer border-2 p-4 ${
                 isSelected ? 'border-primary' : 'border-transparent'
               }`}
-              key={model.id}
+              key={model.model_tag}
               onClick={() => onSelect(model)}
             >
               <p className="text-sm font-medium">
@@ -85,9 +85,9 @@ export const ModelList = ({
       </TableHeader>
       <TableBody>
         {filteredModels.map((model) => {
-          const isSelected = selectedModel?.id === model.id;
+          const isSelected = selectedModel?.model_tag === model.model_tag;
           return (
-            <TableRow key={model.id}>
+            <TableRow key={model.model_tag}>
               <TableCell>
                 {model.name.length > 17
                   ? model.name.slice(0, 17) + '...'

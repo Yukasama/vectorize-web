@@ -52,7 +52,7 @@ const ModelListItem = ({
   };
 
   return (
-    <SidebarMenuSubItem key={model.id}>
+    <SidebarMenuSubItem key={model.model_tag}>
       <div className="flex w-full min-w-0 items-center">
         <HoverCard>
           <HoverCardTrigger asChild>
@@ -68,7 +68,10 @@ const ModelListItem = ({
                 setNewName={setNewName}
               />
             ) : (
-              <Link className="min-w-0 flex-1" href={`/model/${model.id}`}>
+              <Link
+                className="min-w-0 flex-1"
+                href={`/model/${model.model_tag}`}
+              >
                 <SidebarListItemName
                   edit={edit}
                   handleSave={handleSave}
@@ -192,7 +195,7 @@ export const ModelList = () => {
             {/* SidebarMenuSub */}
             <SidebarMenuSub>
               {visibleModels.map((model) => (
-                <ModelListItem key={model.id} model={model} />
+                <ModelListItem key={model.model_tag} model={model} />
               ))}
             </SidebarMenuSub>
             {/* Show More/Less button */}
