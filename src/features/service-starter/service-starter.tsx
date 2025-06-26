@@ -1,6 +1,8 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useState } from 'react';
 import type { Dataset } from '../sidebar/services/dataset-service';
 import type { Model } from '../sidebar/services/model-service';
+import { EvaluationParamsStep } from './evaluation-params';
 import { TrainingParamsStep } from './params-list';
 import { SelectDataset } from './select-dataset';
 import { SelectModel } from './select-model';
@@ -18,6 +20,12 @@ export const ServiceStarter = ({
     batchSize: number;
     epochs: number;
   }>({ batchSize: 16, epochs: 3 });
+  const [evaluationParams, setEvaluationParams] = useState<{
+    baselineModelTag?: string;
+    maxSamples: number;
+  }>({ maxSamples: 1000 });
+
+  const [mode, setMode] = useState<'evaluation' | 'training'>('training');
 
   return (
     <div className="flex flex-col gap-6">
@@ -37,13 +45,34 @@ export const ServiceStarter = ({
         />
       )}
       {step === 2 && (
-        <TrainingParamsStep
-          onBack={() => setStep(1)}
-          selectedDatasets={selectedDatasets}
-          selectedModel={selectedModel}
-          setTrainingParams={setTrainingParams}
-          trainingParams={trainingParams}
-        />
+        <Tabs
+          className="w-full"
+          onValueChange={(v) => setMode(v as 'evaluation' | 'training')}
+          value={mode}
+        >
+          <TabsList className="mb-4 w-full justify-center">
+            <TabsTrigger value="training">Training</TabsTrigger>
+            <TabsTrigger value="evaluation">Evaluation</TabsTrigger>
+          </TabsList>
+          <TabsContent value="training">
+            <TrainingParamsStep
+              onBack={() => setStep(1)}
+              selectedDatasets={selectedDatasets}
+              selectedModel={selectedModel}
+              setTrainingParams={setTrainingParams}
+              trainingParams={trainingParams}
+            />
+          </TabsContent>
+          <TabsContent value="evaluation">
+            <EvaluationParamsStep
+              evaluationParams={evaluationParams}
+              onBack={() => setStep(1)}
+              selectedDatasets={selectedDatasets}
+              selectedModel={selectedModel}
+              setEvaluationParams={setEvaluationParams}
+            />
+          </TabsContent>
+        </Tabs>
       )}
     </div>
   );
