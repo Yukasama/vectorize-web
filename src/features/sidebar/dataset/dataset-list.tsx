@@ -27,7 +27,7 @@ import {
   updateDataset,
 } from '../services/dataset-service';
 import { DatasetDetailsHoverCard } from './dataset-details';
-import { DatasetListOptions } from './dataset-options';
+import { DatasetOptions } from './dataset-options';
 
 const DatasetListItem = ({ dataset }: { dataset: Dataset }) => {
   const [edit, setEdit] = useState(false);
@@ -88,7 +88,7 @@ const DatasetListItem = ({ dataset }: { dataset: Dataset }) => {
             <DatasetDetailsHoverCard datasetId={dataset.id} />
           </HoverCardContent>
         </HoverCard>
-        <DatasetListOptions dataset={dataset} setEdit={setEdit} />
+        <DatasetOptions dataset={dataset} setEdit={setEdit} />
       </div>
     </SidebarMenuSubItem>
   );

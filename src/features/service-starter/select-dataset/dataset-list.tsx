@@ -15,12 +15,14 @@ import { fetchDatasets } from '../../sidebar/services/dataset-service';
 
 interface DatasetListProps {
   onSelect: (dataset: Dataset) => void;
+  search: string;
   selectedDatasets: Dataset[];
   view: 'grid' | 'table';
 }
 
 export const DatasetList = ({
   onSelect,
+  search,
   selectedDatasets,
   view,
 }: DatasetListProps) => {
@@ -32,6 +34,11 @@ export const DatasetList = ({
     queryFn: fetchDatasets,
     queryKey: ['datasets'],
   });
+
+  const filteredDatasets = datasets.filter((d) =>
+    d.name.toLowerCase().includes(search.toLowerCase()),
+  );
+
   let content;
   if (isLoading) {
     content = (
@@ -42,7 +49,7 @@ export const DatasetList = ({
   } else if (view === 'grid') {
     content = (
       <div className="grid grid-cols-4 gap-4 px-4 py-3">
-        {datasets.map((dataset) => {
+        {filteredDatasets.map((dataset) => {
           const isSelected = selectedDatasets.some((d) => d.id === dataset.id);
           return (
             <Card
@@ -75,7 +82,7 @@ export const DatasetList = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {datasets.map((dataset) => {
+          {filteredDatasets.map((dataset) => {
             const isSelected = selectedDatasets.some(
               (d) => d.id === dataset.id,
             );

@@ -1,8 +1,6 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import type { Dataset } from '../sidebar/services/dataset-service';
-import { fetchDatasets } from '../sidebar/services/dataset-service';
 import { DatasetList } from './select-dataset/dataset-list';
 import { DatasetListFooter } from './select-dataset/select-dataset-footer';
 import { DatasetListHeader } from './select-dataset/select-dataset-header';
@@ -18,26 +16,10 @@ export const SelectDataset = ({
   onNext?: () => void;
   setSelectedDatasets: (datasets: Dataset[]) => void;
 }) => {
-  const {
-    data: datasets = [],
-    error,
-    isLoading,
-  } = useQuery({
-    queryFn: fetchDatasets,
-    queryKey: ['datasets'],
-  });
   const [search, setSearch] = useState('');
   const [view, setView] = useState<'grid' | 'table'>('grid');
   const [localSelectedDatasets, setLocalSelectedDatasets] = useState<Dataset[]>(
     initialSelectedDatasets,
-  );
-
-  const filteredDatasets = useMemo(
-    () =>
-      datasets.filter((d) =>
-        d.name.toLowerCase().includes(search.toLowerCase()),
-      ),
-    [datasets, search],
   );
 
   const handleSelect = (dataset: Dataset) => {
@@ -72,20 +54,11 @@ export const SelectDataset = ({
       <ScrollArea className="min-h-0 flex-1">
         <div className="px-0 py-3">
           <DatasetList
-            datasets={filteredDatasets}
-            loading={isLoading}
             onSelect={handleSelect}
+            search={search}
             selectedDatasets={localSelectedDatasets}
             view={view}
           />
-          {isLoading && (
-            <div className="p-4 text-center">Loading datasets...</div>
-          )}
-          {error && (
-            <div className="text-destructive p-4">
-              Error loading datasets: {error.message || String(error)}
-            </div>
-          )}
         </div>
       </ScrollArea>
       <DatasetListFooter

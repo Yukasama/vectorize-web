@@ -13,12 +13,14 @@ import { fetchModels } from '../../sidebar/services/model-service';
 
 interface ModelListProps {
   onSelect: (model: Model) => void;
+  search: string;
   selectedModel?: Model;
   view: 'grid' | 'table';
 }
 
 export const ModelList = ({
   onSelect,
+  search,
   selectedModel,
   view,
 }: ModelListProps) => {
@@ -30,6 +32,11 @@ export const ModelList = ({
     queryFn: fetchModels,
     queryKey: ['models'],
   });
+
+  const filteredModels = models.filter((m) =>
+    m.name.toLowerCase().includes(search.toLowerCase()),
+  );
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">Loading...</div>
@@ -38,14 +45,19 @@ export const ModelList = ({
   if (error) {
     return <div className="text-red-500">Error loading models.</div>;
   }
+  if (filteredModels.length === 0) {
+    return <div className="text-muted-foreground p-4">No models found.</div>;
+  }
   if (view === 'grid') {
     return (
       <div className="grid grid-cols-4 gap-4 px-4 py-3">
-        {models.map((model) => {
+        {filteredModels.map((model) => {
           const isSelected = selectedModel?.id === model.id;
           return (
             <Card
-              className={`cursor-pointer border-2 p-4 ${isSelected ? 'border-primary' : 'border-transparent'}`}
+              className={`cursor-pointer border-2 p-4 ${
+                isSelected ? 'border-primary' : 'border-transparent'
+              }`}
               key={model.id}
               onClick={() => onSelect(model)}
             >
@@ -72,7 +84,7 @@ export const ModelList = ({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {models.map((model) => {
+        {filteredModels.map((model) => {
           const isSelected = selectedModel?.id === model.id;
           return (
             <TableRow key={model.id}>
