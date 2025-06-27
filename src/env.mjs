@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 export const env = createEnv({
   client: {
-    NEXT_PUBLIC_HOST_URL: z.string().url(),
+    NEXT_PUBLIC_HOST_URL: z.string().optional(),
   },
   runtimeEnv: {
     LOG_LEVEL: process.env.LOG_LEVEL,

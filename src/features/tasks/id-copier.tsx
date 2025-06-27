@@ -27,7 +27,7 @@ export const IdCopier = ({ taskId }: { taskId: string }) => {
     >
       {taskId.slice(0, 8)}
       <Button
-        className="disabled pointer-events-none ml-1 size-4 p-0 transition-all"
+        className="disabled pointer-events-none size-4 p-0 transition-all"
         size="icon"
         variant="ghost"
       >

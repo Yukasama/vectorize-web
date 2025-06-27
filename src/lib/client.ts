@@ -1,10 +1,11 @@
 import axios, { AxiosInstance } from 'axios';
-import https from 'node:https';
+// eslint-disable-next-line unicorn/prefer-node-protocol
+import https from 'https';
 
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
 export const client: AxiosInstance = axios.create({
-  baseURL: 'https://localhost/v1',
+  baseURL: 'https://localhost/v1/api',
   httpsAgent,
   timeout: 10000,
 });

@@ -14,6 +14,12 @@ pnpm i
 pnpm run dev
 ```
 
+### Build Docker Image
+
+```bash
+docker build -t vectorize_web:0.1.0 .
+```
+
 ## Features
 
 - Next.js 15

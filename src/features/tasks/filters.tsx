@@ -11,14 +11,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@radix-ui/react-popover';
+} from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { PopoverClose } from '@radix-ui/react-popover';
 import { ChevronDown, Filter, Timer, X } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { TASKS_STATUS_MAP } from './config/mappers';
 import { TaskStatus } from './types/task';
 
@@ -42,7 +43,7 @@ export const StatusFilter = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="gap-2" variant="outline">
+        <Button className="flex-1 gap-2" variant="outline">
           <Filter className="h-4 w-4" />
           Status
           <Badge className="ml-1" variant="secondary">
@@ -92,28 +93,54 @@ interface TimeFilterProps {
   onMaxHoursChange: (hours: number) => void;
 }
 
-export const TimeFilter = ({ maxHours, onMaxHoursChange }: TimeFilterProps) => {
-  const [inputValue, setInputValue] = useState(maxHours.toString());
+type TimeUnit = 'd' | 'h' | 'm';
 
-  const handleApply = () => {
-    const hours = Number.parseInt(inputValue);
-    if (!Number.isNaN(hours) && hours > 0) {
-      onMaxHoursChange(hours);
+const UNITS: Record<
+  TimeUnit,
+  { factor: number; label: string; max: number; min: number }
+> = {
+  d: { factor: 24, label: 'days', max: 999, min: 1 },
+  h: { factor: 1, label: 'hours', max: 99, min: 1 },
+  m: { factor: 1 / 60, label: 'minutes', max: 59, min: 1 },
+};
+
+export const TimeFilter = ({ maxHours, onMaxHoursChange }: TimeFilterProps) => {
+  const [unit, setUnit] = useState<TimeUnit>(() =>
+    // eslint-disable-next-line unicorn/no-nested-ternary, sonarjs/no-nested-conditional
+    maxHours % 24 === 0 ? 'd' : maxHours < 1 ? 'm' : 'h',
+  );
+
+  const [value, setValue] = useState(() => {
+    const base = UNITS[unit];
+    return (maxHours / base.factor).toString();
+  });
+
+  const badge = useMemo(() => `${value}${unit}`, [value, unit]);
+
+  const apply = () => {
+    const num = Number.parseInt(value, 10);
+    const { factor, max, min } = UNITS[unit];
+
+    if (Number.isFinite(num) && num >= min && num <= max) {
+      onMaxHoursChange(num * factor);
     }
   };
+
+  const { max, min } = UNITS[unit];
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button className="gap-2" variant="outline">
+        <Button className="flex-1 gap-2" variant="outline">
           <Timer className="h-4 w-4" />
           Finished
           <Badge className="ml-1" variant="secondary">
-            {maxHours}h
+            {badge}
           </Badge>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+
+      <PopoverContent className="bg-background w-80">
         <div className="space-y-4">
           <div>
             <h4 className="font-medium">Hide completed tasks after</h4>
@@ -121,20 +148,33 @@ export const TimeFilter = ({ maxHours, onMaxHoursChange }: TimeFilterProps) => {
               Tasks completed longer than this time will be hidden
             </p>
           </div>
+
           <div className="flex items-center gap-2">
             <Input
               className="flex-1"
-              min="1"
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Hours"
+              max={max}
+              min={min}
+              onChange={(e) => setValue(e.target.value)}
               type="number"
-              value={inputValue}
+              value={value}
             />
-            <p className="text-muted-foreground text-sm">hours</p>
+
+            <select
+              className="rounded-md border px-2 py-1 text-sm"
+              onChange={(e) => setUnit(e.target.value as TimeUnit)}
+              value={unit}
+            >
+              <option value="m">minutes</option>
+              <option value="h">hours</option>
+              <option value="d">days</option>
+            </select>
           </div>
-          <Button className="w-full" onClick={handleApply} size="sm">
-            Apply
-          </Button>
+
+          <PopoverClose asChild>
+            <Button className="w-full" onClick={apply} size="sm">
+              Apply
+            </Button>
+          </PopoverClose>
         </div>
       </PopoverContent>
     </Popover>
