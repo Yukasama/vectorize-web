@@ -18,7 +18,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.12.0
+          node-version: 22.17.0
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -38,4 +38,4 @@ jobs:
           pnpm lint
 
       - name: Check outdated dependencies
-        run: pnpm outdated
+        run: pnpm outdated --prod
