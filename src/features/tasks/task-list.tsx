@@ -94,7 +94,6 @@ export const TaskList = () => {
         </div>
       </div>
 
-      {/* Rest of your existing JSX... */}
       {isError && (
         <Card className="py-12 text-center">
           <CardContent>
