@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -15,7 +16,7 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Upload } from 'lucide-react';
+import { FilePlus2, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { DatasetList } from './dataset/dataset-list';
@@ -30,7 +31,7 @@ export const AppSidebar = () => {
   const [syntheticOpen, setSyntheticOpen] = useState(false);
 
   return (
-    <Sidebar className="bg-[var(--sidebar)] text-[var(--sidebar-foreground)] transition-all duration-200">
+    <Sidebar className="text-[var(--sidebar-foreground)] transition-all duration-200">
       <SidebarHeader className="header-bg mb-6 w-full pt-4">
         <div className="flex w-full items-center justify-between">
           <Link className="pl-4" href="/" title="Go to homepage">
@@ -39,26 +40,30 @@ export const AppSidebar = () => {
             </span>
           </Link>
           <div className="flex gap-2">
-            <button
-              className="hover:bg-muted rounded p-2"
+            <Button
+              className="size-7 p-0"
               onClick={() => setSyntheticOpen(true)}
+              size="icon"
               title="Generate synthetic dataset"
               type="button"
+              variant="ghost"
             >
-              <Plus className="h-5 w-5" />
-            </button>
+              <FilePlus2 className="h-5 w-5" />
+            </Button>
             <SyntheticGenerateDialog
               onOpenChange={setSyntheticOpen}
               open={syntheticOpen}
             />
-            <button
-              className="hover:bg-muted rounded p-2"
+            <Button
+              className="size-7 p-0"
               onClick={() => setUploadOpen(true)}
+              size="icon"
               title="Upload"
               type="button"
+              variant="ghost"
             >
               <Upload className="h-5 w-5" />
-            </button>
+            </Button>
           </div>
         </div>
       </SidebarHeader>
@@ -80,7 +85,7 @@ export const AppSidebar = () => {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="model">
-              <ModelUpload />
+              <ModelUpload onSuccess={() => setUploadOpen(false)} />
             </TabsContent>
             <TabsContent value="dataset">
               <DatasetUpload />

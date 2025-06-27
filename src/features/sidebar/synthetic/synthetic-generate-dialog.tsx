@@ -8,8 +8,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { DatasetList } from '@/features/service-starter/select-dataset/dataset-list';
+import { useQuery } from '@tanstack/react-query';
 import { X } from 'lucide-react';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Dataset, fetchDatasets } from '../services/dataset-service';
 import {
   startSyntheticFromDataset,
@@ -121,10 +122,8 @@ const UploadMode = ({
 );
 
 interface SelectModeProps {
-  filteredDatasets: Dataset[];
   handleClearSelected: (id: string) => void;
   handleSelect: (dataset: Dataset) => void;
-  loading: boolean;
   localSelectedDatasets: Dataset[];
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
@@ -133,10 +132,8 @@ interface SelectModeProps {
 }
 
 const SelectMode = ({
-  filteredDatasets,
   handleClearSelected,
   handleSelect,
-  loading,
   localSelectedDatasets,
   search,
   setSearch,
@@ -175,11 +172,9 @@ const SelectMode = ({
       </div>
       <div className="max-h-60 overflow-y-auto">
         <div className="px-0 py-3">
-          {/* DatasetList is a custom component, not a JSX intrinsic element */}
           <DatasetList
-            datasets={filteredDatasets}
-            loading={loading}
             onSelect={handleSelect}
+            search={search}
             selectedDatasets={localSelectedDatasets}
             view={view}
           />
@@ -258,7 +253,6 @@ export const SyntheticGenerateDialog = ({
 }: SyntheticGenerateDialogProps) => {
   // Mode: 'upload' (drag-and-drop) or 'select' (dataset list)
   const [mode, setMode] = useState<'select' | 'upload'>('upload');
-  const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [selectedDataset, setSelectedDataset] = useState<string>('');
   // For dataset selection mode
   const [search, setSearch] = useState('');
@@ -276,6 +270,26 @@ export const SyntheticGenerateDialog = ({
   const [dragActive, setDragActive] = useState(false);
   const [fileStates, setFileStates] = useState<FileUploadState[]>([]);
   const [uploading, setUploading] = useState(false);
+
+  // --- React Query for datasets ---
+  useQuery({
+    enabled: open, // Only fetch when dialog is open
+    queryFn: fetchDatasets,
+    queryKey: ['datasets'],
+  });
+
+  // Reset selection/search/view on open
+  React.useEffect(() => {
+    if (open) {
+      setSelectedDataset('');
+      setTaskId(undefined);
+      setStatus(undefined);
+      setError(undefined);
+      setLocalSelectedDatasets([]);
+      setSearch('');
+      setView('grid');
+    }
+  }, [open]);
 
   // Add files to state and start upload
   const handleFilesSelected = (files: File[] | FileList) => {
@@ -351,32 +365,6 @@ export const SyntheticGenerateDialog = ({
       setUploading(false);
     }
   };
-
-  // Load datasets on open
-  React.useEffect(() => {
-    if (open) {
-      void (async () => {
-        const data = await fetchDatasets();
-        setDatasets(data);
-        setSelectedDataset('');
-        setTaskId(undefined);
-        setStatus(undefined);
-        setError(undefined);
-        setLocalSelectedDatasets([]);
-        setSearch('');
-        setView('grid');
-      })();
-    }
-  }, [open]);
-
-  // Filtered datasets for search
-  const filteredDatasets = useMemo(
-    () =>
-      datasets.filter((d) =>
-        d.name.toLowerCase().includes(search.toLowerCase()),
-      ),
-    [datasets, search],
-  );
 
   // Dataset select logic (multi-select)
   const handleSelect = (dataset: Dataset) => {
@@ -463,10 +451,8 @@ export const SyntheticGenerateDialog = ({
             />
           ) : (
             <SelectMode
-              filteredDatasets={filteredDatasets}
               handleClearSelected={handleClearSelected}
               handleSelect={handleSelect}
-              loading={loading}
               localSelectedDatasets={localSelectedDatasets}
               search={search}
               setSearch={setSearch}

@@ -12,9 +12,9 @@ import * as React from 'react';
 
 interface ConfirmDeleteDialogProps {
   datasetName: string;
-  onCancel: () => void;
-  onConfirm: () => void;
-  open: boolean;
+  onCancel?: () => void;
+  onConfirm?: () => void;
+  open?: boolean;
 }
 
 /**

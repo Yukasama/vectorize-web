@@ -7,38 +7,58 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useQuery } from '@tanstack/react-query';
 import type { Model } from '../../sidebar/services/model-service';
+import { fetchModels } from '../../sidebar/services/model-service';
 
 interface ModelListProps {
-  loading?: boolean;
-  models: Model[];
   onSelect: (model: Model) => void;
+  search: string;
   selectedModel?: Model;
   view: 'grid' | 'table';
 }
 
 export const ModelList = ({
-  loading,
-  models,
   onSelect,
+  search,
   selectedModel,
   view,
 }: ModelListProps) => {
-  if (loading) {
+  const {
+    data: models = [],
+    error,
+    isLoading,
+  } = useQuery({
+    queryFn: fetchModels,
+    queryKey: ['models'],
+  });
+
+  const filteredModels = models.filter((m) =>
+    m.name.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">Loading...</div>
     );
   }
-
+  if (error) {
+    return <div className="text-red-500">Error loading models.</div>;
+  }
+  if (filteredModels.length === 0) {
+    return <div className="text-muted-foreground p-4">No models found.</div>;
+  }
   if (view === 'grid') {
     return (
       <div className="grid grid-cols-4 gap-4 px-4 py-3">
-        {models.map((model) => {
-          const isSelected = selectedModel?.id === model.id;
+        {filteredModels.map((model) => {
+          const isSelected = selectedModel?.model_tag === model.model_tag;
           return (
             <Card
-              className={`cursor-pointer border-2 p-4 ${isSelected ? 'border-primary' : 'border-transparent'}`}
-              key={model.id}
+              className={`cursor-pointer border-2 p-4 ${
+                isSelected ? 'border-primary' : 'border-transparent'
+              }`}
+              key={model.model_tag}
               onClick={() => onSelect(model)}
             >
               <p className="text-sm font-medium">
@@ -55,7 +75,6 @@ export const ModelList = ({
       </div>
     );
   }
-
   return (
     <Table className="px-0 py-3">
       <TableHeader>
@@ -65,10 +84,10 @@ export const ModelList = ({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {models.map((model) => {
-          const isSelected = selectedModel?.id === model.id;
+        {filteredModels.map((model) => {
+          const isSelected = selectedModel?.model_tag === model.model_tag;
           return (
-            <TableRow key={model.id}>
+            <TableRow key={model.model_tag}>
               <TableCell>
                 {model.name.length > 17
                   ? model.name.slice(0, 17) + '...'

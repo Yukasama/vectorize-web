@@ -9,32 +9,47 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useQuery } from '@tanstack/react-query';
 import type { Dataset } from '../../sidebar/services/dataset-service';
+import { fetchDatasets } from '../../sidebar/services/dataset-service';
 
 interface DatasetListProps {
-  datasets: Dataset[];
-  loading?: boolean;
   onSelect: (dataset: Dataset) => void;
+  search: string;
   selectedDatasets: Dataset[];
   view: 'grid' | 'table';
 }
 
 export const DatasetList = ({
-  datasets,
-  loading = false,
   onSelect,
+  search,
   selectedDatasets,
   view,
 }: DatasetListProps) => {
+  const {
+    data: datasets = [],
+    error,
+    isLoading,
+  } = useQuery({
+    queryFn: fetchDatasets,
+    queryKey: ['datasets'],
+  });
+
+  const filteredDatasets = datasets.filter((d) =>
+    d.name.toLowerCase().includes(search.toLowerCase()),
+  );
+
   let content;
-  if (loading) {
+  if (isLoading) {
     content = (
       <div className="flex items-center justify-center py-8">Loading...</div>
     );
+  } else if (error) {
+    content = <div className="text-red-500">Error loading datasets.</div>;
   } else if (view === 'grid') {
     content = (
       <div className="grid grid-cols-4 gap-4 px-4 py-3">
-        {datasets.map((dataset) => {
+        {filteredDatasets.map((dataset) => {
           const isSelected = selectedDatasets.some((d) => d.id === dataset.id);
           return (
             <Card
@@ -67,7 +82,7 @@ export const DatasetList = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {datasets.map((dataset) => {
+          {filteredDatasets.map((dataset) => {
             const isSelected = selectedDatasets.some(
               (d) => d.id === dataset.id,
             );
