@@ -11,7 +11,7 @@ const fetchModelStats = async (
 ): Promise<Record<string, number>> => {
   try {
     const { data } = await client.get<Record<string, number>>(
-      `/inference/counter/${modelTag}`,
+      `/embeddings/counter/${modelTag}`,
     );
     if (
       typeof data === 'object' &&
