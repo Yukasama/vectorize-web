@@ -25,12 +25,7 @@ import { fetchModels, Model, updateModelName } from '../services/model-service';
 import { ModelDetailsHoverCardContent } from './model-details';
 import { ModelListOptions } from './model-options';
 
-const ModelListItem = ({
-  model,
-}: {
-  readonly model: Model;
-  onDeleted?: (id: string) => void;
-}) => {
+const ModelListItem = ({ model }: { readonly model: Model }) => {
   const [edit, setEdit] = useState(false);
   const [newName, setNewName] = useState(model.name);
   const [saving, setSaving] = useState(false);
@@ -127,8 +122,11 @@ export const ModelList = () => {
         <SidebarMenuItem>
           <div className="p-4">
             <div className="space-y-2">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div className="flex items-center gap-2" key={i}>
+              {[1, 2, 3, 4, 5].map((key) => (
+                <div
+                  className="flex items-center gap-2"
+                  key={`skeleton-${key}`}
+                >
                   <div className="bg-muted h-6 w-6 animate-pulse rounded-full" />
                   <div className="flex-1">
                     <div className="bg-muted h-4 w-3/4 animate-pulse rounded" />

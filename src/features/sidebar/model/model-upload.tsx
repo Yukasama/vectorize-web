@@ -261,7 +261,8 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
 
       {/* Local file upload section with drag-and-drop */}
       <div className="flex flex-col gap-1">
-        <div
+        <button
+          aria-label="Upload files by clicking or dragging"
           className={`flex h-32 cursor-pointer items-center justify-center rounded border-2 border-dashed transition ${
             dragActive ? 'border-primary bg-muted' : 'border-muted'
           }`}
@@ -272,11 +273,18 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
             setDragActive(true);
           }}
           onDrop={handleDrop}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              fileInputRef.current?.click();
+            }
+          }}
+          type="button"
         >
           {selectedFiles.length > 0 ? (
             <ul className="text-sm">
-              {selectedFiles.map((file, index) => (
-                <li key={index}>{file.name}</li>
+              {selectedFiles.map((file) => (
+                <li key={`${file.name}-${file.size}`}>{file.name}</li>
               ))}
             </ul>
           ) : (
@@ -291,7 +299,7 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
             ref={fileInputRef}
             type="file"
           />
-        </div>
+        </button>
         {errorMessage &&
           selectedFiles.length > 0 &&
           !githubOwner &&

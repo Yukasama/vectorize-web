@@ -73,10 +73,16 @@ export const EvaluationParamsStep = ({
       <h2 className="mb-6 text-lg font-semibold">Evaluation Parameters</h2>
       <div className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2 lg:grid-cols-3">
         <div>
-          <label className="mb-1 block text-sm font-medium">Max samples</label>
+          <label
+            className="mb-1 block text-sm font-medium"
+            htmlFor="max-samples-input"
+          >
+            Max samples
+          </label>
           <input
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            id="max-samples-input"
             min={1}
             onChange={(e) => setMaxSamples(Number(e.target.value))}
             placeholder="e.g. 1000"
@@ -85,12 +91,16 @@ export const EvaluationParamsStep = ({
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">
+          <label
+            className="mb-1 block text-sm font-medium"
+            htmlFor="baseline-model-tag-input"
+          >
             Baseline model tag (optional)
           </label>
           <input
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            id="baseline-model-tag-input"
             onChange={(e) => setBaselineModelTag(e.target.value)}
             placeholder="e.g. my-baseline-model"
             type="text"
@@ -119,6 +129,4 @@ export const EvaluationParamsStep = ({
     </div>
   );
 };
-
-// Test export for debugging
 export default EvaluationParamsStep;

@@ -71,7 +71,9 @@ export const SidebarListItem = ({
   return {
     confirmDeleteDialog: React.cloneElement(confirmDeleteDialog, {
       onCancel: () => setDeleteDialogOpen(false),
-      onConfirm: handleDelete,
+      onConfirm: () => {
+        void handleDelete();
+      },
       open: deleteDialogOpen,
     }),
     nameArea: (

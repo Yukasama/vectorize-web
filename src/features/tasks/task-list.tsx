@@ -116,8 +116,8 @@ export const TaskList = () => {
 
       {!isError && isFetching && !data && (
         <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div className="h-28 space-y-3 rounded-xl border p-5" key={i}>
+          {[1, 2, 3, 4, 5].map((key) => (
+            <div className="h-28 space-y-3 rounded-xl border p-5" key={key}>
               <div className="flex justify-between">
                 <div className="skeleton h-4 w-1/2 rounded" />
                 <div className="skeleton h-6 w-20 rounded" />
