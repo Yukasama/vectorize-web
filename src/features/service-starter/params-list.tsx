@@ -49,6 +49,7 @@ export const TrainingParamsStep = ({
   );
   const [device, setDevice] = useState('');
   const [timeoutSeconds, setTimeoutSeconds] = useState<'' | number>('');
+  const [valDatasetId, setValDatasetId] = useState<string>('');
 
   const handleStart = async () => {
     setIsSubmitting(true);
@@ -82,6 +83,7 @@ export const TrainingParamsStep = ({
           timeoutSeconds === '' ? undefined : Number(timeoutSeconds),
         train_dataset_ids: selectedDatasets.map((d) => d.id),
         use_amp: useAmp,
+        val_dataset_id: valDatasetId || undefined,
         warmup_steps: warmupSteps === '' ? undefined : Number(warmupSteps),
         weight_decay: weightDecay === '' ? undefined : Number(weightDecay),
       });
@@ -395,6 +397,23 @@ export const TrainingParamsStep = ({
             placeholder="e.g. 3600"
             type="number"
             value={timeoutSeconds === '' ? '' : timeoutSeconds}
+          />
+        </div>
+        <div>
+          <label
+            className="mb-1 block text-sm font-medium"
+            htmlFor="val-dataset-id-input"
+          >
+            Validation dataset ID (optional)
+          </label>
+          <input
+            autoComplete="off"
+            className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            id="val-dataset-id-input"
+            onChange={(e) => setValDatasetId(e.target.value)}
+            placeholder="Dataset ID or leave empty for 10% split"
+            type="text"
+            value={valDatasetId}
           />
         </div>
         <div className="col-span-2 flex flex-col gap-2 lg:col-span-1">

@@ -40,7 +40,7 @@ export const EvaluationParamsStep = ({
     try {
       const { startEvaluation } = await import('./evaluation-service');
       await startEvaluation({
-        baseline_model_tag: baselineModelTag || undefined,
+        baseline_model_tag: baselineModelTag,
         dataset_id: selectedDatasets[0]?.id ?? undefined,
         max_samples: maxSamples,
         model_tag: selectedModel?.model_tag ?? '',

@@ -22,6 +22,7 @@ export interface StartTrainingParams {
   timeout_seconds?: number;
   train_dataset_ids: string[];
   use_amp?: boolean;
+  val_dataset_id?: null | string;
   warmup_steps?: number;
   weight_decay?: number;
 }
