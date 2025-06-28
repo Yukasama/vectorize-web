@@ -19,15 +19,18 @@ export const TrainingParamsStep = ({
   selectedDatasets,
   selectedModel,
   setTrainingParams,
+  trainingParams,
 }: TrainingParamsStepProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
 
-  // All training parameters (initially empty)
-  const [epochs, setEpochs] = useState<'' | number>('');
+  // All training parameters (initially from props)
+  const [epochs, setEpochs] = useState<'' | number>(
+    trainingParams.epochs || '',
+  );
   const [perDeviceTrainBatchSize, setPerDeviceTrainBatchSize] = useState<
     '' | number
-  >('');
+  >(trainingParams.batchSize || '');
   const [learningRate, setLearningRate] = useState<'' | number>('');
   const [warmupSteps, setWarmupSteps] = useState<'' | number>('');
   const [optimizerName, setOptimizerName] = useState('');
@@ -111,12 +114,18 @@ export const TrainingParamsStep = ({
     <div className="px-8 py-6">
       <h2 className="mb-6 text-lg font-semibold">Training Parameters</h2>
       <div className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2 lg:grid-cols-3">
-        {/* Erste Reihe: Epochs, Batch Size, Learning Rate */}
+        {/* First row: Epochs, Batch Size, Learning Rate */}
         <div>
-          <label className="mb-1 block text-sm font-medium">Epochs</label>
+          <label
+            className="mb-1 block text-sm font-medium"
+            htmlFor="epochs-input"
+          >
+            Epochs
+          </label>
           <input
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            id="epochs-input"
             min={1}
             onChange={(e) =>
               setEpochs(e.target.value === '' ? '' : Number(e.target.value))
@@ -127,12 +136,16 @@ export const TrainingParamsStep = ({
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">
+          <label
+            className="mb-1 block text-sm font-medium"
+            htmlFor="batch-size-input"
+          >
             Batch size per device
           </label>
           <input
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            id="batch-size-input"
             min={1}
             onChange={(e) =>
               setPerDeviceTrainBatchSize(
@@ -147,12 +160,16 @@ export const TrainingParamsStep = ({
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">
+          <label
+            className="mb-1 block text-sm font-medium"
+            htmlFor="learning-rate-input"
+          >
             Learning rate
           </label>
           <input
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            id="learning-rate-input"
             onChange={(e) =>
               setLearningRate(
                 e.target.value === '' ? '' : Number(e.target.value),
@@ -167,12 +184,18 @@ export const TrainingParamsStep = ({
         <div className="col-span-full">
           <Separator className="my-2" />
         </div>
-        {/* Zweite Reihe: Warmup Steps, Optimizer, Scheduler */}
+        {/* Second row: Warmup Steps, Optimizer, Scheduler */}
         <div>
-          <label className="mb-1 block text-sm font-medium">Warmup steps</label>
+          <label
+            className="mb-1 block text-sm font-medium"
+            htmlFor="warmup-steps-input"
+          >
+            Warmup steps
+          </label>
           <input
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            id="warmup-steps-input"
             min={0}
             onChange={(e) =>
               setWarmupSteps(
@@ -185,10 +208,16 @@ export const TrainingParamsStep = ({
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">Optimizer</label>
+          <label
+            className="mb-1 block text-sm font-medium"
+            htmlFor="optimizer-input"
+          >
+            Optimizer
+          </label>
           <input
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            id="optimizer-input"
             onChange={(e) => setOptimizerName(e.target.value)}
             placeholder="e.g. AdamW"
             type="text"
@@ -196,10 +225,16 @@ export const TrainingParamsStep = ({
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">Scheduler</label>
+          <label
+            className="mb-1 block text-sm font-medium"
+            htmlFor="scheduler-input"
+          >
+            Scheduler
+          </label>
           <input
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            id="scheduler-input"
             onChange={(e) => setScheduler(e.target.value)}
             placeholder="e.g. linear"
             type="text"
@@ -209,12 +244,18 @@ export const TrainingParamsStep = ({
         <div className="col-span-full">
           <Separator className="my-2" />
         </div>
-        {/* Dritte Reihe: Weight Decay, Max Grad Norm, Evaluation Steps */}
+        {/* Third row: Weight Decay, Max Grad Norm, Evaluation Steps */}
         <div>
-          <label className="mb-1 block text-sm font-medium">Weight decay</label>
+          <label
+            className="mb-1 block text-sm font-medium"
+            htmlFor="weight-decay-input"
+          >
+            Weight decay
+          </label>
           <input
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            id="weight-decay-input"
             onChange={(e) =>
               setWeightDecay(
                 e.target.value === '' ? '' : Number(e.target.value),
@@ -227,12 +268,16 @@ export const TrainingParamsStep = ({
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">
+          <label
+            className="mb-1 block text-sm font-medium"
+            htmlFor="max-grad-norm-input"
+          >
             Max grad norm
           </label>
           <input
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            id="max-grad-norm-input"
             onChange={(e) =>
               setMaxGradNorm(
                 e.target.value === '' ? '' : Number(e.target.value),
@@ -245,12 +290,16 @@ export const TrainingParamsStep = ({
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">
+          <label
+            className="mb-1 block text-sm font-medium"
+            htmlFor="evaluation-steps-input"
+          >
             Evaluation steps
           </label>
           <input
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            id="evaluation-steps-input"
             min={0}
             onChange={(e) =>
               setEvaluationSteps(
@@ -265,12 +314,18 @@ export const TrainingParamsStep = ({
         <div className="col-span-full">
           <Separator className="my-2" />
         </div>
-        {/* Vierte Reihe: Output Path, Dataloader Workers, Device */}
+        {/* Fourth row: Output Path, Dataloader Workers, Device */}
         <div>
-          <label className="mb-1 block text-sm font-medium">Output path</label>
+          <label
+            className="mb-1 block text-sm font-medium"
+            htmlFor="output-path-input"
+          >
+            Output path
+          </label>
           <input
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            id="output-path-input"
             onChange={(e) => setOutputPath(e.target.value)}
             placeholder="path/to/output"
             type="text"
@@ -278,12 +333,16 @@ export const TrainingParamsStep = ({
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">
+          <label
+            className="mb-1 block text-sm font-medium"
+            htmlFor="dataloader-workers-input"
+          >
             Dataloader workers
           </label>
           <input
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            id="dataloader-workers-input"
             min={0}
             onChange={(e) =>
               setDataloaderNumWorkers(
@@ -296,10 +355,16 @@ export const TrainingParamsStep = ({
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">Device</label>
+          <label
+            className="mb-1 block text-sm font-medium"
+            htmlFor="device-input"
+          >
+            Device
+          </label>
           <input
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            id="device-input"
             onChange={(e) => setDevice(e.target.value)}
             placeholder="cpu, cuda, ..."
             type="text"
@@ -309,14 +374,18 @@ export const TrainingParamsStep = ({
         <div className="col-span-full">
           <Separator className="my-2" />
         </div>
-        {/* Fünfte Reihe: Timeout, Checkboxen */}
+        {/* Fifth row: Timeout, Checkboxes */}
         <div>
-          <label className="mb-1 block text-sm font-medium">
+          <label
+            className="mb-1 block text-sm font-medium"
+            htmlFor="timeout-seconds-input"
+          >
             Timeout (seconds)
           </label>
           <input
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
+            id="timeout-seconds-input"
             min={0}
             onChange={(e) =>
               setTimeoutSeconds(
