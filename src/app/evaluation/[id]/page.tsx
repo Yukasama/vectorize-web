@@ -6,53 +6,18 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
+import { EvaluationData } from '@/features/evaluation/evaluation-data';
 import { AppSidebar } from '@/features/sidebar/app-sidebar';
 import { ThemeToggle } from '@/features/theme/theme-toggle';
-import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
-
-declare function fetchEvaluationById(
-  id: string,
-): Promise<undefined | { id: string; name?: string }>;
 
 export default function EvaluationDetailPage() {
   const params = useParams();
   const evaluationId = typeof params.id === 'string' ? params.id : '';
-  const {
-    data: evaluation,
-    error,
-    isLoading,
-  } = useQuery({
-    enabled: !!evaluationId,
-    queryFn: () => fetchEvaluationById(evaluationId),
-    queryKey: ['evaluation', evaluationId],
-  });
 
-  let evaluationNameContent;
-  if (isLoading) {
-    evaluationNameContent = (
-      <span className="text-muted-foreground text-sm">Loading...</span>
-    );
-  } else if (error) {
-    evaluationNameContent = (
-      <span className="text-destructive text-sm">Error loading evaluation</span>
-    );
-  } else if (evaluation?.name) {
-    evaluationNameContent = (
-      <span
-        className="max-w-xs truncate text-lg font-semibold"
-        title={evaluation.name}
-      >
-        {evaluation.name}
-      </span>
-    );
-  } else {
-    evaluationNameContent = (
-      <span className="max-w-xs truncate text-lg font-semibold">
-        {evaluationId}
-      </span>
-    );
-  }
+  const evaluationNameContent = (
+    <span className="max-w-xs text-lg font-semibold">{evaluationId}</span>
+  );
 
   return (
     <SidebarProvider>
@@ -75,6 +40,7 @@ export default function EvaluationDetailPage() {
           <div className="mb-8">
             <span className="font-mono text-base">ID: {evaluationId}</span>
           </div>
+          <EvaluationData evaluationId={evaluationId} />
         </main>
       </SidebarInset>
     </SidebarProvider>

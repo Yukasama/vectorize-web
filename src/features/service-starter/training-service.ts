@@ -27,6 +27,23 @@ export interface StartTrainingParams {
   weight_decay?: number;
 }
 
+export interface TrainingStatusResponse {
+  epoch?: number;
+  error?: string;
+  finished_at?: string;
+  id: string;
+  model_tag?: string;
+  output_dir?: string;
+  started_at?: string;
+  status: string;
+  train_loss?: number;
+  train_runtime?: number;
+  train_samples_per_second?: number;
+  train_steps_per_second?: number;
+  trained_model_id?: string;
+  validation_dataset_path?: string;
+}
+
 /**
  * Start a training job with the required and optional parameters.
  * Only sends required and filled optional fields.
@@ -66,4 +83,13 @@ export const startTraining = async (
     }
   }
   await client.post('/training/train', body);
+};
+
+export const fetchTrainingById = async (
+  id: string,
+): Promise<TrainingStatusResponse> => {
+  const { data } = await client.get<TrainingStatusResponse>(
+    `/training/${id}/status`,
+  );
+  return data;
 };

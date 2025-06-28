@@ -1,5 +1,18 @@
 import { client } from '@/lib/client';
 
+export interface EvaluationStatusResponse {
+  baseline_metrics?: null | Record<string, unknown>;
+  created_at: string;
+  end_date?: null | string;
+  error_msg?: null | string;
+  evaluation_metrics?: null | Record<string, unknown>;
+  evaluation_summary?: null | string;
+  progress: number;
+  status: string;
+  task_id: string;
+  updated_at: string;
+}
+
 export interface StartEvaluationParams {
   baseline_model_tag?: string;
   dataset_id?: string;
@@ -28,4 +41,22 @@ export const startEvaluation = async (
     }
   }
   await client.post('/evaluation/evaluate', body);
+};
+
+/**
+ * Get the status of an evaluation task by its task ID.
+ * @param taskId - The evaluation task ID
+ * @returns EvaluationStatusResponse with status and metrics
+ */
+export const fetchEvaluationStatus = async (
+  taskId: string,
+): Promise<EvaluationStatusResponse | undefined> => {
+  try {
+    const { data } = await client.get<EvaluationStatusResponse>(
+      `/evaluation/${taskId}/status`,
+    );
+    return data;
+  } catch {
+    return undefined;
+  }
 };
