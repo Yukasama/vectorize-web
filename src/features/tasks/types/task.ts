@@ -13,5 +13,5 @@ export type TaskType =
   | 'dataset_upload'
   | 'evaluation'
   | 'model_upload'
-  | 'synthetis'
+  | 'synthesis'
   | 'training';

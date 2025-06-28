@@ -17,7 +17,7 @@ export const TASKS_STATUS_MAP: Record<
     color: 'text-green-600',
     description: 'Task completed successfully',
     Icon: CheckCircle,
-    label: 'Completed',
+    label: 'Done',
   },
   F: {
     badgeColor: 'bg-red-100 text-red-700 border-red-300',
@@ -47,6 +47,6 @@ export const TASKS_TYPE_MAP: Record<TaskType, string> = {
   dataset_upload: 'Dataset Upload',
   evaluation: 'Evaluation',
   model_upload: 'Model Upload',
-  synthetis: 'Synthesis',
+  synthesis: 'Synthesis',
   training: 'Training',
 };

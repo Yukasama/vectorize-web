@@ -19,19 +19,23 @@ import {
   Search,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { StatusFilter, TimeFilter } from './filters';
 import { filterTasks } from './lib/filter-tasks';
+import { StatusFilter } from './status-filter';
 import { TaskCard } from './task-card';
-import { Task, TaskStatus } from './types/task';
+import { TimeFilter } from './time-filter';
+import { TypeFilter } from './type-filter';
+import { Task, TaskStatus, TaskType } from './types/task';
 
 export const TaskList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatuses, setSelectedStatuses] = useState<TaskStatus[]>([]);
+  const [selectedTypes, setSelectedTypes] = useState<TaskType[]>([]);
   const [maxHours, setMaxHours] = useState(1);
 
   const { data, isError, isFetching, refetch } = useQuery({
-    queryFn: () => client.get<Task[]>('/tasks').then((r) => r.data),
-    queryKey: ['tasks'],
+    queryFn: () =>
+      client.get<Task[]>(`/tasks?within_hours=${maxHours}`).then((r) => r.data),
+    queryKey: ['tasks', maxHours],
     refetchInterval: 30_000,
   });
 
@@ -40,11 +44,15 @@ export const TaskList = () => {
       return [];
     }
 
-    return filterTasks(data, { maxHours, searchQuery, selectedStatuses });
-  }, [data, selectedStatuses, searchQuery, maxHours]);
+    return filterTasks(data, {
+      searchQuery,
+      selectedStatuses,
+      selectedTypes,
+    });
+  }, [data, selectedStatuses, selectedTypes, searchQuery]);
 
   return (
-    <div className="space-y-2" data-testid="task-list">
+    <div className="h-[calc(100vh-80px)] space-y-2" data-testid="task-list">
       <div className="flex items-center gap-3">
         <h3 className="text-md font-medium">Tasks</h3>
         <Separator className="bg-desc/50 flex-1" />
@@ -77,6 +85,10 @@ export const TaskList = () => {
           <StatusFilter
             onStatusChange={setSelectedStatuses}
             selectedStatuses={selectedStatuses}
+          />
+          <TypeFilter
+            onTypeChange={setSelectedTypes}
+            selectedTypes={selectedTypes}
           />
           <TimeFilter maxHours={maxHours} onMaxHoursChange={setMaxHours} />
         </div>
@@ -116,6 +128,7 @@ export const TaskList = () => {
           ))}
         </div>
       )}
+
       {!isError && !isFetching && filteredTasks.length === 0 && (
         <Card className="py-12 text-center">
           <CardContent>
@@ -126,11 +139,14 @@ export const TaskList = () => {
                 ? 'Your task queue is empty.'
                 : 'No tasks match your current filters. Try adjusting your search criteria.'}
             </CardDescription>
-            {(selectedStatuses.length > 0 || searchQuery) && (
+            {(selectedStatuses.length > 0 ||
+              selectedTypes.length > 0 ||
+              searchQuery) && (
               <Button
                 className="mt-4"
                 onClick={() => {
                   setSelectedStatuses([]);
+                  setSelectedTypes([]);
                   setSearchQuery('');
                 }}
                 variant="outline"
@@ -141,8 +157,9 @@ export const TaskList = () => {
           </CardContent>
         </Card>
       )}
+
       {!isError && !isFetching && filteredTasks.length > 0 && (
-        <div className="space-y-4 scroll-auto pt-3">
+        <div className="hide-scrollbar h-full space-y-4 overflow-y-auto scroll-auto pt-3">
           {filteredTasks.map((task) => (
             <TaskCard key={task.id} task={task} />
           ))}

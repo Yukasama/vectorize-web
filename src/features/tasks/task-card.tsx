@@ -29,7 +29,9 @@ export const TaskCard = ({ task }: { task: Task }) => {
           <div className="flex-1 space-y-0.5">
             <div className="flex items-center gap-3">
               <h3 className="text-md w-[210px] truncate font-semibold">
-                {task.tag ?? 'Synthetic Generation'}
+                {task.task_type === 'synthesis'
+                  ? 'Synthetic Generation'
+                  : task.tag}
               </h3>
               <IdCopier taskId={task.id} />
             </div>

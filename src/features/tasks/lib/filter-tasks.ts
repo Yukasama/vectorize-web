@@ -1,26 +1,34 @@
 import { TASKS_TYPE_MAP } from '@/features/tasks/config/mappers';
-import { Task, TaskStatus } from '@/features/tasks/types/task';
+import { Task, TaskStatus, TaskType } from '@/features/tasks/types/task';
 
 export interface TaskFilterOptions {
-  maxHours?: number;
   searchQuery?: string;
   selectedStatuses?: TaskStatus[];
+  selectedTypes?: TaskType[];
 }
 
 /**
- * Filters tasks based on search query, status selection, and time constraints.
+ * Filters tasks based on search query, status selection, type selection, and time constraints.
  */
 export const filterTasks = (
   tasks: Task[],
   options: TaskFilterOptions = {},
 ): Task[] => {
-  const { maxHours = 1, searchQuery = '', selectedStatuses = [] } = options;
+  const {
+    searchQuery = '',
+    selectedStatuses = [],
+    selectedTypes = [],
+  } = options;
 
   return tasks.filter((task) => {
     if (
       selectedStatuses.length > 0 &&
       !selectedStatuses.includes(task.task_status)
     ) {
+      return false;
+    }
+
+    if (selectedTypes.length > 0 && !selectedTypes.includes(task.task_type)) {
       return false;
     }
 
@@ -33,19 +41,6 @@ export const filterTasks = (
         .includes(query);
 
       if (!matchesTag && !matchesId && !matchesType) {
-        return false;
-      }
-    }
-
-    if (
-      ['D', 'F'].includes(task.task_status) &&
-      task.end_date &&
-      selectedStatuses.includes(task.task_status)
-    ) {
-      const endTime = new Date(task.end_date).getTime();
-      const cutoffTime = Date.now() - maxHours * 60 * 60 * 1000;
-
-      if (endTime < cutoffTime) {
         return false;
       }
     }
