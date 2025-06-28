@@ -35,7 +35,7 @@ interface UploadModeProps {
   fileInputRef: React.RefObject<HTMLInputElement>;
   fileStates: FileUploadState[];
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleDrop: (e: React.DragEvent<HTMLDivElement>) => void;
+  handleDrop: (e: React.DragEvent<HTMLButtonElement>) => void;
   handleRemoveFile: (index: number) => void;
   setDragActive: React.Dispatch<React.SetStateAction<boolean>>;
   taskId: null | string | undefined;
@@ -53,72 +53,81 @@ const UploadMode = ({
   taskId,
   uploading,
 }: UploadModeProps) => (
-  <>
-    <div
-      className={`flex h-56 min-h-[224px] w-full min-w-0 cursor-pointer items-center justify-center rounded border-2 border-dashed transition ${
-        dragActive ? 'border-primary bg-muted' : 'border-muted'
-      }`}
-      onClick={() => fileInputRef.current.click()}
-      onDragLeave={() => setDragActive(false)}
-      onDragOver={(e) => {
+  <button
+    aria-label="Upload files by clicking or dragging"
+    className={`flex h-56 min-h-[224px] w-full min-w-0 items-center justify-center rounded border-2 border-dashed text-sm transition ${
+      dragActive ? 'border-primary bg-muted' : 'border-muted'
+    }`}
+    disabled={uploading || !!taskId}
+    onClick={() => {
+      fileInputRef.current.click();
+    }}
+    onDragLeave={() => setDragActive(false)}
+    onDragOver={(e) => {
+      e.preventDefault();
+      setDragActive(true);
+    }}
+    onDrop={handleDrop}
+    onKeyDown={(e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        setDragActive(true);
-      }}
-      onDrop={handleDrop}
-    >
-      <p className="text-muted-foreground text-sm">
-        Drop PDF or media files here or click to select.
-      </p>
-      <Input
-        accept=".pdf,image/*,video/*,audio/*"
-        className="hidden"
-        disabled={uploading || !!taskId}
-        multiple
-        onChange={handleChange}
-        ref={fileInputRef}
-        type="file"
-      />
-    </div>
-    <div className="bg-muted mt-2 flex-shrink-0 rounded p-2">
-      {fileStates.length > 0 ? (
-        fileStates.map((state, index) => (
-          <div
-            className="mb-2 flex items-center justify-between rounded border p-2"
-            key={index}
+        fileInputRef.current.click();
+      }
+    }}
+    type="button"
+  >
+    {fileStates.length > 0 ? (
+      <ul className="w-full text-sm">
+        {fileStates.map((state) => (
+          <li
+            className="flex flex-1 items-center justify-between gap-2"
+            key={`${state.file.name}-${state.file.size}`}
           >
-            <div className="flex-1">
-              <p className="text-muted-foreground truncate text-sm">
-                {state.file.name}
-              </p>
-              <div className="flex items-center gap-2">
-                <Progress className="flex-1" value={state.progress} />
-                <span className="w-10 text-right text-xs">
-                  {state.progress}%
-                </span>
-                {state.done && !state.error && (
-                  <span className="ml-2 text-xs text-green-600">Done</span>
-                )}
-                {state.error && (
-                  <span className="ml-2 text-xs text-red-600">Error</span>
-                )}
-              </div>
-            </div>
+            <span className="flex-1 truncate">{state.file.name}</span>
+            <Progress className="flex-1" value={state.progress} />
+            <span className="w-10 text-right text-xs">{state.progress}%</span>
+            {state.done && !state.error && (
+              <span className="ml-2 text-xs text-green-600">Done</span>
+            )}
+            {state.error && (
+              <span className="ml-2 text-xs text-red-600">Error</span>
+            )}
             <button
               className="ml-2 text-red-500 hover:text-red-700"
               disabled={uploading || !!taskId}
-              onClick={() => handleRemoveFile(index)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRemoveFile(
+                  fileStates.findIndex(
+                    (f) =>
+                      f.file.name === state.file.name &&
+                      f.file.size === state.file.size,
+                  ),
+                );
+              }}
               title="Remove"
               type="button"
             >
               <X className="h-4 w-4" />
             </button>
-          </div>
-        ))
-      ) : (
-        <p className="text-muted-foreground text-sm">No files selected.</p>
-      )}
-    </div>
-  </>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p className="text-muted-foreground text-sm">
+        Drop PDF or media files here or click to select.
+      </p>
+    )}
+    <Input
+      accept=".pdf"
+      className="hidden"
+      disabled={uploading || !!taskId}
+      multiple
+      onChange={handleChange}
+      ref={fileInputRef}
+      type="file"
+    />
+  </button>
 );
 
 interface SelectModeProps {

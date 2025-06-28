@@ -222,7 +222,8 @@ export const DatasetUpload = () => {
         )}
       </div>
       {/* Drag-and-Drop Area */}
-      <div
+      <button
+        aria-label="Upload files by clicking or dragging"
         className={`flex h-44 min-h-[176px] w-full min-w-0 cursor-pointer items-center justify-center rounded border-2 border-dashed transition ${
           dragActive ? 'border-primary bg-muted' : 'border-muted'
         }`}
@@ -233,6 +234,13 @@ export const DatasetUpload = () => {
           setDragActive(true);
         }}
         onDrop={handleDrop}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            fileInputRef.current?.click();
+          }
+        }}
+        type="button"
       >
         <p className="text-muted-foreground text-sm">
           {messages.dataset.upload.localDropText}
@@ -244,15 +252,15 @@ export const DatasetUpload = () => {
           ref={fileInputRef}
           type="file"
         />
-      </div>
+      </button>
 
       {/* File List with Progress */}
       <div className="bg-muted mt-4 flex-shrink-0 rounded p-4">
         {fileStates.length > 0 ? (
-          fileStates.map((state, index) => (
+          fileStates.map((state) => (
             <div
               className="mb-2 flex items-center justify-between rounded border p-2"
-              key={index}
+              key={`${state.file.name}-${state.file.size}`}
             >
               <div className="flex-1">
                 <p className="text-muted-foreground truncate text-sm">
@@ -279,7 +287,15 @@ export const DatasetUpload = () => {
               <button
                 className="ml-2 text-red-500 hover:text-red-700"
                 disabled={uploading}
-                onClick={() => handleRemoveFile(index)}
+                onClick={() =>
+                  handleRemoveFile(
+                    fileStates.findIndex(
+                      (f) =>
+                        f.file.name === state.file.name &&
+                        f.file.size === state.file.size,
+                    ),
+                  )
+                }
                 title={messages.dataset.upload.remove}
                 type="button"
               >

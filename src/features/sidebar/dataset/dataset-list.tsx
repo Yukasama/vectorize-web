@@ -123,8 +123,11 @@ export const DatasetList = () => {
         <SidebarMenuItem>
           <div className="p-4">
             <div className="space-y-2">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div className="flex items-center gap-2" key={i}>
+              {[1, 2, 3, 4, 5].map((key) => (
+                <div
+                  className="flex items-center gap-2"
+                  key={`skeleton-${key}`}
+                >
                   <div className="bg-muted h-6 w-6 animate-pulse rounded-full" />
                 </div>
               ))}
