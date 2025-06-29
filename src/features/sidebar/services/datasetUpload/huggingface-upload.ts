@@ -58,7 +58,7 @@ export const getHFUploadStatus = async (
 ): Promise<UploadDatasetTask> => {
   try {
     const { data } = await client.get<UploadDatasetTask>(
-      `/datasets/upload/huggingface/status/${taskId}`,
+      `/datasets/huggingface/status/${taskId}`,
     );
     return data;
   } catch (error: unknown) {

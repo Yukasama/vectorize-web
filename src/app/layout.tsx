@@ -1,3 +1,4 @@
+import { Toaster } from '@/components/ui/sonner';
 import { Provider } from '@/features/shared/provider';
 import { cn } from '@/lib/utils';
 import { Analytics } from '@vercel/analytics/next';
@@ -46,6 +47,7 @@ export default async function RootLayout({
           <div className="flex min-h-screen w-full flex-col">
             <main className="flex flex-col">{children}</main>
           </div>
+          <Toaster position="bottom-left" />
         </Provider>
         <Analytics />
         <SpeedInsights />

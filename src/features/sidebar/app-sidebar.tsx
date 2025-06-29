@@ -88,7 +88,7 @@ export const AppSidebar = () => {
               <ModelUpload onSuccess={() => setUploadOpen(false)} />
             </TabsContent>
             <TabsContent value="dataset">
-              <DatasetUpload />
+              <DatasetUpload onClose={() => setUploadOpen(false)} />
             </TabsContent>
           </Tabs>
         </DialogContent>

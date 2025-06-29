@@ -54,7 +54,7 @@ importers:
         specifier: ^5.81.4
         version: 5.81.5(react@19.1.0)
       '@tanstack/react-query-devtools':
-        specifier: ^5.80.10
+        specifier: ^5.81.5
         version: 5.81.5(@tanstack/react-query@5.81.5(react@19.1.0))(react@19.1.0)
       '@vercel/analytics':
         specifier: ^1.5.0
@@ -105,7 +105,7 @@ importers:
         specifier: ^19.1.0
         version: 19.1.0(react@19.1.0)
       recharts:
-        specifier: ^3.0.0
+        specifier: ^3.0.2
         version: 3.0.2(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react-is@16.13.1)(react@19.1.0)(redux@5.0.1)
       server-only:
         specifier: ^0.0.1
@@ -130,7 +130,7 @@ importers:
         specifier: ^3.3.1
         version: 3.3.1
       '@eslint/js':
-        specifier: ^9.29.0
+        specifier: ^9.30.0
         version: 9.30.0
       '@next/bundle-analyzer':
         specifier: 15.4.0-canary.51
@@ -151,7 +151,7 @@ importers:
         specifier: ^0.5.16
         version: 0.5.16(tailwindcss@4.1.11)
       '@types/node':
-        specifier: ^24.0.4
+        specifier: ^24.0.6
         version: 24.0.6
       '@types/react':
         specifier: ^19.1.8
@@ -163,7 +163,7 @@ importers:
         specifier: ^10.4.21
         version: 10.4.21(postcss@8.5.6)
       eslint:
-        specifier: ^9.29.0
+        specifier: ^9.30.0
         version: 9.30.0(jiti@2.4.2)
       eslint-config-next:
         specifier: ^15.3.4

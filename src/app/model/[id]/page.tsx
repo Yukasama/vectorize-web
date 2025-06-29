@@ -7,6 +7,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { CounterChart } from '@/features/model/counter-chart';
+import { ModelTaskList } from '@/features/model/model-task-list';
 import { AppSidebar } from '@/features/sidebar/app-sidebar';
 import { fetchModelById } from '@/features/sidebar/services/model-service';
 import { ThemeToggle } from '@/features/theme/theme-toggle';
@@ -68,6 +69,10 @@ export default function ModelDetailPage() {
           <h1 className="mb-4 text-2xl font-bold">Model Details</h1>
           <div className="mb-8">
             <CounterChart modelTag={modelTag} />
+          </div>
+          <div className="mb-8">
+            <h2 className="mb-2 text-xl font-semibold">Tasks for this Model</h2>
+            <ModelTaskList modelTag={modelTag} />
           </div>
         </main>
       </SidebarInset>

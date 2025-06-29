@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Toaster } from '@/components/ui/sonner';
 import React, { useState } from 'react';
 import { Dataset } from '../sidebar/services/dataset-service';
 import { Model } from '../sidebar/services/model-service';
@@ -122,9 +121,6 @@ export const EvaluationParamsStep = ({
         >
           {isSubmitting ? 'Starting...' : 'Start evaluation'}
         </Button>
-      </div>
-      <div style={{ bottom: 0, position: 'fixed', right: 0, zIndex: 9999 }}>
-        <Toaster position="bottom-right" />
       </div>
     </div>
   );

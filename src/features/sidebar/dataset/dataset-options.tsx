@@ -26,9 +26,7 @@ export const DatasetOptions = ({
     );
     setDeleteDialogOpen(false);
     if (success) {
-      toast.success(messages.dataset.delete.success(dataset.name), {
-        position: 'bottom-right',
-      });
+      toast.success(messages.dataset.delete.success(dataset.name));
       void queryClient.invalidateQueries({ queryKey: ['datasets'] });
       onDeleted?.(dataset.id);
     } else {

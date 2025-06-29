@@ -26,9 +26,7 @@ export const ModelOptions = ({
     );
     setDeleteDialogOpen(false);
     if (success) {
-      toast.success(messages.model.delete.success(model.name), {
-        position: 'bottom-right',
-      });
+      toast.success(messages.model.delete.success(model.name));
       void queryClient.invalidateQueries({ queryKey: ['models'] });
       onDeleted?.(model.id);
     } else {

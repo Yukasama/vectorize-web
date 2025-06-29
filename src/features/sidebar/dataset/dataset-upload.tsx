@@ -46,7 +46,11 @@ const updateFileProgress = (
 ): FileUploadState[] =>
   states.map((state, i) => (i === index ? { ...state, progress } : state));
 
-export const DatasetUpload = () => {
+interface DatasetUploadProps {
+  onClose?: () => void;
+}
+
+export const DatasetUpload = ({ onClose }: DatasetUploadProps) => {
   // File input ref and component state
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -144,6 +148,9 @@ export const DatasetUpload = () => {
       duration: 4000,
     });
     resetForm();
+    if (onClose) {
+      onClose();
+    }
   };
 
   // Hugging Face upload logic

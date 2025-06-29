@@ -12,7 +12,8 @@ export const ModelDetailsHoverCardContent = ({
 }: {
   modelId: string;
 }) => {
-  const [copied, setCopied] = React.useState(false);
+  const [copiedId, setCopiedId] = React.useState(false);
+  const [copiedTag, setCopiedTag] = React.useState(false);
   const { data: model, isLoading: loading } = useQuery({
     enabled: !!modelId,
     queryFn: () => fetchModelById(modelId),
@@ -21,18 +22,27 @@ export const ModelDetailsHoverCardContent = ({
 
   const handleCopy = (id: string) => {
     void navigator.clipboard.writeText(id);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1200);
+    setCopiedId(true);
+    setTimeout(() => setCopiedId(false), 1200);
+  };
+
+  const handleCopyTag = (tag: string) => {
+    void navigator.clipboard.writeText(tag);
+    setCopiedTag(true);
+    setTimeout(() => setCopiedTag(false), 1200);
   };
 
   return (
     <DetailsHoverCard
-      copied={copied}
+      copied={copiedId}
+      copiedTag={copiedTag}
       createdAt={model?.created_at ? formatRelativeDate(model.created_at) : ''}
       createdAtBelowId
       id={model?.id ?? ''}
       loading={loading}
       onCopy={handleCopy}
+      onCopyTag={model?.model_tag ? handleCopyTag : undefined}
+      tag={model?.model_tag ?? ''}
       title={model?.name ?? ''}
       updatedAt={model?.updated_at ? formatRelativeDate(model.updated_at) : ''}
     >
