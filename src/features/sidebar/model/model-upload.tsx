@@ -6,6 +6,7 @@ import { uploadGithub } from '@/features/sidebar/services/modelUpload/upload-git
 import { uploadHuggingFace } from '@/features/sidebar/services/modelUpload/upload-huggingface';
 import { uploadLocalFile } from '@/features/sidebar/services/modelUpload/upload-local-file';
 import { messages } from '@/lib/messages';
+import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import React, { useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -34,6 +35,8 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
   const [githubRepo, setGithubRepo] = useState('');
   const [githubRevision, setGithubRevision] = useState('');
   const [errorMessage, setErrorMessage] = useState<string>();
+
+  const queryClient = useQueryClient();
 
   // Handles file drop event for local file upload.
   const handleDrop = (e: React.DragEvent) => {
@@ -72,6 +75,8 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
           duration: 4000,
           id: toastId,
         });
+        void queryClient.invalidateQueries({ queryKey: ['models'] });
+        void queryClient.invalidateQueries({ queryKey: ['tasks'] });
         return true;
       } catch (error: unknown) {
         if (
@@ -172,6 +177,7 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
         if (onSuccess) {
           onSuccess();
         }
+        void queryClient.invalidateQueries({ queryKey: ['tasks'] });
       }
     } finally {
       setUploading(false);

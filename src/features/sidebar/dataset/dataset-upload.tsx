@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { uploadHFDataset } from '@/features/sidebar/services/datasetUpload/huggingface-upload';
 import { messages } from '@/lib/messages';
+import { useQueryClient } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import Image from 'next/image';
 import React, { useRef, useState } from 'react';
@@ -61,6 +62,8 @@ export const DatasetUpload = ({ onClose }: DatasetUploadProps) => {
   const [hfId, setHfId] = useState('');
   const [hfTag, setHfTag] = useState('');
   const [hfError, setHfError] = useState<null | string>();
+
+  const queryClient = useQueryClient();
 
   // Add files to state and start upload
   const handleFilesSelected = (files: File[] | FileList) => {
@@ -148,6 +151,7 @@ export const DatasetUpload = ({ onClose }: DatasetUploadProps) => {
       duration: 4000,
     });
     resetForm();
+    void queryClient.invalidateQueries({ queryKey: ['datasets'] });
     if (onClose) {
       onClose();
     }
@@ -167,9 +171,9 @@ export const DatasetUpload = ({ onClose }: DatasetUploadProps) => {
       });
       setHfId('');
       setHfTag('');
+      void queryClient.invalidateQueries({ queryKey: ['tasks'] });
     } catch (error) {
       setHfError(error instanceof Error ? error.message : String(error));
-      toast.error(error instanceof Error ? error.message : String(error));
     } finally {
       setUploading(false);
     }
@@ -185,6 +189,7 @@ export const DatasetUpload = ({ onClose }: DatasetUploadProps) => {
         );
       });
       setFileStates((prev) => markFileDone(prev, index));
+      void queryClient.invalidateQueries({ queryKey: ['datasets'] });
     } catch {
       setFileStates((prev) => markFileError(prev, index));
       toast.error(messages.dataset.upload.errorFile(file.name));

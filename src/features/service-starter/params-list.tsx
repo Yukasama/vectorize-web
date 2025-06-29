@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useQueryClient } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { Dataset } from '../sidebar/services/dataset-service';
 import { Model } from '../sidebar/services/model-service';
@@ -22,6 +23,7 @@ export const TrainingParamsStep = ({
 }: TrainingParamsStepProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
+  const queryClient = useQueryClient();
 
   // All training parameters (initially from props)
   const [epochs, setEpochs] = useState<'' | number>(
@@ -88,6 +90,7 @@ export const TrainingParamsStep = ({
       });
       const { toast } = await import('sonner');
       toast.success('Training started!');
+      void queryClient.invalidateQueries({ queryKey: ['tasks'] });
     } catch (error_) {
       const err: {
         message?: string;

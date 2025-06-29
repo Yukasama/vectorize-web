@@ -8,7 +8,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { DatasetList } from '@/features/service-starter/select-dataset/dataset-list';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 import { Dataset, fetchDatasets } from '../services/dataset-service';
@@ -280,6 +280,8 @@ export const SyntheticGenerateDialog = ({
   const [fileStates, setFileStates] = useState<FileUploadState[]>([]);
   const [uploading, setUploading] = useState(false);
 
+  const queryClient = useQueryClient();
+
   // --- React Query for datasets ---
   useQuery({
     enabled: open, // Only fetch when dialog is open
@@ -401,6 +403,7 @@ export const SyntheticGenerateDialog = ({
       const res = await startSyntheticFromDataset(id);
       setTaskId(res.task_id);
       setStatus('started');
+      void queryClient.invalidateQueries({ queryKey: ['tasks'] });
     } catch (error_) {
       let message = 'Failed to start synthetic generation';
       if (error_ instanceof Error) {

@@ -25,8 +25,11 @@ import { TaskCard } from './task-card';
 import { TimeFilter } from './time-filter';
 import { TypeFilter } from './type-filter';
 import { Task, TaskStatus, TaskType } from './types/task';
+import { useTaskPollingAndListSync } from './use-task-polling';
 
 export const TaskList = () => {
+  useTaskPollingAndListSync();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatuses, setSelectedStatuses] = useState<TaskStatus[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<TaskType[]>([]);
@@ -36,7 +39,6 @@ export const TaskList = () => {
     queryFn: () =>
       client.get<Task[]>(`/tasks?within_hours=${maxHours}`).then((r) => r.data),
     queryKey: ['tasks', maxHours],
-    refetchInterval: 30_000,
   });
 
   const filteredTasks = useMemo(() => {

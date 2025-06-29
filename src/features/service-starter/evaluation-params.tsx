@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useQueryClient } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { Dataset } from '../sidebar/services/dataset-service';
 import { Model } from '../sidebar/services/model-service';
@@ -32,6 +33,7 @@ export const EvaluationParamsStep = ({
   const [baselineModelTag, setBaselineModelTag] = useState<string>(
     evaluationParams.baselineModelTag ?? '',
   );
+  const queryClient = useQueryClient();
 
   const handleStart = async () => {
     setIsSubmitting(true);
@@ -46,6 +48,7 @@ export const EvaluationParamsStep = ({
       });
       const { toast } = await import('sonner');
       toast.success('Evaluation started!');
+      void queryClient.invalidateQueries({ queryKey: ['tasks'] });
     } catch (error_) {
       const err: {
         message?: string;
