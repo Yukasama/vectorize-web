@@ -25,7 +25,6 @@ export const uploadHuggingFace = async (
       if (error.response?.status === 400) {
         throw new Error(messages.model.upload.huggingfaceError);
       }
-      // Use backend error message if available, otherwise fallback to messages
       const data = error.response?.data as
         | undefined
         | { detail?: string; message?: string };

@@ -403,7 +403,7 @@ export const SyntheticGenerateDialog = ({
       const res = await startSyntheticFromDataset(id);
       setTaskId(res.task_id);
       setStatus('started');
-      void queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      void queryClient.invalidateQueries({ exact: false, queryKey: ['tasks'] });
     } catch (error_) {
       let message = 'Failed to start synthetic generation';
       if (error_ instanceof Error) {

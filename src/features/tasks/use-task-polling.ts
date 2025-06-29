@@ -17,7 +17,7 @@ export const useTaskPollingAndListSync = ({
     queryFn: () =>
       client.get<Task[]>(`/tasks?within_hours=${maxHours}`).then((r) => r.data),
     queryKey: ['tasks', maxHours],
-    refetchInterval: 30_000,
+    refetchInterval: 10_000,
   });
 
   useEffect(() => {
@@ -33,6 +33,7 @@ export const useTaskPollingAndListSync = ({
           task.task_type === 'model_upload'
         ) {
           void queryClient.invalidateQueries({ queryKey: ['models'] });
+          void queryClient.refetchQueries({ queryKey: ['tasks'] });
         }
         if (
           task.task_type === 'dataset_upload' ||

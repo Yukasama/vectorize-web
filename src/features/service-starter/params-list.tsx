@@ -56,8 +56,10 @@ export const TrainingParamsStep = ({
     setIsSubmitting(true);
     setError(undefined);
     try {
-      const { startTraining } = await import('./training-service');
-      await startTraining({
+      const { startTrainingWithRevalidate } = await import(
+        '@/app/actions/training-actions'
+      );
+      await startTrainingWithRevalidate({
         dataloader_num_workers:
           dataloaderNumWorkers === ''
             ? undefined
@@ -90,7 +92,7 @@ export const TrainingParamsStep = ({
       });
       const { toast } = await import('sonner');
       toast.success('Training started!');
-      void queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      void queryClient.invalidateQueries({ exact: false, queryKey: ['tasks'] });
     } catch (error_) {
       const err: {
         message?: string;

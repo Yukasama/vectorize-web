@@ -171,7 +171,7 @@ export const DatasetUpload = ({ onClose }: DatasetUploadProps) => {
       });
       setHfId('');
       setHfTag('');
-      void queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      void queryClient.invalidateQueries({ exact: false, queryKey: ['tasks'] });
     } catch (error) {
       setHfError(error instanceof Error ? error.message : String(error));
     } finally {

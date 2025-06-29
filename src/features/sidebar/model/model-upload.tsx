@@ -76,7 +76,10 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
           id: toastId,
         });
         void queryClient.invalidateQueries({ queryKey: ['models'] });
-        void queryClient.invalidateQueries({ queryKey: ['tasks'] });
+        void queryClient.invalidateQueries({
+          exact: false,
+          queryKey: ['tasks'],
+        });
         return true;
       } catch (error: unknown) {
         if (
@@ -177,7 +180,10 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
         if (onSuccess) {
           onSuccess();
         }
-        void queryClient.invalidateQueries({ queryKey: ['tasks'] });
+        void queryClient.invalidateQueries({
+          exact: false,
+          queryKey: ['tasks'],
+        });
       }
     } finally {
       setUploading(false);

@@ -48,7 +48,7 @@ export const EvaluationParamsStep = ({
       });
       const { toast } = await import('sonner');
       toast.success('Evaluation started!');
-      void queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      void queryClient.invalidateQueries({ exact: false, queryKey: ['tasks'] });
     } catch (error_) {
       const err: {
         message?: string;
