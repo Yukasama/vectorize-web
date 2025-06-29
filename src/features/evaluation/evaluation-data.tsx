@@ -77,6 +77,49 @@ export const EvaluationData = ({ evaluationId }: EvaluationDataProps) => {
           </pre>
         </div>
       )}
+      {status.model_tag && (
+        <div>
+          <span className="font-semibold">Model:</span>{' '}
+          <a
+            className="text-primary underline transition hover:opacity-80"
+            href={`/model/${status.model_tag}`}
+          >
+            {status.model_tag}
+          </a>
+        </div>
+      )}
+      {status.baseline_model_tag && (
+        <div>
+          <span className="font-semibold">Baseline model:</span>{' '}
+          <a
+            className="text-primary underline transition hover:opacity-80"
+            href={`/model/${status.baseline_model_tag}`}
+          >
+            {status.baseline_model_tag}
+          </a>
+        </div>
+      )}
+      {status.dataset_info && (
+        <div>
+          <table className="mt-2 w-full border-collapse text-sm">
+            <thead>
+              <tr className="border-b">
+                <th className="p-1 text-left font-medium">Datasets</th>
+              </tr>
+            </thead>
+            <tbody>
+              {status.dataset_info.split(',').map((id: string) => {
+                const trimmed = id.trim();
+                return (
+                  <tr className="border-b last:border-0" key={trimmed}>
+                    <td className="p-1">{trimmed}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

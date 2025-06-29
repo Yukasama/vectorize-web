@@ -2,11 +2,14 @@ import { client } from '@/lib/client';
 
 export interface EvaluationStatusResponse {
   baseline_metrics?: null | Record<string, unknown>;
+  baseline_model_tag?: null | string;
   created_at: string;
+  dataset_info?: null | string;
   end_date?: null | string;
   error_msg?: null | string;
   evaluation_metrics?: null | Record<string, unknown>;
   evaluation_summary?: null | string;
+  model_tag?: null | string;
   progress: number;
   status: string;
   task_id: string;

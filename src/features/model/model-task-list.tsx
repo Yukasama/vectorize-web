@@ -70,7 +70,16 @@ export const ModelTaskList = ({ modelTag }: ModelTaskListProps) => {
         {tasks.map((task) => (
           <TableRow key={task.id}>
             <TableCell className="font-mono text-xs">
-              {task.id.slice(0, 8)}
+              {task.task_type === 'evaluation' ? (
+                <a
+                  className="text-primary underline transition hover:opacity-80"
+                  href={`/evaluation/${task.id}`}
+                >
+                  {task.id.slice(0, 8)}
+                </a>
+              ) : (
+                task.id.slice(0, 8)
+              )}
             </TableCell>
             <TableCell>{TASKS_TYPE_MAP[task.task_type]}</TableCell>
             <TableCell>{TASKS_STATUS_MAP[task.task_status].label}</TableCell>
