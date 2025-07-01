@@ -2,13 +2,18 @@ import { client } from '@/lib/client';
 import { messages } from '@/lib/messages';
 import { isAxiosError } from 'axios';
 
+export interface HFModelUploadResponse {
+  taskId: string;
+}
+
 /**
  * Upload a model from Hugging Face by model tag and optional revision.
+ * Returns the task ID for tracking the upload progress.
  */
 export const uploadHuggingFace = async (
   modelTag: string,
   revision: string,
-): Promise<void> => {
+): Promise<HFModelUploadResponse> => {
   try {
     const payload: { model_tag: string; revision?: string } = {
       model_tag: modelTag,
@@ -16,7 +21,11 @@ export const uploadHuggingFace = async (
     if (revision && revision.trim() !== '') {
       payload.revision = revision;
     }
-    await client.post('/uploads/huggingface', payload);
+    const { data } = await client.post<HFModelUploadResponse>(
+      '/uploads/huggingface',
+      payload,
+    );
+    return data;
   } catch (error: unknown) {
     if (isAxiosError(error)) {
       if (error.response?.status === 409) {

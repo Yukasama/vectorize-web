@@ -131,10 +131,14 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
   const uploadFromHuggingFace = async () => {
     if (huggingFaceModelId) {
       try {
-        await uploadHuggingFace(huggingFaceModelId, huggingFaceTag);
+        const response = await uploadHuggingFace(
+          huggingFaceModelId,
+          huggingFaceTag,
+        );
         toast.success(
           messages.model.upload.huggingfaceSuccess(huggingFaceModelId),
         );
+        console.log('Hugging Face model upload task created:', response.taskId);
         return true;
       } catch (error: unknown) {
         if (
