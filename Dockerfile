@@ -31,24 +31,17 @@ ENV NODE_ENV=production \
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/package.json /app/pnpm-lock.yaml ./
 
-COPY next.config.ts ./
-COPY tsconfig.json ./
-COPY tailwind.config.ts ./
-COPY postcss.config.mjs ./
-COPY components.json ./
+COPY next.config.ts tsconfig.json tailwind.config.ts postcss.config.mjs components.json ./
 COPY public ./public
 COPY src ./src
 
 RUN pnpm build
-  
+
 # --------------------------------------------------------
 # Stage 3: Run the application
 # --------------------------------------------------------
 FROM node:${NODE_VERSION}-slim AS runner
 WORKDIR /app
-
-# Create a non-root user
-RUN groupadd -r nextjs && useradd --no-log-init -r -g nextjs nextjs
 
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
@@ -60,7 +53,10 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-RUN chown -R nextjs:nextjs /app
+# Create .next/cache directory and fix ownership for Next.js image caching
+RUN groupadd -r nextjs && useradd --no-log-init -r -g nextjs nextjs && \
+    mkdir -p /app/.next/cache && \
+    chown -R nextjs:nextjs /app
 
 USER nextjs
 EXPOSE 3000
