@@ -10,6 +10,7 @@ import { Model } from '../sidebar/services/model-service';
 interface EvaluationParamsStepProps {
   evaluationParams: { baselineModelTag?: string; maxSamples: number };
   onBack: () => void;
+  onReset: () => void;
   selectedDatasets: Dataset[];
   selectedModel?: Model;
   setEvaluationParams: (params: {
@@ -21,6 +22,7 @@ interface EvaluationParamsStepProps {
 export const EvaluationParamsStep = ({
   evaluationParams,
   onBack,
+  onReset,
   selectedDatasets,
   selectedModel,
   setEvaluationParams,
@@ -49,6 +51,12 @@ export const EvaluationParamsStep = ({
       const { toast } = await import('sonner');
       toast.success('Evaluation started!');
       void queryClient.invalidateQueries({ exact: false, queryKey: ['tasks'] });
+
+      // Reset all parameters to default values
+      setMaxSamples(1000);
+      setBaselineModelTag('');
+
+      onReset();
     } catch (error_) {
       const err: {
         message?: string;

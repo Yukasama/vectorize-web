@@ -10,6 +10,7 @@ import { startTraining } from './training-service';
 
 interface TrainingParamsStepProps {
   onBack: () => void;
+  onReset: () => void;
   selectedDatasets: Dataset[];
   selectedModel?: Model;
   setTrainingParams: (params: { batchSize: number; epochs: number }) => void;
@@ -17,6 +18,7 @@ interface TrainingParamsStepProps {
 }
 export const TrainingParamsStep = ({
   onBack,
+  onReset,
   selectedDatasets,
   selectedModel,
   setTrainingParams,
@@ -91,6 +93,28 @@ export const TrainingParamsStep = ({
       const { toast } = await import('sonner');
       toast.success('Training started!');
       void queryClient.invalidateQueries({ exact: false, queryKey: ['tasks'] });
+
+      // Reset all parameters to default values
+      setEpochs('');
+      setPerDeviceTrainBatchSize('');
+      setLearningRate('');
+      setWarmupSteps('');
+      setOptimizerName('');
+      setScheduler('');
+      setWeightDecay('');
+      setMaxGradNorm('');
+      setUseAmp(false);
+      setShowProgressBar(true);
+      setEvaluationSteps('');
+      setOutputPath('');
+      setSaveBestModel(true);
+      setSaveEachEpoch(false);
+      setDataloaderNumWorkers('');
+      setDevice('');
+      setTimeoutSeconds('');
+      setValDatasetId('');
+
+      onReset();
     } catch (error_) {
       const err: {
         message?: string;

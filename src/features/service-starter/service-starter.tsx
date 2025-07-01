@@ -27,6 +27,13 @@ export const ServiceStarter = ({
 
   const [mode, setMode] = useState<'evaluation' | 'training'>('training');
 
+  const handleReset = () => {
+    setStep(0);
+    setSelectedModel(undefined);
+    setSelectedDatasets([]);
+    setMode('training');
+  };
+
   return (
     <div className="flex flex-col gap-6">
       {step === 0 && (
@@ -57,6 +64,7 @@ export const ServiceStarter = ({
           <TabsContent value="training">
             <TrainingParamsStep
               onBack={() => setStep(1)}
+              onReset={handleReset}
               selectedDatasets={selectedDatasets}
               selectedModel={selectedModel}
               setTrainingParams={setTrainingParams}
@@ -67,6 +75,7 @@ export const ServiceStarter = ({
             <EvaluationParamsStep
               evaluationParams={evaluationParams}
               onBack={() => setStep(1)}
+              onReset={handleReset}
               selectedDatasets={selectedDatasets}
               selectedModel={selectedModel}
               setEvaluationParams={setEvaluationParams}

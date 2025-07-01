@@ -127,7 +127,7 @@ export const DatasetUpload = ({ onClose }: DatasetUploadProps) => {
       return messages.dataset.upload.uploading;
     }
     if (fileStates.length > 0 && fileStates.every((f) => f.done)) {
-      return messages.dataset.upload.save;
+      return messages.dataset.upload.done;
     }
     return messages.dataset.upload.upload;
   };
@@ -309,24 +309,26 @@ export const DatasetUpload = ({ onClose }: DatasetUploadProps) => {
                   )}
                 </div>
               </div>
-              {/* Remove file button */}
-              <button
-                className="ml-2 text-red-500 hover:text-red-700"
-                disabled={uploading}
-                onClick={() =>
-                  handleRemoveFile(
-                    fileStates.findIndex(
-                      (f) =>
-                        f.file.name === state.file.name &&
-                        f.file.size === state.file.size,
-                    ),
-                  )
-                }
-                title={messages.dataset.upload.remove}
-                type="button"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              {/* Remove file button*/}
+              {!state.done && (
+                <button
+                  className="ml-2 text-red-500 hover:text-red-700"
+                  disabled={uploading}
+                  onClick={() =>
+                    handleRemoveFile(
+                      fileStates.findIndex(
+                        (f) =>
+                          f.file.name === state.file.name &&
+                          f.file.size === state.file.size,
+                      ),
+                    )
+                  }
+                  title={messages.dataset.upload.remove}
+                  type="button"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
           ))
         ) : (
