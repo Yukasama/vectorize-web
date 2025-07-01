@@ -151,7 +151,10 @@ export const DatasetUpload = ({ onClose }: DatasetUploadProps) => {
       duration: 4000,
     });
     resetForm();
-    void queryClient.invalidateQueries({ queryKey: ['datasets'] });
+    void queryClient.invalidateQueries({
+      exact: false,
+      queryKey: ['datasets'],
+    });
     if (onClose) {
       onClose();
     }
@@ -189,7 +192,10 @@ export const DatasetUpload = ({ onClose }: DatasetUploadProps) => {
         );
       });
       setFileStates((prev) => markFileDone(prev, index));
-      void queryClient.invalidateQueries({ queryKey: ['datasets'] });
+      void queryClient.invalidateQueries({
+        exact: false,
+        queryKey: ['datasets'],
+      });
     } catch {
       setFileStates((prev) => markFileError(prev, index));
       toast.error(messages.dataset.upload.errorFile(file.name));

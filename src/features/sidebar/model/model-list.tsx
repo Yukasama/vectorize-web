@@ -17,15 +17,21 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { SidebarListItemName } from '@/components/ui/sidebar-list-item';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, ChevronUp, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
-import { fetchModels, Model, updateModelName } from '../services/model-service';
+import { toast } from 'sonner';
+import {
+  fetchAllModels,
+  Model,
+  updateModelName,
+} from '../services/model-service';
 import { ModelDetailsHoverCardContent } from './model-details';
 import { ModelListOptions } from './model-options';
 
 const ModelListItem = ({ model }: { readonly model: Model }) => {
+  const queryClient = useQueryClient();
   const [edit, setEdit] = useState(false);
   const [newName, setNewName] = useState(model.name);
   const [saving, setSaving] = useState(false);
@@ -41,13 +47,20 @@ const ModelListItem = ({ model }: { readonly model: Model }) => {
     try {
       await updateModelName(model.id, newName.trim(), model.version);
       setEdit(false);
+      void queryClient.invalidateQueries({
+        exact: false,
+        queryKey: ['models'],
+      });
+    } catch (error) {
+      console.error('Error renaming model:', error);
+      toast.error('Error renaming model');
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <SidebarMenuSubItem key={model.model_tag}>
+    <SidebarMenuSubItem key={model.id}>
       <div className="flex w-full min-w-0 items-center">
         <HoverCard>
           <HoverCardTrigger asChild>
@@ -91,19 +104,17 @@ const ModelListItem = ({ model }: { readonly model: Model }) => {
 };
 
 export const ModelList = () => {
-  const {
-    data: models = [],
-    error,
-    isLoading,
-  } = useQuery({
-    queryFn: fetchModels,
+  const [modelSearch, setModelSearch] = useState('');
+  const [open, setOpen] = useState(false);
+  const [showMoreModels, setShowMoreModels] = useState(false);
+
+  // Fetch all models (simplified approach)
+  const { data, error, isLoading } = useQuery({
+    queryFn: fetchAllModels,
     queryKey: ['models'],
   });
 
-  // State for models and UI logic
-  const [modelSearch, setModelSearch] = useState('');
-  const [showMoreModels, setShowMoreModels] = useState(false);
-  const [open, setOpen] = useState(false);
+  const models = data ?? [];
 
   // Filter models by search term
   const filteredModels = models.filter((model) =>
@@ -193,7 +204,7 @@ export const ModelList = () => {
             {/* SidebarMenuSub */}
             <SidebarMenuSub>
               {visibleModels.map((model) => (
-                <ModelListItem key={model.model_tag} model={model} />
+                <ModelListItem key={model.id} model={model} />
               ))}
             </SidebarMenuSub>
             {/* Show More/Less button */}

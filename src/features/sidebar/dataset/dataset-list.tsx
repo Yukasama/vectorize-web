@@ -17,10 +17,11 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { SidebarListItemName } from '@/components/ui/sidebar-list-item';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, ChevronUp, Search } from 'lucide-react';
 import Link from 'next/link';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import {
   Dataset,
   fetchDatasets,
@@ -30,6 +31,7 @@ import { DatasetDetailsHoverCard } from './dataset-details';
 import { DatasetOptions } from './dataset-options';
 
 const DatasetListItem = ({ dataset }: { dataset: Dataset }) => {
+  const queryClient = useQueryClient();
   const [edit, setEdit] = useState(false);
   const [newName, setNewName] = useState(dataset.name);
   const [saving, setSaving] = useState(false);
@@ -48,6 +50,13 @@ const DatasetListItem = ({ dataset }: { dataset: Dataset }) => {
       }
       await updateDataset(dataset.id, newName.trim(), dataset.version);
       setEdit(false);
+      void queryClient.invalidateQueries({
+        exact: false,
+        queryKey: ['datasets'],
+      });
+    } catch (error) {
+      console.error('Error renaming dataset:', error);
+      toast.error('Error renaming dataset');
     } finally {
       setSaving(false);
     }
@@ -95,27 +104,41 @@ const DatasetListItem = ({ dataset }: { dataset: Dataset }) => {
 };
 
 export const DatasetList = () => {
-  const {
-    data: datasets = [],
-    error,
-    isLoading,
-  } = useQuery({
-    queryFn: fetchDatasets,
-    queryKey: ['datasets'],
+  const [datasetSearch, setDatasetSearch] = useState('');
+  const [open, setOpen] = useState(false);
+  const [allDatasets, setAllDatasets] = useState<Dataset[]>([]);
+  const [visibleCount, setVisibleCount] = useState(5);
+  const [totalCount, setTotalCount] = useState(0);
+
+  // Fetch initial datasets (dynamic limit based on visibleCount)
+  const { data, error, isLoading } = useQuery({
+    queryFn: async () => {
+      const limit = Math.max(5, visibleCount);
+      const result = await fetchDatasets(limit, 0);
+      return result;
+    },
+    queryKey: ['datasets', visibleCount],
   });
 
-  const [datasetSearch, setDatasetSearch] = useState('');
-  const [showMoreDatasets, setShowMoreDatasets] = useState(false);
-  const [open, setOpen] = useState(false);
+  // Update local state when query data changes
+  useEffect(() => {
+    if (data) {
+      const uniqueDatasets = data.items.filter(
+        (dataset, index, self) =>
+          index === self.findIndex((d) => d.id === dataset.id),
+      );
+      setAllDatasets(uniqueDatasets);
+      setTotalCount(data.total);
+    }
+  }, [data]);
 
-  const filteredDatasets = datasets.filter((dataset) =>
+  // No longer need loadMoreDatasets function since we fetch based on visibleCount
+
+  const filteredDatasets = allDatasets.filter((dataset) =>
     dataset.name.toLowerCase().includes(datasetSearch.toLowerCase()),
   );
 
-  const visibleDatasets = filteredDatasets.slice(
-    0,
-    showMoreDatasets ? filteredDatasets.length : 5,
-  );
+  const visibleDatasets = filteredDatasets.slice(0, visibleCount);
 
   if (isLoading) {
     return (
@@ -161,7 +184,7 @@ export const DatasetList = () => {
         onOpenChange={(open) => {
           setOpen(open);
           if (!open) {
-            setShowMoreDatasets(false);
+            setVisibleCount(5);
           }
         }}
       >
@@ -192,13 +215,32 @@ export const DatasetList = () => {
                 <DatasetListItem dataset={dataset} key={dataset.id} />
               ))}
             </SidebarMenuSub>
-            {filteredDatasets.length > 5 && (
+            {(filteredDatasets.length > 5 ||
+              (filteredDatasets.length >= visibleCount &&
+                allDatasets.length < totalCount)) && (
               <button
                 className="text-muted-foreground mt-2 w-full text-xs hover:underline"
-                onClick={() => setShowMoreDatasets((v) => !v)}
+                onClick={() => {
+                  if (
+                    visibleCount >= filteredDatasets.length &&
+                    allDatasets.length >= totalCount
+                  ) {
+                    setVisibleCount(5);
+                  } else {
+                    setVisibleCount((prev) => prev + 10);
+                  }
+                }}
                 type="button"
               >
-                {showMoreDatasets ? 'Show Less' : 'Show More'}
+                {(() => {
+                  if (
+                    visibleCount >= filteredDatasets.length &&
+                    allDatasets.length >= totalCount
+                  ) {
+                    return 'Show Less';
+                  }
+                  return 'Show More';
+                })()}
               </button>
             )}
           </CollapsibleContent>

@@ -32,14 +32,20 @@ export const useTaskPollingAndListSync = ({
           task.task_type === 'training' ||
           task.task_type === 'model_upload'
         ) {
-          void queryClient.invalidateQueries({ queryKey: ['models'] });
+          void queryClient.invalidateQueries({
+            exact: false,
+            queryKey: ['models'],
+          });
           void queryClient.refetchQueries({ queryKey: ['tasks'] });
         }
         if (
           task.task_type === 'dataset_upload' ||
           task.task_type === 'synthesis'
         ) {
-          void queryClient.invalidateQueries({ queryKey: ['datasets'] });
+          void queryClient.invalidateQueries({
+            exact: false,
+            queryKey: ['datasets'],
+          });
         }
         updated = true;
       }

@@ -75,7 +75,10 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
           duration: 4000,
           id: toastId,
         });
-        void queryClient.invalidateQueries({ queryKey: ['models'] });
+        void queryClient.invalidateQueries({
+          exact: false,
+          queryKey: ['models'],
+        });
         void queryClient.invalidateQueries({
           exact: false,
           queryKey: ['tasks'],

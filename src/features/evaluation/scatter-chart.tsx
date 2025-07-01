@@ -34,10 +34,10 @@ export const EvaluationScatterChart = ({
     );
   }
 
-  // Wenn beide vorhanden, wie gehabt
   if (evaluationMetrics && baselineMetrics) {
     const keys = Object.keys(evaluationMetrics).filter(
       (k) =>
+        k !== 'num_samples' &&
         typeof evaluationMetrics[k] === 'number' &&
         typeof baselineMetrics[k] === 'number',
     );
@@ -104,7 +104,7 @@ export const EvaluationScatterChart = ({
   // Wenn nur evaluationMetrics vorhanden, plotte gegen Index
   if (evaluationMetrics) {
     const keys = Object.keys(evaluationMetrics).filter(
-      (k) => typeof evaluationMetrics[k] === 'number',
+      (k) => k !== 'num_samples' && typeof evaluationMetrics[k] === 'number',
     );
     const data = keys.map((k, i) => ({
       metric: k,

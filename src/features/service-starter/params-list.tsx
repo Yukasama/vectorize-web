@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { Dataset } from '../sidebar/services/dataset-service';
 import { Model } from '../sidebar/services/model-service';
+import { startTraining } from './training-service';
 
 interface TrainingParamsStepProps {
   onBack: () => void;
@@ -56,10 +57,7 @@ export const TrainingParamsStep = ({
     setIsSubmitting(true);
     setError(undefined);
     try {
-      const { startTrainingWithRevalidate } = await import(
-        '@/app/actions/training-actions'
-      );
-      await startTrainingWithRevalidate({
+      await startTraining({
         dataloader_num_workers:
           dataloaderNumWorkers === ''
             ? undefined

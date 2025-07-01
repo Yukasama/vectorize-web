@@ -11,7 +11,7 @@ import { DatasetList } from '@/features/service-starter/select-dataset/dataset-l
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import React, { useRef, useState } from 'react';
-import { Dataset, fetchDatasets } from '../services/dataset-service';
+import { Dataset, fetchAllDatasets } from '../services/dataset-service';
 import {
   startSyntheticFromDataset,
   uploadMediaForSynthesis,
@@ -285,7 +285,7 @@ export const SyntheticGenerateDialog = ({
   // --- React Query for datasets ---
   useQuery({
     enabled: open, // Only fetch when dialog is open
-    queryFn: fetchDatasets,
+    queryFn: fetchAllDatasets,
     queryKey: ['datasets'],
   });
 

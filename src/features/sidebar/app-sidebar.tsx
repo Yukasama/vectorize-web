@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FilePlus2, Upload } from 'lucide-react';
-import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { DatasetList } from './dataset/dataset-list';
 import { DatasetUpload } from './dataset/dataset-upload';
@@ -29,16 +29,30 @@ export const AppSidebar = () => {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [tab, setTab] = useState<'dataset' | 'model'>('model');
   const [syntheticOpen, setSyntheticOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleVectorizeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (pathname === '/') {
+      globalThis.location.reload();
+    } else {
+      router.push('/');
+    }
+  };
 
   return (
     <Sidebar className="text-[var(--sidebar-foreground)] transition-all duration-200">
       <SidebarHeader className="header-bg mb-6 w-full pt-4">
         <div className="flex w-full items-center justify-between">
-          <Link className="pl-4" href="/" title="Go to homepage">
-            <span className="focus:ring-primary hover:bg-muted inline-block min-w-[120px] rounded bg-transparent p-2 text-center text-lg font-semibold text-[var(--sidebar-foreground)] shadow transition-colors focus:ring-2 focus:outline-none">
-              Vectorize
-            </span>
-          </Link>
+          <button
+            className="focus:ring-primary hover:bg-muted ml-4 inline-block min-w-[120px] rounded bg-transparent p-2 text-center text-lg font-semibold text-[var(--sidebar-foreground)] shadow transition-colors focus:ring-2 focus:outline-none"
+            onClick={handleVectorizeClick}
+            title="Go to homepage"
+            type="button"
+          >
+            Vectorize
+          </button>
           <div className="flex gap-2">
             <Button
               className="size-7 p-0"

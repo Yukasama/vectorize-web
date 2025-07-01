@@ -9,7 +9,7 @@ import {
 import { CounterChart } from '@/features/model/counter-chart';
 import { ModelTaskList } from '@/features/model/model-task-list';
 import { AppSidebar } from '@/features/sidebar/app-sidebar';
-import { fetchModelById } from '@/features/sidebar/services/model-service';
+import { fetchModelByTag } from '@/features/sidebar/services/model-service';
 import { ThemeToggle } from '@/features/theme/theme-toggle';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
@@ -23,7 +23,7 @@ export default function ModelDetailPage() {
     isLoading,
   } = useQuery({
     enabled: !!modelId,
-    queryFn: () => fetchModelById(modelId),
+    queryFn: () => fetchModelByTag(modelId),
     queryKey: ['model', modelId],
   });
 

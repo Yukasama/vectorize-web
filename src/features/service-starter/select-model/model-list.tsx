@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/table';
 import { useQuery } from '@tanstack/react-query';
 import type { Model } from '../../sidebar/services/model-service';
-import { fetchModels } from '../../sidebar/services/model-service';
+import { fetchAllModels } from '../../sidebar/services/model-service';
 
 interface ModelListProps {
   onSelect: (model: Model) => void;
@@ -29,7 +29,7 @@ export const ModelList = ({
     error,
     isLoading,
   } = useQuery({
-    queryFn: fetchModels,
+    queryFn: fetchAllModels,
     queryKey: ['models'],
   });
 

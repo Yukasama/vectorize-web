@@ -21,24 +21,23 @@ export interface SyntheticTaskResponse {
  * Upload media files (images, PDFs) for synthetic data generation.
  * Optionally links to an existing dataset.
  * @param files - Array of File objects to upload
- * @param existingDatasetId - Optional dataset ID to use
+ * @param DatasetId - Optional dataset ID to use
  * @returns SyntheticMediaResponse with task info
  */
 export const uploadMediaForSynthesis = async (
   files: File[],
-  existingDatasetId?: string,
+  DatasetId?: string,
 ): Promise<SyntheticMediaResponse> => {
   const formData = new FormData();
   for (const file of files) {
     formData.append('files', file);
   }
-  if (existingDatasetId) {
-    formData.append('existing_dataset_id', existingDatasetId);
+  if (DatasetId) {
+    formData.append('dataset_id', DatasetId);
   }
   const { data } = await client.post<SyntheticMediaResponse>(
     '/synthesis/media',
     formData,
-    { headers: { 'Content-Type': 'multipart/form-data' } },
   );
   return data;
 };
@@ -62,11 +61,10 @@ export const listSynthesisTasks = async (limit = 20) => {
  */
 export const startSyntheticFromDataset = async (datasetId: string) => {
   const formData = new FormData();
-  formData.append('existing_dataset_id', datasetId);
+  formData.append('dataset_id', datasetId);
   const { data } = await client.post<SyntheticMediaResponse>(
     '/synthesis/media',
     formData,
-    { headers: { 'Content-Type': 'multipart/form-data' } },
   );
   return data;
 };

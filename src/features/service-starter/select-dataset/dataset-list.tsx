@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/table';
 import { useQuery } from '@tanstack/react-query';
 import type { Dataset } from '../../sidebar/services/dataset-service';
-import { fetchDatasets } from '../../sidebar/services/dataset-service';
+import { fetchAllDatasets } from '../../sidebar/services/dataset-service';
 
 interface DatasetListProps {
   onSelect: (dataset: Dataset) => void;
@@ -31,7 +31,7 @@ export const DatasetList = ({
     error,
     isLoading,
   } = useQuery({
-    queryFn: fetchDatasets,
+    queryFn: fetchAllDatasets,
     queryKey: ['datasets'],
   });
 
