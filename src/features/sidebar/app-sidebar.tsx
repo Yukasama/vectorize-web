@@ -43,7 +43,7 @@ export const AppSidebar = () => {
 
   return (
     <Sidebar className="text-[var(--sidebar-foreground)] transition-all duration-200">
-      <SidebarHeader className="header-bg mb-6 w-full pt-4">
+      <SidebarHeader className="header-bg mb-6 w-full pt-2.5">
         <div className="flex w-full items-center justify-between">
           <button
             className="focus:ring-primary hover:bg-muted ml-4 inline-block min-w-[120px] rounded bg-transparent p-2 text-center text-lg font-semibold text-[var(--sidebar-foreground)] shadow transition-colors focus:ring-2 focus:outline-none"
@@ -55,7 +55,7 @@ export const AppSidebar = () => {
           </button>
           <div className="flex gap-2">
             <Button
-              className="size-7 p-0"
+              className="size-9 p-0"
               onClick={() => setSyntheticOpen(true)}
               size="icon"
               title="Generate synthetic dataset"
@@ -69,7 +69,7 @@ export const AppSidebar = () => {
               open={syntheticOpen}
             />
             <Button
-              className="size-7 p-0"
+              className="size-9 p-0"
               onClick={() => setUploadOpen(true)}
               size="icon"
               title="Upload"

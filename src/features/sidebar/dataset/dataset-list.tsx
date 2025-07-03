@@ -105,7 +105,7 @@ const DatasetListItem = ({ dataset }: { dataset: Dataset }) => {
 
 export const DatasetList = () => {
   const [datasetSearch, setDatasetSearch] = useState('');
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [allDatasets, setAllDatasets] = useState<Dataset[]>([]);
   const [visibleCount, setVisibleCount] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
@@ -131,8 +131,6 @@ export const DatasetList = () => {
       setTotalCount(data.total);
     }
   }, [data]);
-
-  // No longer need loadMoreDatasets function since we fetch based on visibleCount
 
   const filteredDatasets = allDatasets.filter((dataset) =>
     dataset.name.toLowerCase().includes(datasetSearch.toLowerCase()),
@@ -190,7 +188,7 @@ export const DatasetList = () => {
       >
         <SidebarMenuItem>
           <CollapsibleTrigger asChild>
-            <SidebarMenuButton className="sticky top-0 z-10 flex w-full items-center gap-2">
+            <SidebarMenuButton className="sticky top-0 z-10 flex w-full items-center gap-2 bg-white dark:bg-black">
               <span className="text-md">Datasets</span>
               <span className="ml-auto flex flex-row items-center gap-2">
                 {open ? (
@@ -202,9 +200,10 @@ export const DatasetList = () => {
             </SidebarMenuButton>
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <div className="mt-2 flex items-center gap-2">
-              <Search className="h-4 w-4" />
+            <div className="relative mt-2">
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <Input
+                className="pl-10"
                 onChange={(e) => setDatasetSearch(e.target.value)}
                 placeholder="Search datasets"
                 value={datasetSearch}

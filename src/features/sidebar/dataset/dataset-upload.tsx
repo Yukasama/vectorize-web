@@ -63,10 +63,14 @@ export const DatasetUpload = ({ onClose }: DatasetUploadProps) => {
   const [hfTag, setHfTag] = useState('');
   const [hfError, setHfError] = useState<null | string>();
 
+  // Local file upload error state
+  const [localUploadError, setLocalUploadError] = useState<null | string>();
+
   const queryClient = useQueryClient();
 
   // Add files to state and start upload
   const handleFilesSelected = (files: File[] | FileList) => {
+    setLocalUploadError(undefined);
     const filesArray = [...files];
     const newFileStates: FileUploadState[] = filesArray.map((file) => ({
       done: false,
@@ -165,11 +169,11 @@ export const DatasetUpload = ({ onClose }: DatasetUploadProps) => {
     setUploading(true);
     setHfError(undefined);
     try {
-      const datasetTag = hfTag.trim()
+      await uploadHFDataset(hfId.trim(), hfTag.trim() || undefined);
+      const displayTag = hfTag.trim()
         ? `${hfId.trim()}:${hfTag.trim()}`
         : hfId.trim();
-      await uploadHFDataset(datasetTag);
-      toast.success(messages.dataset.upload.success(datasetTag), {
+      toast.success(messages.dataset.upload.success(displayTag), {
         duration: 4000,
       });
       setHfId('');
@@ -193,6 +197,7 @@ export const DatasetUpload = ({ onClose }: DatasetUploadProps) => {
   // Upload a single file and update progress
   const uploadFileWithProgress = async (file: File, index: number) => {
     setUploading(true);
+    setLocalUploadError(undefined); // Clear previous errors
     try {
       await uploadLocalDataset(file, (percent) => {
         setFileStates((prev) =>
@@ -204,9 +209,15 @@ export const DatasetUpload = ({ onClose }: DatasetUploadProps) => {
         exact: false,
         queryKey: ['datasets'],
       });
-    } catch {
+    } catch (error: unknown) {
       setFileStates((prev) => markFileError(prev, index));
-      toast.error(messages.dataset.upload.errorFile(file.name));
+
+      let errorMessage = messages.dataset.upload.errorFile(file.name);
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      setLocalUploadError(errorMessage);
     } finally {
       setUploading(false);
     }
@@ -279,6 +290,13 @@ export const DatasetUpload = ({ onClose }: DatasetUploadProps) => {
           type="file"
         />
       </button>
+
+      {/* Local upload error display */}
+      {localUploadError && (
+        <div className="mt-2">
+          <span className="text-xs text-red-600">{localUploadError}</span>
+        </div>
+      )}
 
       {/* File List with Progress */}
       <div className="bg-muted mt-4 flex-shrink-0 rounded p-4">

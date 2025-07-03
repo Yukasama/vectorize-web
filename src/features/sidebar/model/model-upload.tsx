@@ -66,14 +66,10 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
 
   const uploadSelectedFile = async () => {
     if (selectedFiles.length > 0) {
-      const toastId = toast(messages.model.upload.started, {
-        duration: Infinity,
-      });
       try {
         await uploadLocalFile(selectedFiles[0]);
         toast.success(messages.model.upload.success(selectedFiles[0].name), {
           duration: 4000,
-          id: toastId,
         });
         void queryClient.invalidateQueries({
           exact: false,
@@ -103,6 +99,9 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
 
   const uploadFromGithub = async () => {
     if (githubOwner && githubRepo) {
+      toast(messages.model.upload.started, {
+        duration: 3000,
+      });
       try {
         await uploadGithub(githubOwner, githubRepo, githubRevision);
         toast.success(
@@ -130,15 +129,14 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
 
   const uploadFromHuggingFace = async () => {
     if (huggingFaceModelId) {
+      toast(messages.model.upload.started, {
+        duration: 3000,
+      });
       try {
-        const response = await uploadHuggingFace(
-          huggingFaceModelId,
-          huggingFaceTag,
-        );
+        await uploadHuggingFace(huggingFaceModelId, huggingFaceTag);
         toast.success(
           messages.model.upload.huggingfaceSuccess(huggingFaceModelId),
         );
-        console.log('Hugging Face model upload task created:', response.taskId);
         return true;
       } catch (error: unknown) {
         if (

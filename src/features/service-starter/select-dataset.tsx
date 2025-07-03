@@ -32,10 +32,6 @@ export const SelectDataset = ({
     }
   };
 
-  const handleClearSelected = (id: string) => {
-    setLocalSelectedDatasets(localSelectedDatasets.filter((d) => d.id !== id));
-  };
-
   const handleNext = () => {
     setSelectedDatasets(localSelectedDatasets);
     if (onNext) {
@@ -63,7 +59,6 @@ export const SelectDataset = ({
       </ScrollArea>
       <DatasetListFooter
         onBack={onBack}
-        onClearSelected={handleClearSelected}
         onNext={handleNext}
         selectedDatasets={localSelectedDatasets}
       />

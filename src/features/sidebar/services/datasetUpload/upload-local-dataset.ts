@@ -1,6 +1,5 @@
 import { client } from '@/lib/client';
-import { messages } from '@/lib/messages';
-import axios from 'axios';
+import { getBackendErrorMessage } from '@/lib/error-utils';
 
 interface DatasetUploadResponse {
   datasetId: string;
@@ -36,12 +35,8 @@ export const uploadLocalDataset = async (
     );
     return data;
   } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      console.error(
-        messages.dataset.upload.errorFile(file.name),
-        error.response?.data ?? error.message,
-      );
-    }
-    throw new Error(messages.dataset.upload.errorFile(file.name));
+    const errorMessage = getBackendErrorMessage(error);
+
+    throw new Error(errorMessage);
   }
 };

@@ -1,4 +1,5 @@
 import { client } from '@/lib/client';
+import { getBackendErrorMessage } from '@/lib/error-utils';
 // --- Media Synthesis Endpoints ---
 
 // Response from the /synthetic/media endpoint (media upload for synthesis)
@@ -28,18 +29,23 @@ export const uploadMediaForSynthesis = async (
   files: File[],
   DatasetId?: string,
 ): Promise<SyntheticMediaResponse> => {
-  const formData = new FormData();
-  for (const file of files) {
-    formData.append('files', file);
+  try {
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append('files', file);
+    }
+    if (DatasetId) {
+      formData.append('dataset_id', DatasetId);
+    }
+    const { data } = await client.post<SyntheticMediaResponse>(
+      '/synthesis/media',
+      formData,
+    );
+    return data;
+  } catch (error) {
+    const errorMessage = getBackendErrorMessage(error);
+    throw new Error(errorMessage);
   }
-  if (DatasetId) {
-    formData.append('dataset_id', DatasetId);
-  }
-  const { data } = await client.post<SyntheticMediaResponse>(
-    '/synthesis/media',
-    formData,
-  );
-  return data;
 };
 
 /**
@@ -48,10 +54,15 @@ export const uploadMediaForSynthesis = async (
  * @returns Array of SyntheticTaskResponse
  */
 export const listSynthesisTasks = async (limit = 20) => {
-  const { data } = await client.get<SyntheticTaskResponse[]>(
-    `/synthesis/tasks?limit=${String(limit)}`,
-  );
-  return data;
+  try {
+    const { data } = await client.get<SyntheticTaskResponse[]>(
+      `/synthesis/tasks?limit=${String(limit)}`,
+    );
+    return data;
+  } catch (error) {
+    const errorMessage = getBackendErrorMessage(error);
+    throw new Error(errorMessage);
+  }
 };
 
 /**
@@ -60,13 +71,18 @@ export const listSynthesisTasks = async (limit = 20) => {
  * @returns SyntheticTaskResponse with task info
  */
 export const startSyntheticFromDataset = async (datasetId: string) => {
-  const formData = new FormData();
-  formData.append('dataset_id', datasetId);
-  const { data } = await client.post<SyntheticMediaResponse>(
-    '/synthesis/media',
-    formData,
-  );
-  return data;
+  try {
+    const formData = new FormData();
+    formData.append('dataset_id', datasetId);
+    const { data } = await client.post<SyntheticMediaResponse>(
+      '/synthesis/media',
+      formData,
+    );
+    return data;
+  } catch (error) {
+    const errorMessage = getBackendErrorMessage(error);
+    throw new Error(errorMessage);
+  }
 };
 
 /**
@@ -75,8 +91,13 @@ export const startSyntheticFromDataset = async (datasetId: string) => {
  * @returns SyntheticTaskResponse with status and error info
  */
 export const getSyntheticTaskStatus = async (taskId: string) => {
-  const { data } = await client.get<SyntheticTaskResponse>(
-    `/synthesis/tasks/${taskId}`,
-  );
-  return data;
+  try {
+    const { data } = await client.get<SyntheticTaskResponse>(
+      `/synthesis/tasks/${taskId}`,
+    );
+    return data;
+  } catch (error) {
+    const errorMessage = getBackendErrorMessage(error);
+    throw new Error(errorMessage);
+  }
 };

@@ -60,7 +60,6 @@ const BreadcrumbPage = ({
     aria-disabled="true"
     className={cn('text-foreground font-normal', className)}
     data-slot="breadcrumb-page"
-    role="link"
     {...props}
   />
 );
@@ -74,7 +73,6 @@ const BreadcrumbSeparator = ({
     aria-hidden="true"
     className={cn('[&>svg]:size-3.5', className)}
     data-slot="breadcrumb-separator"
-    role="presentation"
     {...props}
   >
     {children ?? <ChevronRight />}
@@ -89,7 +87,6 @@ const BreadcrumbEllipsis = ({
     aria-hidden="true"
     className={cn('flex size-9 items-center justify-center', className)}
     data-slot="breadcrumb-ellipsis"
-    role="presentation"
     {...props}
   >
     <MoreHorizontal className="size-4" />

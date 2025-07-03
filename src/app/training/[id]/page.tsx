@@ -16,8 +16,8 @@ export default function TrainingDetailPage() {
   const trainingId = typeof params.id === 'string' ? params.id : '';
 
   const trainingNameContent = (
-    <span className="max-w-xs truncate text-lg font-semibold">
-      {trainingId}
+    <span className="text-muted-foreground text-sm font-medium">
+      Training: {trainingId}
     </span>
   );
 
@@ -38,10 +38,6 @@ export default function TrainingDetailPage() {
         </header>
         <Separator className="mb-4" />
         <main className="flex-1 p-8">
-          <h1 className="mb-4 text-2xl font-bold">Training Details</h1>
-          <div className="mb-8">
-            <span className="font-mono text-base">ID: {trainingId}</span>
-          </div>
           <TrainingData trainingId={trainingId} />
         </main>
       </SidebarInset>

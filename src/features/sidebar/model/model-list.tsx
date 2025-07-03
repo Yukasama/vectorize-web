@@ -105,7 +105,7 @@ const ModelListItem = ({ model }: { readonly model: Model }) => {
 
 export const ModelList = () => {
   const [modelSearch, setModelSearch] = useState('');
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [showMoreModels, setShowMoreModels] = useState(false);
 
   // Fetch all models (simplified approach)
@@ -180,7 +180,7 @@ export const ModelList = () => {
       >
         <SidebarMenuItem>
           <CollapsibleTrigger asChild>
-            <SidebarMenuButton className="sticky top-0 z-10 flex w-full items-center gap-2">
+            <SidebarMenuButton className="sticky top-0 z-10 flex w-full items-center gap-2 bg-white dark:bg-black">
               <span className="text-md">Models</span>
               <span className="ml-auto flex flex-row items-center gap-2">
                 {open ? (
@@ -193,9 +193,10 @@ export const ModelList = () => {
           </CollapsibleTrigger>
           <CollapsibleContent>
             {/* Search input */}
-            <div className="mt-2 flex items-center gap-2">
-              <Search className="h-4 w-4" />
+            <div className="relative mt-2">
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <Input
+                className="pl-10"
                 onChange={(e) => setModelSearch(e.target.value)}
                 placeholder="Search models"
                 value={modelSearch}

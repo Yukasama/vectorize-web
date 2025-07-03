@@ -6,8 +6,9 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
+import { EvaluationScatterChart } from '@/features/evaluation/bar-chart';
 import { EvaluationData } from '@/features/evaluation/evaluation-data';
-import { EvaluationScatterChart } from '@/features/evaluation/scatter-chart';
+import { EvaluationList } from '@/features/evaluation/evaluation-list';
 import { fetchEvaluationStatus } from '@/features/service-starter/evaluation-service';
 import { AppSidebar } from '@/features/sidebar/app-sidebar';
 import { ThemeToggle } from '@/features/theme/theme-toggle';
@@ -37,7 +38,9 @@ export default function EvaluationDetailPage() {
   });
 
   const evaluationNameContent = (
-    <span className="max-w-xs text-lg font-semibold">{evaluationId}</span>
+    <span className="text-muted-foreground text-sm">
+      Evaluation: {evaluationId}
+    </span>
   );
 
   return (
@@ -57,15 +60,50 @@ export default function EvaluationDetailPage() {
         </header>
         <Separator className="mb-4" />
         <main className="flex-1 p-8">
-          <h1 className="mb-4 text-2xl font-bold">Evaluation Details</h1>
-          <div className="mb-8">
-            <span className="font-mono text-base">ID: {evaluationId}</span>
-          </div>
           <EvaluationData evaluationId={evaluationId} />
           <EvaluationScatterChart
             baselineMetrics={filterMetrics(status?.baseline_metrics)}
             evaluationMetrics={filterMetrics(status?.evaluation_metrics)}
           />
+
+          {/* Metrics sections */}
+          <div className="mt-8">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              {status?.evaluation_metrics && (
+                <div className="border-border bg-card text-card-foreground rounded-lg border p-4">
+                  <h3 className="mb-3 font-semibold">Evaluation metrics</h3>
+                  <pre className="bg-muted overflow-x-auto rounded p-2 text-xs">
+                    {JSON.stringify(status.evaluation_metrics, undefined, 2)}
+                  </pre>
+                </div>
+              )}
+              {status?.baseline_metrics && (
+                <div className="border-border bg-card text-card-foreground rounded-lg border p-4">
+                  <h3 className="mb-3 font-semibold">Baseline metrics</h3>
+                  <pre className="bg-muted overflow-x-auto rounded p-2 text-xs">
+                    {JSON.stringify(status.baseline_metrics, undefined, 2)}
+                  </pre>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Related Evaluations Table */}
+          {status?.model_tag && status.dataset_info && (
+            <div className="mt-8">
+              <h3 className="mb-4 text-lg font-semibold">
+                Related Evaluations (Same Model & Dataset)
+              </h3>
+              <EvaluationList
+                currentEvaluationId={evaluationId}
+                datasetId={status.dataset_info
+                  .split(',')[0]
+                  ?.trim()
+                  .replace(/^Dataset:\s*/, '')}
+                modelTag={status.model_tag}
+              />
+            </div>
+          )}
         </main>
       </SidebarInset>
     </SidebarProvider>

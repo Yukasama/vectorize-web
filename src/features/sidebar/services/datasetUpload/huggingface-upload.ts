@@ -1,6 +1,5 @@
 import { client } from '@/lib/client';
-import { messages } from '@/lib/messages';
-import { isAxiosError } from 'axios';
+import { getBackendErrorMessage } from '@/lib/error-utils';
 
 export interface HFUploadResponse {
   taskId: string;
@@ -30,23 +29,9 @@ export const uploadHFDataset = async (
     }
     await client.post('/datasets/huggingface', payload);
   } catch (error: unknown) {
-    if (isAxiosError(error)) {
-      if (error.response?.status === 409) {
-        throw new Error(messages.dataset.upload.alreadyExists);
-      }
-      if (error.response?.status === 400) {
-        throw new Error(messages.dataset.upload.error);
-      }
-      const data = error.response?.data as
-        | undefined
-        | { detail?: string; message?: string };
-      const backendMessage =
-        data?.detail ??
-        data?.message ??
-        messages.dataset.upload.errorFile(datasetTag);
-      throw new Error(backendMessage);
-    }
-    throw new Error(messages.dataset.upload.errorFile(datasetTag));
+    const errorMessage = getBackendErrorMessage(error);
+
+    throw new Error(errorMessage);
   }
 };
 
@@ -62,12 +47,8 @@ export const getHFUploadStatus = async (
     );
     return data;
   } catch (error: unknown) {
-    if (isAxiosError(error)) {
-      console.error(
-        messages.dataset.upload.errorFile(taskId),
-        error.response?.data ?? error.message,
-      );
-    }
-    throw new Error(messages.dataset.upload.errorFile(taskId));
+    const errorMessage = getBackendErrorMessage(error);
+
+    throw new Error(errorMessage);
   }
 };

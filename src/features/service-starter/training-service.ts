@@ -44,6 +44,15 @@ export interface TrainingStatusResponse {
   validation_dataset_path?: string;
 }
 
+export interface TrainingTaskResponse {
+  created_at: string;
+  end_date?: null | string;
+  model_tag?: string;
+  status: string;
+  task_id: string;
+  train_dataset_ids?: string[];
+}
+
 /**
  * Start a training job with the required and optional parameters.
  * Only sends required and filled optional fields.
@@ -51,38 +60,72 @@ export interface TrainingStatusResponse {
 export const startTraining = async (
   params: StartTrainingParams,
 ): Promise<void> => {
-  const body: Record<string, unknown> = {
-    model_tag: params.model_tag,
-    train_dataset_ids: params.train_dataset_ids,
-  };
-  for (const key of [
-    'epochs',
-    'per_device_train_batch_size',
-    'learning_rate',
-    'warmup_steps',
-    'optimizer_name',
-    'scheduler',
-    'weight_decay',
-    'max_grad_norm',
-    'use_amp',
-    'show_progress_bar',
-    'evaluation_steps',
-    'output_path',
-    'save_best_model',
-    'save_each_epoch',
-    'save_optimizer_state',
-    'dataloader_num_workers',
-    'device',
-    'timeout_seconds',
-  ]) {
-    if (
-      params[key as keyof StartTrainingParams] !== undefined &&
-      params[key as keyof StartTrainingParams] !== ''
-    ) {
-      body[key] = params[key as keyof StartTrainingParams];
+  try {
+    const body: Record<string, unknown> = {
+      model_tag: params.model_tag,
+      train_dataset_ids: params.train_dataset_ids,
+    };
+    for (const key of [
+      'epochs',
+      'per_device_train_batch_size',
+      'learning_rate',
+      'warmup_steps',
+      'optimizer_name',
+      'scheduler',
+      'weight_decay',
+      'max_grad_norm',
+      'use_amp',
+      'show_progress_bar',
+      'evaluation_steps',
+      'output_path',
+      'save_best_model',
+      'save_each_epoch',
+      'save_optimizer_state',
+      'dataloader_num_workers',
+      'device',
+      'timeout_seconds',
+    ]) {
+      if (
+        params[key as keyof StartTrainingParams] !== undefined &&
+        params[key as keyof StartTrainingParams] !== ''
+      ) {
+        body[key] = params[key as keyof StartTrainingParams];
+      }
     }
+    await client.post('/training/train', body);
+  } catch (error) {
+    const err = error as {
+      message?: string;
+      response?: {
+        data?: {
+          detail?: string;
+          error?: string;
+          message?: string;
+        };
+        status?: number;
+      };
+    };
+
+    if (err.response) {
+      const { data, status } = err.response;
+
+      // Special handling for 422 validation errors
+      if (status === 422) {
+        throw new Error(
+          'Invalid parameter input. Please check your training parameters and try again.',
+        );
+      }
+
+      // For all other status codes, return the backend message
+      const backendMessage =
+        data?.message ?? data?.detail ?? data?.error ?? 'Server error';
+      throw new Error(backendMessage);
+    } else if (err.message) {
+      throw new Error(err.message);
+    }
+
+    throw new Error('Unknown error occurred while starting training');
   }
-  await client.post('/training/train', body);
 };
 
 export const fetchTrainingById = async (
@@ -90,6 +133,24 @@ export const fetchTrainingById = async (
 ): Promise<TrainingStatusResponse> => {
   const { data } = await client.get<TrainingStatusResponse>(
     `/training/${id}/status`,
+  );
+  return data;
+};
+
+export const fetchFineTuneTrainingTasks = async (
+  modelTag: string,
+): Promise<TrainingTaskResponse[]> => {
+  const { data } = await client.get<TrainingTaskResponse[]>(
+    `/training/fine-tunes/${modelTag}/tasks`,
+  );
+  return data;
+};
+
+export const fetchFineTuneTrainingTasksByModelId = async (
+  modelId: string,
+): Promise<TrainingTaskResponse[]> => {
+  const { data } = await client.get<TrainingTaskResponse[]>(
+    `/training/fine-tunes/${modelId}/tasks`,
   );
   return data;
 };

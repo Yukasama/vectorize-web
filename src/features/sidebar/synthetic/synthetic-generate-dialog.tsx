@@ -5,417 +5,42 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
-import { DatasetList } from '@/features/service-starter/select-dataset/dataset-list';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { X } from 'lucide-react';
-import React, { useRef, useState } from 'react';
-import { Dataset, fetchAllDatasets } from '../services/dataset-service';
-import {
-  startSyntheticFromDataset,
-  uploadMediaForSynthesis,
-} from '../services/synthetic-service';
-
-// File upload state for synthetic media
-interface FileUploadState {
-  done: boolean;
-  error: boolean;
-  file: File;
-  progress: number;
-}
+import React from 'react';
+import { getActionButtonProps } from './action-button-props';
+import { SelectMode } from './select-mode';
+import { UploadMode } from './upload-mode';
+import { useDatasetSelection } from './use-dataset-selection';
+import { useDialogState } from './use-dialog-state';
+import { useFileUpload } from './use-file-upload';
 
 interface SyntheticGenerateDialogProps {
   onOpenChange: (open: boolean) => void;
   open: boolean;
 }
 
-interface UploadModeProps {
-  dragActive: boolean;
-  fileInputRef: React.RefObject<HTMLInputElement>;
-  fileStates: FileUploadState[];
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleDrop: (e: React.DragEvent<HTMLButtonElement>) => void;
-  handleRemoveFile: (index: number) => void;
-  setDragActive: React.Dispatch<React.SetStateAction<boolean>>;
-  taskId: null | string | undefined;
-  uploading: boolean;
-}
-
-const UploadMode = ({
-  dragActive,
-  fileInputRef,
-  fileStates,
-  handleChange,
-  handleDrop,
-  handleRemoveFile,
-  setDragActive,
-  taskId,
-  uploading,
-}: UploadModeProps) => (
-  <button
-    aria-label="Upload files by clicking or dragging"
-    className={`flex h-56 min-h-[224px] w-full min-w-0 items-center justify-center rounded border-2 border-dashed text-sm transition ${
-      dragActive ? 'border-primary bg-muted' : 'border-muted'
-    }`}
-    disabled={uploading || !!taskId}
-    onClick={() => {
-      fileInputRef.current.click();
-    }}
-    onDragLeave={() => setDragActive(false)}
-    onDragOver={(e) => {
-      e.preventDefault();
-      setDragActive(true);
-    }}
-    onDrop={handleDrop}
-    onKeyDown={(e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        fileInputRef.current.click();
-      }
-    }}
-    type="button"
-  >
-    {fileStates.length > 0 ? (
-      <ul className="w-full text-sm">
-        {fileStates.map((state) => (
-          <li
-            className="flex flex-1 items-center justify-between gap-2"
-            key={`${state.file.name}-${state.file.size}`}
-          >
-            <span className="flex-1 truncate">{state.file.name}</span>
-            <Progress className="flex-1" value={state.progress} />
-            <span className="w-10 text-right text-xs">{state.progress}%</span>
-            {state.done && !state.error && (
-              <span className="ml-2 text-xs text-green-600">Done</span>
-            )}
-            {state.error && (
-              <span className="ml-2 text-xs text-red-600">Error</span>
-            )}
-            <button
-              className="ml-2 text-red-500 hover:text-red-700"
-              disabled={uploading || !!taskId}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRemoveFile(
-                  fileStates.findIndex(
-                    (f) =>
-                      f.file.name === state.file.name &&
-                      f.file.size === state.file.size,
-                  ),
-                );
-              }}
-              title="Remove"
-              type="button"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p className="text-muted-foreground text-sm">
-        Drop PDF or media files here or click to select.
-      </p>
-    )}
-    <Input
-      accept=".pdf"
-      className="hidden"
-      disabled={uploading || !!taskId}
-      multiple
-      onChange={handleChange}
-      ref={fileInputRef}
-      type="file"
-    />
-  </button>
-);
-
-interface SelectModeProps {
-  handleClearSelected: (id: string) => void;
-  handleSelect: (dataset: Dataset) => void;
-  localSelectedDatasets: Dataset[];
-  search: string;
-  setSearch: React.Dispatch<React.SetStateAction<string>>;
-  setView: React.Dispatch<React.SetStateAction<'grid' | 'table'>>;
-  view: 'grid' | 'table';
-}
-
-const SelectMode = ({
-  handleClearSelected,
-  handleSelect,
-  localSelectedDatasets,
-  search,
-  setSearch,
-  setView,
-  view,
-}: SelectModeProps) => (
-  <div className="bg-muted/50 rounded-xl border">
-    <div className="p-2">
-      <div className="mb-2">
-        <div className="flex items-center gap-2">
-          <Input
-            className="w-full"
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search datasets..."
-            value={search}
-          />
-          <div className="flex-shrink-0">
-            <Button
-              onClick={() => setView('grid')}
-              size="sm"
-              type="button"
-              variant={view === 'grid' ? 'default' : 'outline'}
-            >
-              Grid
-            </Button>
-            <Button
-              onClick={() => setView('table')}
-              size="sm"
-              type="button"
-              variant={view === 'table' ? 'default' : 'outline'}
-            >
-              Table
-            </Button>
-          </div>
-        </div>
-      </div>
-      <div className="max-h-60 overflow-y-auto">
-        <div className="px-0 py-3">
-          <DatasetList
-            onSelect={handleSelect}
-            search={search}
-            selectedDatasets={localSelectedDatasets}
-            view={view}
-          />
-        </div>
-      </div>
-      <div className="mt-2">
-        <div className="flex flex-wrap gap-2">
-          {localSelectedDatasets.map((ds) => (
-            <span
-              className="bg-muted flex items-center gap-1 rounded px-2 py-1 text-xs font-medium"
-              key={ds.id}
-            >
-              {ds.name}
-              <button
-                aria-label={`Remove selected dataset ${ds.name}`}
-                className="text-muted-foreground hover:text-destructive ml-1"
-                onClick={() => handleClearSelected(ds.id)}
-                type="button"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-interface GetActionButtonProps {
-  fileStates: FileUploadState[];
-  handleGenerate: (datasetId?: string) => Promise<void>;
-  handleUploadMedia: () => Promise<void>;
-  loading: boolean;
-  localSelectedDatasets: Dataset[];
-  mode: 'select' | 'upload';
-  setSelectedDataset: React.Dispatch<React.SetStateAction<string>>;
-  taskId: null | string | undefined;
-  uploading: boolean;
-}
-
-const getActionButtonProps = ({
-  fileStates,
-  handleGenerate,
-  handleUploadMedia,
-  loading,
-  localSelectedDatasets,
-  mode,
-  taskId,
-  uploading,
-}: GetActionButtonProps) => {
-  const disabled =
-    (mode === 'upload' && (fileStates.length === 0 || uploading || !!taskId)) ||
-    (mode === 'select' &&
-      (localSelectedDatasets.length === 0 || loading || !!taskId || uploading));
-  const onClick =
-    mode === 'upload'
-      ? handleUploadMedia
-      : async () => {
-          if (localSelectedDatasets.length > 0) {
-            await handleGenerate(localSelectedDatasets[0].id);
-          }
-        };
-  let label = '';
-  if (mode === 'upload') {
-    label = uploading ? 'Uploading…' : 'Upload & Generate';
-  } else {
-    label = loading ? 'Starting…' : 'Generate from Dataset';
-  }
-  return { disabled, label, onClick };
-};
-
 export const SyntheticGenerateDialog = ({
   onOpenChange,
   open,
 }: SyntheticGenerateDialogProps) => {
-  // Mode: 'upload' (drag-and-drop) or 'select' (dataset list)
-  const [mode, setMode] = useState<'select' | 'upload'>('upload');
-  const [selectedDataset, setSelectedDataset] = useState<string>('');
-  // For dataset selection mode
-  const [search, setSearch] = useState('');
-  const [view, setView] = useState<'grid' | 'table'>('grid');
-  const [localSelectedDatasets, setLocalSelectedDatasets] = useState<Dataset[]>(
-    [],
+  // Use the new dialog state hook
+  const dialogState = useDialogState({ onOpenChange, open });
+
+  // Custom hooks for upload and dataset selection
+  const fileUploadHook = useFileUpload(
+    open,
+    dialogState.closeDialog,
+    dialogState.setTaskId,
+    dialogState.setStatus,
+    dialogState.setError,
   );
-  const [loading, setLoading] = useState(false);
-  const [taskId, setTaskId] = useState<null | string | undefined>();
-  const [status, setStatus] = useState<null | string | undefined>();
-  const [error, setError] = useState<null | string | undefined>();
 
-  // File upload state and handlers (must be inside the component)
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [dragActive, setDragActive] = useState(false);
-  const [fileStates, setFileStates] = useState<FileUploadState[]>([]);
-  const [uploading, setUploading] = useState(false);
-
-  const queryClient = useQueryClient();
-
-  // --- React Query for datasets ---
-  useQuery({
-    enabled: open, // Only fetch when dialog is open
-    queryFn: fetchAllDatasets,
-    queryKey: ['datasets'],
-  });
-
-  // Reset selection/search/view on open
-  React.useEffect(() => {
-    if (open) {
-      setSelectedDataset('');
-      setTaskId(undefined);
-      setStatus(undefined);
-      setError(undefined);
-      setLocalSelectedDatasets([]);
-      setSearch('');
-      setView('grid');
-    }
-  }, [open]);
-
-  // Add files to state and start upload
-  const handleFilesSelected = (files: File[] | FileList) => {
-    const filesArray = [...files];
-    const newFileStates: FileUploadState[] = filesArray.map((file) => ({
-      done: false,
-      error: false,
-      file,
-      progress: 0,
-    }));
-    setFileStates((prev) => [...prev, ...newFileStates]);
-  };
-
-  // Remove a file from the list
-  const handleRemoveFile = (index: number) => {
-    setFileStates((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  // Handle drag-and-drop file upload
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragActive(false);
-    handleFilesSelected(e.dataTransfer.files);
-  };
-
-  // Handle file input change
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      handleFilesSelected(e.target.files);
-    }
-  };
-
-  // Upload all files for synthetic media generation
-  const handleUploadMedia = async () => {
-    if (fileStates.length === 0) {
-      return;
-    }
-    setUploading(true);
-    setError(undefined);
-    try {
-      // Only upload files that are not done or errored
-      const filesToUpload = fileStates
-        .filter((f) => !f.done && !f.error)
-        .map((f) => f.file);
-      if (filesToUpload.length === 0) {
-        return;
-      }
-      // No per-file progress from backend, so just set 99% until done
-      setFileStates((prev) =>
-        prev.map((f) => (!f.done && !f.error ? { ...f, progress: 99 } : f)),
-      );
-      const res = await uploadMediaForSynthesis(
-        filesToUpload,
-        selectedDataset || undefined,
-      );
-      setTaskId(res.task_id);
-      setStatus('started');
-      setFileStates((prev) =>
-        prev.map((f) =>
-          !f.done && !f.error ? { ...f, done: true, progress: 100 } : f,
-        ),
-      );
-    } catch (error_) {
-      setFileStates((prev) =>
-        prev.map((f) => (!f.done && !f.error ? { ...f, error: true } : f)),
-      );
-      let message = 'Failed to upload media';
-      if (error_ instanceof Error) {
-        message = error_.message;
-      }
-      setError(message);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  // Dataset select logic (multi-select)
-  const handleSelect = (dataset: Dataset) => {
-    if (localSelectedDatasets.some((d) => d.id === dataset.id)) {
-      setLocalSelectedDatasets(
-        localSelectedDatasets.filter((d) => d.id !== dataset.id),
-      );
-    } else {
-      setLocalSelectedDatasets([...localSelectedDatasets, dataset]);
-    }
-  };
-
-  const handleClearSelected = (id: string) => {
-    setLocalSelectedDatasets(localSelectedDatasets.filter((d) => d.id !== id));
-  };
-
-  const handleGenerate = async (datasetId?: string) => {
-    const id = datasetId ?? selectedDataset;
-    if (!id) {
-      return;
-    }
-    setLoading(true);
-    setError(undefined);
-    try {
-      const res = await startSyntheticFromDataset(id);
-      setTaskId(res.task_id);
-      setStatus('started');
-      void queryClient.invalidateQueries({ exact: false, queryKey: ['tasks'] });
-    } catch (error_) {
-      let message = 'Failed to start synthetic generation';
-      if (error_ instanceof Error) {
-        message = error_.message || message;
-      } else if (typeof error_ === 'object' && error_ && 'message' in error_) {
-        message = String((error_ as { message?: unknown }).message) || message;
-      }
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const datasetSelectionHook = useDatasetSelection(
+    open,
+    dialogState.closeDialog,
+    dialogState.setTaskId,
+    dialogState.setStatus,
+    dialogState.setError,
+  );
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -434,42 +59,43 @@ export const SyntheticGenerateDialog = ({
           {/* Mode Toggle */}
           <div className="flex gap-2">
             <Button
-              onClick={() => setMode('upload')}
+              onClick={() => dialogState.setMode('upload')}
               type="button"
-              variant={mode === 'upload' ? 'default' : 'outline'}
+              variant={dialogState.mode === 'upload' ? 'default' : 'outline'}
             >
               Upload Media
             </Button>
             <Button
-              onClick={() => setMode('select')}
+              onClick={() => dialogState.setMode('select')}
               type="button"
-              variant={mode === 'select' ? 'default' : 'outline'}
+              variant={dialogState.mode === 'select' ? 'default' : 'outline'}
             >
               Select Dataset
             </Button>
           </div>
 
-          {mode === 'upload' ? (
+          {dialogState.mode === 'upload' ? (
             <UploadMode
-              dragActive={dragActive}
-              fileInputRef={fileInputRef as React.RefObject<HTMLInputElement>}
-              fileStates={fileStates}
-              handleChange={handleChange}
-              handleDrop={handleDrop}
-              handleRemoveFile={handleRemoveFile}
-              setDragActive={setDragActive}
-              taskId={taskId}
-              uploading={uploading}
+              dragActive={fileUploadHook.dragActive}
+              fileInputRef={
+                dialogState.fileInputRef as React.RefObject<HTMLInputElement>
+              }
+              fileStates={fileUploadHook.fileStates}
+              handleChange={fileUploadHook.handleChange}
+              handleDrop={fileUploadHook.handleDrop}
+              handleRemoveFile={fileUploadHook.handleRemoveFile}
+              setDragActive={fileUploadHook.setDragActive}
+              taskId={dialogState.taskId}
+              uploading={fileUploadHook.uploading}
             />
           ) : (
             <SelectMode
-              handleClearSelected={handleClearSelected}
-              handleSelect={handleSelect}
-              localSelectedDatasets={localSelectedDatasets}
-              search={search}
-              setSearch={setSearch}
-              setView={setView}
-              view={view}
+              handleSelect={datasetSelectionHook.handleSelect}
+              localSelectedDatasets={datasetSelectionHook.localSelectedDatasets}
+              search={dialogState.search}
+              setSearch={dialogState.setSearch}
+              setView={dialogState.setView}
+              view={dialogState.view}
             />
           )}
 
@@ -477,15 +103,15 @@ export const SyntheticGenerateDialog = ({
           <div className="mt-4 flex gap-2">
             {(() => {
               const actionButtonProps = getActionButtonProps({
-                fileStates,
-                handleGenerate,
-                handleUploadMedia,
-                loading,
-                localSelectedDatasets,
-                mode,
-                setSelectedDataset,
-                taskId,
-                uploading,
+                fileStates: fileUploadHook.fileStates,
+                handleGenerate: datasetSelectionHook.handleGenerate,
+                handleUploadMedia: () => fileUploadHook.handleUploadMedia(),
+                loading: datasetSelectionHook.loading,
+                localSelectedDatasets:
+                  datasetSelectionHook.localSelectedDatasets,
+                mode: dialogState.mode,
+                taskId: dialogState.taskId,
+                uploading: fileUploadHook.uploading,
               });
               return (
                 <Button
@@ -501,12 +127,14 @@ export const SyntheticGenerateDialog = ({
           </div>
 
           {/* Task status only */}
-          {taskId && (
+          {dialogState.taskId && (
             <div className="space-y-2">
-              <div>Status: {status}</div>
+              <div>Status: {dialogState.status}</div>
             </div>
           )}
-          {error && <div className="text-sm text-red-600">{error}</div>}
+          {dialogState.error && (
+            <div className="text-sm text-red-600">{dialogState.error}</div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

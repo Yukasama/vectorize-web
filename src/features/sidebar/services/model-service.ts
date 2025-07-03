@@ -1,4 +1,5 @@
 import { client } from '@/lib/client';
+import { getBackendErrorMessage } from '@/lib/error-utils';
 import { messages } from '@/lib/messages';
 import axios from 'axios';
 
@@ -28,8 +29,9 @@ export const deleteModel = async (id: string): Promise<boolean> => {
     await client.delete(`/models/${id}`);
     return true;
   } catch (error) {
-    console.error(messages.model.delete.error, error);
-    return false;
+    const errorMessage = getBackendErrorMessage(error);
+    console.error(`${messages.model.delete.error}: ${errorMessage}`, error);
+    throw new Error(errorMessage);
   }
 };
 
@@ -52,10 +54,12 @@ export const fetchModels = async (
   } catch (error) {
     if (axios.isAxiosError(error) && error.code === 'ERR_NETWORK') {
       console.warn('Backend not reachable - returning empty models list');
-    } else {
-      console.error('Error fetching models:', error);
+      return { items: [], total: 0 };
     }
-    return { items: [], total: 0 };
+
+    const errorMessage = getBackendErrorMessage(error);
+    console.error(`Error fetching models: ${errorMessage}`, error);
+    throw new Error(errorMessage);
   }
 };
 
@@ -90,10 +94,12 @@ export const fetchAllModels = async (): Promise<Model[]> => {
   } catch (error) {
     if (axios.isAxiosError(error) && error.code === 'ERR_NETWORK') {
       console.warn('Backend not reachable - returning empty models list');
-    } else {
-      console.error('Error fetching all models:', error);
+      return [];
     }
-    return [];
+
+    const errorMessage = getBackendErrorMessage(error);
+    console.error(`Error fetching all models: ${errorMessage}`, error);
+    throw new Error(errorMessage);
   }
 };
 
@@ -110,7 +116,10 @@ export const fetchModelByTag = async (
     if (axios.isAxiosError(error) && error.response?.status === 304) {
       return;
     }
-    console.error('Error fetching model:', error);
+
+    const errorMessage = getBackendErrorMessage(error);
+    console.error(`Error fetching model: ${errorMessage}`, error);
+    throw new Error(errorMessage);
   }
 };
 
@@ -122,6 +131,12 @@ export const updateModelName = async (
   name: string,
   version: number,
 ): Promise<void> => {
-  const headers = { 'If-Match': `"${String(version)}"` };
-  await client.put(`/models/${id}`, { name }, { headers: headers });
+  try {
+    const headers = { 'If-Match': `"${String(version)}"` };
+    await client.put(`/models/${id}`, { name }, { headers: headers });
+  } catch (error) {
+    const errorMessage = getBackendErrorMessage(error);
+    console.error(`Error updating model name: ${errorMessage}`, error);
+    throw new Error(errorMessage);
+  }
 };

@@ -1,6 +1,6 @@
 import { client } from '@/lib/client';
+import { getBackendErrorMessage } from '@/lib/error-utils';
 import { messages } from '@/lib/messages';
-import { isAxiosError } from 'axios';
 
 /**
  * Upload a local model file (ZIP) to the backend API.
@@ -32,21 +32,8 @@ export const uploadLocalFile = async (
 
     return data;
   } catch (error: unknown) {
-    if (isAxiosError(error)) {
-      if (error.response?.status === 400) {
-        throw new Error(messages.model.upload.onlyZip);
-      }
-      if (error.response?.status === 409) {
-        throw new Error(messages.model.upload.alreadyExists);
-      }
-      // Use backend error message if available, otherwise fallback to messages
-      const data = error.response?.data as
-        | undefined
-        | { detail?: string; message?: string };
-      const backendMessage =
-        data?.detail ?? data?.message ?? messages.model.upload.error;
-      throw new Error(backendMessage);
-    }
-    throw new Error(messages.model.upload.error);
+    const errorMessage = getBackendErrorMessage(error);
+
+    throw new Error(errorMessage);
   }
 };

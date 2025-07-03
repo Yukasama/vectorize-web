@@ -1,14 +1,14 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Check, CopyIcon } from 'lucide-react';
 import { useState } from 'react';
 
 export const IdCopier = ({ taskId }: { taskId: string }) => {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async () => {
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     try {
       await navigator.clipboard.writeText(taskId);
       setCopied(true);
@@ -20,29 +20,23 @@ export const IdCopier = ({ taskId }: { taskId: string }) => {
 
   return (
     <Badge
-      className="group text-muted-foreground hover:bg-muted cursor-pointer font-mono text-xs"
+      className="group text-muted-foreground hover:bg-muted flex cursor-pointer items-center gap-1 font-mono text-xs"
       onClick={handleCopy}
       title={copied ? 'Copied!' : 'Copy ID'}
       variant="outline"
     >
       {taskId.slice(0, 8)}
-      <Button
-        className="disabled pointer-events-none size-4 p-0 transition-all"
-        size="icon"
-        variant="ghost"
+      <span
+        className={`relative block transition-transform duration-300 ${
+          copied ? 'motion-safe:animate-in fade-in zoom-in scale-110' : ''
+        }`}
       >
-        <span
-          className={`relative block transition-transform duration-300 ${
-            copied ? 'motion-safe:animate-in fade-in zoom-in scale-110' : ''
-          }`}
-        >
-          {copied ? (
-            <Check className="size-3" />
-          ) : (
-            <CopyIcon className="group-hover:text-muted-foreground size-3" />
-          )}
-        </span>
-      </Button>
+        {copied ? (
+          <Check className="size-3" />
+        ) : (
+          <CopyIcon className="group-hover:text-muted-foreground size-3" />
+        )}
+      </span>
     </Badge>
   );
 };

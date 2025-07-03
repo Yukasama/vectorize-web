@@ -6,6 +6,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
+import { DatasetData } from '@/features/dataset/dataset-data';
 import { AppSidebar } from '@/features/sidebar/app-sidebar';
 import { fetchDatasetById } from '@/features/sidebar/services/dataset-service';
 import { ThemeToggle } from '@/features/theme/theme-toggle';
@@ -34,13 +35,18 @@ export default function DatasetDetailPage() {
     datasetNameContent = (
       <span className="text-destructive text-sm">Error loading dataset</span>
     );
-  } else if (dataset?.name) {
+  } else if (!dataset) {
     datasetNameContent = (
-      <span
-        className="max-w-xs truncate text-lg font-semibold"
-        title={dataset.name}
-      >
-        {dataset.name}
+      <span className="text-destructive text-sm">Dataset not found</span>
+    );
+  } else if (dataset.name) {
+    const truncatedName =
+      dataset.name.length > 50
+        ? `${dataset.name.slice(0, 50)}...`
+        : dataset.name;
+    datasetNameContent = (
+      <span className="text-muted-foreground text-sm">
+        Dataset: {truncatedName}
       </span>
     );
   }
@@ -63,6 +69,7 @@ export default function DatasetDetailPage() {
         <Separator className="mb-4" />
         <main className="flex-1 p-8">
           <h1 className="mb-4 text-2xl font-bold">Dataset Details</h1>
+          <DatasetData datasetId={datasetId} />
         </main>
       </SidebarInset>
     </SidebarProvider>

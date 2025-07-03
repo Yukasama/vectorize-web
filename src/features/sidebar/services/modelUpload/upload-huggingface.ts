@@ -1,6 +1,5 @@
 import { client } from '@/lib/client';
-import { messages } from '@/lib/messages';
-import { isAxiosError } from 'axios';
+import { getBackendErrorMessage } from '@/lib/error-utils';
 
 export interface HFModelUploadResponse {
   taskId: string;
@@ -27,20 +26,8 @@ export const uploadHuggingFace = async (
     );
     return data;
   } catch (error: unknown) {
-    if (isAxiosError(error)) {
-      if (error.response?.status === 409) {
-        throw new Error(messages.model.upload.alreadyExists);
-      }
-      if (error.response?.status === 400) {
-        throw new Error(messages.model.upload.huggingfaceError);
-      }
-      const data = error.response?.data as
-        | undefined
-        | { detail?: string; message?: string };
-      const backendMessage =
-        data?.detail ?? data?.message ?? messages.model.upload.huggingfaceError;
-      throw new Error(backendMessage);
-    }
-    throw new Error(messages.model.upload.huggingfaceError);
+    const errorMessage = getBackendErrorMessage(error);
+
+    throw new Error(errorMessage);
   }
 };

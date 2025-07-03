@@ -1,4 +1,5 @@
 import { client } from '@/lib/client';
+import { getBackendErrorMessage } from '@/lib/error-utils';
 import { messages } from '@/lib/messages';
 import { isAxiosError } from 'axios';
 
@@ -38,8 +39,9 @@ export const updateDataset = async (
     };
     await client.put(`/datasets/${id}`, { name }, { headers });
   } catch (error) {
-    console.error('Error updating dataset:', error);
-    throw error;
+    const errorMessage = getBackendErrorMessage(error);
+    console.error(`Error updating dataset: ${errorMessage}`, error);
+    throw new Error(errorMessage);
   }
 };
 
@@ -69,10 +71,15 @@ export const fetchDatasets = async (
       (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED')
     ) {
       console.warn('Backend not reachable - returning empty datasets list');
-    } else {
-      console.error(messages.dataset.general.unknownError, error);
+      return { items: [], total: 0 };
     }
-    return { items: [], total: 0 };
+
+    const errorMessage = getBackendErrorMessage(error);
+    console.error(
+      `${messages.dataset.general.unknownError}: ${errorMessage}`,
+      error,
+    );
+    throw new Error(errorMessage);
   }
 };
 
@@ -110,10 +117,15 @@ export const fetchAllDatasets = async (): Promise<Dataset[]> => {
       (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED')
     ) {
       console.warn('Backend not reachable - returning empty datasets list');
-    } else {
-      console.error(messages.dataset.general.unknownError, error);
+      return [];
     }
-    return [];
+
+    const errorMessage = getBackendErrorMessage(error);
+    console.error(
+      `${messages.dataset.general.unknownError}: ${errorMessage}`,
+      error,
+    );
+    throw new Error(errorMessage);
   }
 };
 
@@ -127,8 +139,12 @@ export const fetchDatasetById = async (
     const { data } = await client.get<Dataset>(`/datasets/${id}`);
     return data;
   } catch (error) {
-    console.error(messages.dataset.general.unknownError, error);
-    return undefined;
+    const errorMessage = getBackendErrorMessage(error);
+    console.error(
+      `${messages.dataset.general.unknownError}: ${errorMessage}`,
+      error,
+    );
+    throw new Error(errorMessage);
   }
 };
 
@@ -140,7 +156,8 @@ export const deleteDataset = async (id: string): Promise<boolean> => {
     await client.delete(`/datasets/${id}`);
     return true;
   } catch (error) {
-    console.error(messages.dataset.delete.error, error);
-    return false;
+    const errorMessage = getBackendErrorMessage(error);
+    console.error(`${messages.dataset.delete.error}: ${errorMessage}`, error);
+    throw new Error(errorMessage);
   }
 };

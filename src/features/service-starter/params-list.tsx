@@ -198,6 +198,7 @@ export const TrainingParamsStep = ({
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
             id="learning-rate-input"
+            min={0}
             onChange={(e) =>
               setLearningRate(
                 e.target.value === '' ? '' : Number(e.target.value),
@@ -284,6 +285,7 @@ export const TrainingParamsStep = ({
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
             id="weight-decay-input"
+            min={0}
             onChange={(e) =>
               setWeightDecay(
                 e.target.value === '' ? '' : Number(e.target.value),
@@ -306,6 +308,7 @@ export const TrainingParamsStep = ({
             autoComplete="off"
             className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
             id="max-grad-norm-input"
+            min={0}
             onChange={(e) =>
               setMaxGradNorm(
                 e.target.value === '' ? '' : Number(e.target.value),

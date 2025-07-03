@@ -35,54 +35,56 @@ export const ServiceStarter = ({
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      {step === 0 && (
-        <SelectModel
-          initialSelectedModel={selectedModel}
-          onNext={() => setStep(1)}
-          setSelectedModel={setSelectedModel}
-        />
-      )}
-      {step === 1 && (
-        <SelectDataset
-          initialSelectedDatasets={selectedDatasets}
-          onBack={() => setStep(0)}
-          onNext={() => setStep(2)}
-          setSelectedDatasets={setSelectedDatasets}
-        />
-      )}
-      {step === 2 && (
-        <Tabs
-          className="w-full"
-          onValueChange={(v) => setMode(v as 'evaluation' | 'training')}
-          value={mode}
-        >
-          <TabsList className="mb-4 w-full justify-center">
-            <TabsTrigger value="training">Training</TabsTrigger>
-            <TabsTrigger value="evaluation">Evaluation</TabsTrigger>
-          </TabsList>
-          <TabsContent value="training">
-            <TrainingParamsStep
-              onBack={() => setStep(1)}
-              onReset={handleReset}
-              selectedDatasets={selectedDatasets}
-              selectedModel={selectedModel}
-              setTrainingParams={setTrainingParams}
-              trainingParams={trainingParams}
-            />
-          </TabsContent>
-          <TabsContent value="evaluation">
-            <EvaluationParamsStep
-              evaluationParams={evaluationParams}
-              onBack={() => setStep(1)}
-              onReset={handleReset}
-              selectedDatasets={selectedDatasets}
-              selectedModel={selectedModel}
-              setEvaluationParams={setEvaluationParams}
-            />
-          </TabsContent>
-        </Tabs>
-      )}
+    <div className="flex h-full flex-col overflow-hidden">
+      <div className="flex-1 overflow-y-auto p-6">
+        {step === 0 && (
+          <SelectModel
+            initialSelectedModel={selectedModel}
+            onNext={() => setStep(1)}
+            setSelectedModel={setSelectedModel}
+          />
+        )}
+        {step === 1 && (
+          <SelectDataset
+            initialSelectedDatasets={selectedDatasets}
+            onBack={() => setStep(0)}
+            onNext={() => setStep(2)}
+            setSelectedDatasets={setSelectedDatasets}
+          />
+        )}
+        {step === 2 && (
+          <Tabs
+            className="w-full"
+            onValueChange={(v) => setMode(v as 'evaluation' | 'training')}
+            value={mode}
+          >
+            <TabsList className="mb-4 w-full justify-center">
+              <TabsTrigger value="training">Training</TabsTrigger>
+              <TabsTrigger value="evaluation">Evaluation</TabsTrigger>
+            </TabsList>
+            <TabsContent value="training">
+              <TrainingParamsStep
+                onBack={() => setStep(1)}
+                onReset={handleReset}
+                selectedDatasets={selectedDatasets}
+                selectedModel={selectedModel}
+                setTrainingParams={setTrainingParams}
+                trainingParams={trainingParams}
+              />
+            </TabsContent>
+            <TabsContent value="evaluation">
+              <EvaluationParamsStep
+                evaluationParams={evaluationParams}
+                onBack={() => setStep(1)}
+                onReset={handleReset}
+                selectedDatasets={selectedDatasets}
+                selectedModel={selectedModel}
+                setEvaluationParams={setEvaluationParams}
+              />
+            </TabsContent>
+          </Tabs>
+        )}
+      </div>
     </div>
   );
 };

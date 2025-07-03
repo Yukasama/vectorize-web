@@ -59,10 +59,8 @@ export const DatasetList = ({
               key={dataset.id}
               onClick={() => onSelect(dataset)}
             >
-              <p className="text-sm font-medium">
-                {dataset.name.length > 17
-                  ? dataset.name.slice(0, 17) + '...'
-                  : dataset.name}
+              <p className="truncate text-sm font-medium" title={dataset.name}>
+                {dataset.name}
               </p>
               {isSelected && (
                 <span className="text-primary text-xs">Selected</span>
@@ -88,7 +86,9 @@ export const DatasetList = ({
             );
             return (
               <TableRow key={dataset.id}>
-                <TableCell>{dataset.name}</TableCell>
+                <TableCell className="max-w-0 truncate" title={dataset.name}>
+                  {dataset.name}
+                </TableCell>
                 <TableCell>
                   <input
                     aria-checked={isSelected}

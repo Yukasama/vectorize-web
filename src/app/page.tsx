@@ -20,9 +20,16 @@ import { ServiceStarter } from '../features/service-starter/service-starter';
 
 export default function Page() {
   const [step, setStep] = useState(0);
+
   // Breadcrumbs: 0 = model, 1 = dataset, 2 = service
   const getBreadcrumbColor = (idx: number) =>
     step === idx ? 'text-foreground font-semibold' : 'text-muted-foreground';
+
+  const handleBreadcrumbClick = (targetStep: number) => {
+    if (targetStep < step) {
+      setStep(targetStep);
+    }
+  };
 
   return (
     <SidebarProvider>
@@ -38,27 +45,59 @@ export default function Page() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <span className={getBreadcrumbColor(0)}>Select model</span>
+                  <button
+                    className={`${getBreadcrumbColor(0)} ${
+                      step > 0
+                        ? 'cursor-pointer hover:underline'
+                        : 'cursor-default'
+                    }`}
+                    onClick={() => handleBreadcrumbClick(0)}
+                    type="button"
+                  >
+                    Select model
+                  </button>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <span className={getBreadcrumbColor(1)}>Select dataset</span>
+                  <button
+                    className={`${getBreadcrumbColor(1)} ${
+                      step > 1
+                        ? 'cursor-pointer hover:underline'
+                        : 'cursor-default'
+                    }`}
+                    onClick={() => handleBreadcrumbClick(1)}
+                    type="button"
+                  >
+                    Select dataset
+                  </button>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <span className={getBreadcrumbColor(2)}>Start service</span>
+                  <button
+                    className={`${getBreadcrumbColor(2)} ${
+                      step > 2
+                        ? 'cursor-pointer hover:underline'
+                        : 'cursor-default'
+                    }`}
+                    onClick={() => handleBreadcrumbClick(2)}
+                    type="button"
+                  >
+                    Start service
+                  </button>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
           <ThemeToggle />
         </header>
-        <div className="flex min-h-0 flex-1 flex-col">
-          <div className="grid h-[calc(100dvh-4rem)] min-h-0 w-full flex-1 gap-4 p-4 md:grid-cols-[1fr_320px]">
+        <div className="flex h-[calc(100dvh-4rem)] flex-col">
+          <div className="grid h-full min-h-0 w-full gap-4 p-4 md:grid-cols-[1fr_320px]">
             <div className="bg-muted/50 flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border-2 border-transparent shadow-lg transition-colors">
               <ServiceStarter setStep={setStep} step={step} />
             </div>
-            <TaskList />
+            <div className="h-full min-h-0">
+              <TaskList />
+            </div>
           </div>
         </div>
       </SidebarInset>

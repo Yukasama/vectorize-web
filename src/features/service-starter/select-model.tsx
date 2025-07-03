@@ -31,11 +31,6 @@ export const SelectModel = ({
     setSelectedModel(newModel);
   };
 
-  const handleClearSelected = () => {
-    setLocalSelectedModel(undefined);
-    setSelectedModel(undefined);
-  };
-
   return (
     <div className="relative flex h-full min-h-0 w-full flex-col p-0">
       <ModelListHeader
@@ -56,7 +51,6 @@ export const SelectModel = ({
       </ScrollArea>
       <ModelListFooter
         onBack={onBack}
-        onClearSelected={handleClearSelected}
         onNext={onNext}
         selectedModel={localSelectedModel}
       />
