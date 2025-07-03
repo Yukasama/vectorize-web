@@ -40,6 +40,13 @@ export const EvaluationParamsStep = ({
   const handleStart = async () => {
     setIsSubmitting(true);
     setError(undefined);
+
+    if (selectedDatasets.length > 1) {
+      setError('Please select only one dataset for evaluation.');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const { startEvaluation } = await import('./evaluation-service');
       await startEvaluation({
