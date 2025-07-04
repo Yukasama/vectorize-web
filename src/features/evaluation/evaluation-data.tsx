@@ -29,6 +29,7 @@ export const EvaluationData = ({
   evaluationId,
   modelId,
 }: EvaluationDataProps) => {
+  // Fetch evaluation status and handle loading/error states
   const {
     data: status,
     error,
@@ -154,9 +155,7 @@ export const EvaluationData = ({
               ))}
             </div>
           ) : (
-            <div className="text-muted-foreground">
-              Kein Datensatz verknüpft
-            </div>
+            <div className="text-muted-foreground">No dataset linked</div>
           )}
         </div>
       </div>
