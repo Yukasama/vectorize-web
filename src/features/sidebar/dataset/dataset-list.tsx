@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Collapsible,
   CollapsibleContent,
@@ -62,7 +64,7 @@ const DatasetListItem = ({ dataset }: { dataset: Dataset }) => {
       await updateDataset(dataset.id, newName.trim(), dataset.version);
       setEdit(false);
       // Invalidate dataset queries to refresh sidebar after rename
-      void queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         exact: false,
         queryKey: ['datasets'],
       });

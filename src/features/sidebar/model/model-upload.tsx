@@ -71,11 +71,11 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
         toast.success(messages.model.upload.success(selectedFiles[0].name), {
           duration: 4000,
         });
-        void queryClient.invalidateQueries({
+        await queryClient.invalidateQueries({
           exact: false,
           queryKey: ['models'],
         });
-        void queryClient.invalidateQueries({
+        await queryClient.invalidateQueries({
           exact: false,
           queryKey: ['tasks'],
         });
@@ -189,7 +189,7 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
           onSuccess();
         }
         // Invalidate tasks query to refresh sidebar after upload
-        void queryClient.invalidateQueries({
+        await queryClient.invalidateQueries({
           exact: false,
           queryKey: ['tasks'],
         });

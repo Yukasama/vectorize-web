@@ -1,3 +1,5 @@
+'use client';
+
 import { fetchEvaluationStatus } from '@/features/service-starter/evaluation-service';
 import { TASKS_STATUS_MAP } from '@/features/tasks/config/mappers';
 import { formatDate } from '@/features/tasks/lib/date-helpers';

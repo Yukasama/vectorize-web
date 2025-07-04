@@ -146,12 +146,7 @@ export const EvaluationParamsStep = ({
         <Button disabled={isSubmitting} onClick={onBack} variant="outline">
           Back
         </Button>
-        <Button
-          disabled={
-            isSubmitting || !selectedModel || selectedDatasets.length === 0
-          }
-          onClick={handleStart}
-        >
+        <Button disabled={isSubmitting} onClick={handleStart}>
           {isSubmitting ? 'Starting...' : 'Start evaluation'}
         </Button>
       </div>

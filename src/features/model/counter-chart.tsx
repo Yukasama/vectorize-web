@@ -1,3 +1,5 @@
+'use client';
+
 import { AreaChart } from '@/components/ui/area-chart';
 import { client } from '@/lib/client';
 import { useQuery } from '@tanstack/react-query';

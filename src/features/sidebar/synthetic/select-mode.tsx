@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DatasetList } from '@/features/service-starter/select-dataset/dataset-list';

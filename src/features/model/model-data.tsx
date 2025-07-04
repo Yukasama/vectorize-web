@@ -1,3 +1,5 @@
+'use client';
+
 import { fetchModelByIdOrTag } from '@/features/sidebar/services/model-service';
 import { formatDate } from '@/features/tasks/lib/date-helpers';
 import { useQuery } from '@tanstack/react-query';

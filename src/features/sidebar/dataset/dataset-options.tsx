@@ -1,3 +1,5 @@
+'use client';
+
 import { SidebarListItemOptions } from '@/components/ui/sidebar-list-item';
 import { messages } from '@/lib/messages';
 import { useQueryClient } from '@tanstack/react-query';
@@ -34,7 +36,7 @@ export const DatasetOptions = ({
     setDeleteDialogOpen(false);
     if (success) {
       toast.success(messages.dataset.delete.success(dataset.name));
-      void queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         exact: false,
         queryKey: ['datasets'],
       });

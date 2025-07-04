@@ -1,3 +1,5 @@
+'use client';
+
 import { fetchDatasetById } from '@/features/sidebar/services/dataset-service';
 import { formatDate } from '@/features/tasks/lib/date-helpers';
 import { useQuery } from '@tanstack/react-query';

@@ -30,8 +30,10 @@ export const getDuration = (start: Date, end: Date) => {
 
 export const getRelative = (date: Date | string) => {
   const base = typeof date === 'string' ? new Date(date) : date;
+  const baseWithOffset = new Date(base);
+  baseWithOffset.setHours(baseWithOffset.getHours() + 2);
   const now = new Date();
-  const diffMs = now.getTime() - base.getTime();
+  const diffMs = now.getTime() - baseWithOffset.getTime();
   const diffSec = Math.floor(diffMs / 1000);
   if (diffSec < 60) {
     return `${diffSec} seconds ago`;

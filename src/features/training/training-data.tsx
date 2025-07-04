@@ -1,4 +1,9 @@
-import { fetchTrainingById } from '@/features/service-starter/training-service';
+'use client';
+
+import {
+  fetchTrainingById,
+  TrainingStatusResponse,
+} from '@/features/service-starter/training-service';
 import { TASKS_STATUS_MAP } from '@/features/tasks/config/mappers';
 import { formatDate } from '@/features/tasks/lib/date-helpers';
 import { useQuery } from '@tanstack/react-query';
@@ -12,6 +17,13 @@ interface TrainingDataProps {
   trainingId: string;
 }
 
+// Extend TrainingStatusResponse to include optional properties if not present in the base type
+type TrainingStatusWithExtras = TrainingStatusResponse & {
+  baseline_model_id?: string;
+  created_at?: string;
+  train_dataset_ids?: string | string[];
+};
+
 export const TrainingData = ({ trainingId }: TrainingDataProps) => {
   // Fetch training status by ID
   const { data, error, isLoading } = useQuery({
@@ -20,41 +32,31 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
     queryKey: ['training-status', trainingId],
   });
 
-  // Add a type assertion for the data to ensure type safety
-  const status = data;
+  const status = data as TrainingStatusWithExtras | undefined;
 
   // Extract train dataset IDs as array
-  const statusWithDatasets = status
-    ? (status as typeof status & { train_dataset_ids?: string | string[] })
-    : undefined;
   let trainDatasetIds: string[] = [];
-  if (statusWithDatasets) {
-    if (Array.isArray(statusWithDatasets.train_dataset_ids)) {
-      trainDatasetIds = statusWithDatasets.train_dataset_ids;
+  if (status) {
+    if (Array.isArray(status.train_dataset_ids)) {
+      trainDatasetIds = status.train_dataset_ids;
     } else if (
-      typeof statusWithDatasets.train_dataset_ids === 'string' &&
-      statusWithDatasets.train_dataset_ids
+      typeof status.train_dataset_ids === 'string' &&
+      status.train_dataset_ids
     ) {
-      trainDatasetIds = [statusWithDatasets.train_dataset_ids];
+      trainDatasetIds = [status.train_dataset_ids];
     }
   }
-
-  // Extract baseline model and creation date if present
-  const statusWithBaseline = status as typeof status & {
-    baseline_model_id?: string;
-  };
-  const statusWithCreated = status as typeof status & { created_at?: string };
 
   // Loading state
   if (isLoading) {
     return (
-      <div className="text-muted-foreground">Loading training status...</div>
+      <div className="text-muted-foreground">Loading training details...</div>
     );
   }
   // Error state
   if (error || !status) {
     return (
-      <div className="text-destructive">Error loading training status</div>
+      <div className="text-destructive">Error loading training details</div>
     );
   }
 
@@ -63,7 +65,7 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
       {/* Training Status Section */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="border-border bg-card text-card-foreground rounded-lg border p-6">
-          <h3 className="mb-4 text-lg font-semibold">Training Status</h3>
+          <h3 className="mb-4 text-lg font-semibold">Training Details</h3>
           <div className="space-y-3">
             <div>
               <span className="font-semibold">Status:</span>{' '}
@@ -80,10 +82,10 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
               </span>
             </div>
             {/* Show creation date if available */}
-            {statusWithCreated.created_at && (
+            {status.created_at && (
               <div>
                 <span className="font-semibold">Created at:</span>{' '}
-                {formatDate(statusWithCreated.created_at)}
+                {formatDate(status.created_at)}
               </div>
             )}
             {/* Show epoch if available */}
@@ -128,8 +130,8 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
               </div>
             )}
           {/* Baseline model info */}
-          {typeof statusWithBaseline.baseline_model_id === 'string' &&
-            statusWithBaseline.baseline_model_id && (
+          {typeof status.baseline_model_id === 'string' &&
+            status.baseline_model_id && (
               <div className="border-border bg-card text-card-foreground rounded-lg border p-4">
                 <div className="text-muted-foreground mb-1 text-xs font-medium">
                   Base Model ID
@@ -137,9 +139,9 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
                 <div className="text-sm font-medium break-all">
                   <a
                     className="text-primary hover:text-primary/80 underline"
-                    href={`/model/${encodeURIComponent(statusWithBaseline.baseline_model_id)}`}
+                    href={`/model/${encodeURIComponent(status.baseline_model_id)}`}
                   >
-                    {statusWithBaseline.baseline_model_id}
+                    {status.baseline_model_id}
                   </a>
                 </div>
               </div>

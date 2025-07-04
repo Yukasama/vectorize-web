@@ -1,3 +1,5 @@
+'use client';
+
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { X } from 'lucide-react';

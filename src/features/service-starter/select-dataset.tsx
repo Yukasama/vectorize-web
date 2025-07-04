@@ -1,3 +1,5 @@
+'use client';
+
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useState } from 'react';
 import type { Dataset } from '../sidebar/services/dataset-service';

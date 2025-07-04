@@ -1,7 +1,5 @@
 'use client';
 
-// TrainingParamsStep allows users to configure and start a model training task.
-// Handles parameter input, validation, error display, and triggers training via service call.
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useQueryClient } from '@tanstack/react-query';
@@ -9,6 +7,11 @@ import React, { useState } from 'react';
 import { Dataset } from '../sidebar/services/dataset-service';
 import { Model } from '../sidebar/services/model-service';
 import { startTraining } from './training-service';
+
+/**
+ * TrainingParamsStep allows users to configure and start a model training task.
+ * Handles parameter input, validation, error display, and triggers training via service call.
+ */
 
 interface TrainingParamsStepProps {
   onBack: () => void;
@@ -69,15 +72,15 @@ export const TrainingParamsStep = ({
           dataloaderNumWorkers === ''
             ? undefined
             : Number(dataloaderNumWorkers),
-        device: device || undefined,
+        device,
         epochs: epochs === '' ? undefined : Number(epochs),
         evaluation_steps:
           evaluationSteps === '' ? undefined : Number(evaluationSteps),
         learning_rate: learningRate === '' ? undefined : Number(learningRate),
         max_grad_norm: maxGradNorm === '' ? undefined : Number(maxGradNorm),
         model_tag: selectedModel?.model_tag ?? '',
-        optimizer_name: optimizerName || undefined,
-        output_path: outputPath || undefined,
+        optimizer_name: optimizerName,
+        output_path: outputPath,
         per_device_train_batch_size:
           perDeviceTrainBatchSize === ''
             ? undefined
@@ -85,20 +88,23 @@ export const TrainingParamsStep = ({
         save_best_model: saveBestModel,
         save_each_epoch: saveEachEpoch,
         save_optimizer_state: saveOptimizerState,
-        scheduler: scheduler || undefined,
+        scheduler: scheduler,
         show_progress_bar: showProgressBar,
         timeout_seconds:
           timeoutSeconds === '' ? undefined : Number(timeoutSeconds),
         train_dataset_ids: selectedDatasets.map((d) => d.id),
         use_amp: useAmp,
-        val_dataset_id: valDatasetId || undefined,
+        val_dataset_id: valDatasetId,
         warmup_steps: warmupSteps === '' ? undefined : Number(warmupSteps),
         weight_decay: weightDecay === '' ? undefined : Number(weightDecay),
       });
       // Show success toast and refresh tasks
       const { toast } = await import('sonner');
       toast.success('Training started!');
-      void queryClient.invalidateQueries({ exact: false, queryKey: ['tasks'] });
+      await queryClient.invalidateQueries({
+        exact: false,
+        queryKey: ['tasks'],
+      });
 
       // Reset all parameters to default values
       setEpochs('');
@@ -521,12 +527,7 @@ export const TrainingParamsStep = ({
         <Button disabled={isSubmitting} onClick={onBack} variant="outline">
           Back
         </Button>
-        <Button
-          disabled={
-            isSubmitting || !selectedModel || selectedDatasets.length === 0
-          }
-          onClick={handleStart}
-        >
+        <Button disabled={isSubmitting} onClick={handleStart}>
           {isSubmitting ? 'Starting...' : 'Start training'}
         </Button>
       </div>

@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Collapsible,
   CollapsibleContent,
@@ -57,7 +59,7 @@ const ModelListItem = ({ model }: { readonly model: Model }) => {
       await updateModelName(model.id, newName.trim(), model.version);
       setEdit(false);
       // Invalidate model queries to refresh sidebar after rename
-      void queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         exact: false,
         queryKey: ['models'],
       });
@@ -173,7 +175,7 @@ export const ModelList = () => {
         <SidebarMenuItem>
           <div className="p-4">
             <div className="bg-destructive/10 border-destructive text-destructive rounded border p-2 text-sm">
-              Error loading models: {error.message || String(error)}
+              Error loading models: {error.message}
             </div>
           </div>
         </SidebarMenuItem>

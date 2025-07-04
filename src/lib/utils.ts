@@ -3,7 +3,8 @@ import { twMerge } from 'tailwind-merge';
 
 export const formatRelativeDate = (date: Date | string): string => {
   const now = new Date();
-  const d = typeof date === 'string' ? new Date(date) : date;
+  const d = new Date(typeof date === 'string' ? new Date(date) : date);
+  d.setHours(d.getHours() + 2);
   const diffMs = now.getTime() - d.getTime();
   const diffSec = Math.floor(diffMs / 1000);
   const diffMin = Math.floor(diffSec / 60);

@@ -1,3 +1,5 @@
+'use client';
+
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useState } from 'react';
 import type { Model } from '../sidebar/services/model-service';

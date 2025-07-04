@@ -1,3 +1,5 @@
+'use client';
+
 import type { Dataset } from '../services/dataset-service';
 import type { FileUploadState } from './upload-mode';
 
