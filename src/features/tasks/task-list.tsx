@@ -24,7 +24,7 @@ import { StatusFilter } from './status-filter';
 import { TaskCard } from './task-card';
 import { TimeFilter } from './time-filter';
 import { TypeFilter } from './type-filter';
-import { Task, TaskStatus, TaskType } from './types/task';
+import { TaskResponse, TaskStatus, TaskType } from './types/task';
 import { useTaskPollingAndListSync } from './use-task-polling';
 
 export const TaskList = () => {
@@ -37,7 +37,9 @@ export const TaskList = () => {
 
   const { data, isError, isFetching, refetch } = useQuery({
     queryFn: () =>
-      client.get<Task[]>(`/tasks?within_hours=${maxHours}`).then((r) => r.data),
+      client
+        .get<TaskResponse>(`/tasks?within_hours=${maxHours}`)
+        .then((r) => r.data),
     queryKey: ['tasks', maxHours],
   });
 
@@ -46,7 +48,7 @@ export const TaskList = () => {
       return [];
     }
 
-    return filterTasks(data, {
+    return filterTasks(data.items, {
       searchQuery,
       selectedStatuses,
       selectedTypes,
@@ -59,7 +61,7 @@ export const TaskList = () => {
         <h3 className="text-md font-medium">Tasks</h3>
         <Separator className="bg-desc/50 flex-1" />
         <p className="text-desc text-xs">
-          Showing {filteredTasks.length} of {data?.length ?? 0} tasks
+          Showing {filteredTasks.length} of {data?.items.length ?? 0} tasks
         </p>
       </div>
 
@@ -137,7 +139,7 @@ export const TaskList = () => {
             <Clock className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
             <CardTitle className="mb-2">No tasks found</CardTitle>
             <CardDescription>
-              {data?.length === 0
+              {data?.items.length === 0
                 ? 'Your task queue is empty.'
                 : 'No tasks match your current filters. Try adjusting your search criteria.'}
             </CardDescription>

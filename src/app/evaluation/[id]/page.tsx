@@ -8,12 +8,13 @@ import {
 } from '@/components/ui/sidebar';
 import { EvaluationScatterChart } from '@/features/evaluation/bar-chart';
 import { EvaluationData } from '@/features/evaluation/evaluation-data';
-import { EvaluationList } from '@/features/evaluation/evaluation-list';
 import { fetchEvaluationStatus } from '@/features/service-starter/evaluation-service';
 import { AppSidebar } from '@/features/sidebar/app-sidebar';
+import { fetchModelByTag } from '@/features/sidebar/services/model-service';
 import { ThemeToggle } from '@/features/theme/theme-toggle';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 const filterMetrics = (obj: unknown): Record<string, number> | undefined => {
   if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
@@ -36,6 +37,27 @@ export default function EvaluationDetailPage() {
     queryFn: () => fetchEvaluationStatus(evaluationId),
     queryKey: ['evaluation-status', evaluationId],
   });
+
+  const [modelId, setModelId] = useState<string | undefined>();
+  const [baselineId, setBaselineId] = useState<string | undefined>();
+
+  useEffect(() => {
+    const resolveModelIds = async () => {
+      if (status?.model_tag) {
+        const model = await fetchModelByTag(status.model_tag);
+        setModelId(model?.id);
+      } else {
+        setModelId(undefined);
+      }
+      if (status?.baseline_model_tag) {
+        const baseline = await fetchModelByTag(status.baseline_model_tag);
+        setBaselineId(baseline?.id);
+      } else {
+        setBaselineId(undefined);
+      }
+    };
+    void resolveModelIds();
+  }, [status?.model_tag, status?.baseline_model_tag]);
 
   const evaluationNameContent = (
     <span className="text-muted-foreground text-sm">
@@ -60,7 +82,11 @@ export default function EvaluationDetailPage() {
         </header>
         <Separator className="mb-4" />
         <main className="flex-1 p-8">
-          <EvaluationData evaluationId={evaluationId} />
+          <EvaluationData
+            baselineId={baselineId}
+            evaluationId={evaluationId}
+            modelId={modelId}
+          />
           <EvaluationScatterChart
             baselineMetrics={filterMetrics(status?.baseline_metrics)}
             evaluationMetrics={filterMetrics(status?.evaluation_metrics)}
@@ -87,23 +113,6 @@ export default function EvaluationDetailPage() {
               )}
             </div>
           </div>
-
-          {/* Related Evaluations Table */}
-          {status?.model_tag && status.dataset_info && (
-            <div className="mt-8">
-              <h3 className="mb-4 text-lg font-semibold">
-                Related Evaluations (Same Model & Dataset)
-              </h3>
-              <EvaluationList
-                currentEvaluationId={evaluationId}
-                datasetId={status.dataset_info
-                  .split(',')[0]
-                  ?.trim()
-                  .replace(/^Dataset:\s*/, '')}
-                modelTag={status.model_tag}
-              />
-            </div>
-          )}
         </main>
       </SidebarInset>
     </SidebarProvider>

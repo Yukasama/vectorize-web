@@ -1,7 +1,7 @@
 import { client } from '@/lib/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
-import { Task } from './types/task';
+import { TaskResponse } from './types/task';
 
 /**
  * Polls the tasks endpoint and invalidates models/datasets queries
@@ -15,9 +15,11 @@ export const useTaskPollingAndListSync = ({
 
   const { data: tasks } = useQuery({
     queryFn: () =>
-      client.get<Task[]>(`/tasks?within_hours=${maxHours}`).then((r) => r.data),
+      client
+        .get<TaskResponse>(`/tasks?within_hours=${maxHours}`)
+        .then((r) => r.data),
     queryKey: ['tasks', maxHours],
-    refetchInterval: 10_000,
+    refetchInterval: 20_000,
   });
 
   useEffect(() => {
@@ -25,7 +27,7 @@ export const useTaskPollingAndListSync = ({
       return;
     }
     let updated = false;
-    for (const task of tasks) {
+    for (const task of tasks.items) {
       const prev = lastTaskStatus.current[task.id];
       if (prev && prev !== 'D' && task.task_status === 'D') {
         if (

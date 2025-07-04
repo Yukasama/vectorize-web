@@ -3,6 +3,7 @@
 import { Loader } from '@/components/loader';
 import { Badge } from '@/components/ui/badge';
 import { CardContent } from '@/components/ui/card';
+import { fetchModelByIdOrTag } from '@/features/sidebar/services/model-service';
 import { cn } from '@/lib/utils';
 import { Check, Clock, X } from 'lucide-react';
 import { TASKS_TYPE_MAP } from './config/mappers';
@@ -11,33 +12,26 @@ import { formatDate, useDuration, useRelativeTime } from './lib/date-helpers';
 import { TaskErrorHoverCard } from './task-error-hover-card';
 import { Task } from './types/task';
 
-// Helper function to get the detail page URL for a task
 const getTaskDetailUrl = (task: Task): string | undefined => {
   switch (task.task_type) {
     case 'dataset_upload': {
-      // Dataset upload tasks don't have a direct dataset ID reference
-      // Making them non-clickable until proper mapping is available
       return undefined;
     }
     case 'evaluation': {
       return `/evaluation/${task.id}`;
     }
     case 'model_upload': {
-      if (!task.tag) {
-        return undefined;
-      }
-      // For model uploads, use the tag to navigate to the model
-      let modelTag = task.tag;
-
-      // Transform encoded tags back to proper format
-      if (modelTag.includes('_') && !modelTag.includes('/')) {
-        modelTag = modelTag.replaceAll('_', '/');
+      if (task.model_id) {
+        return `/model/${task.model_id}`;
       }
 
-      return `/model/${modelTag}`;
+      if (task.tag) {
+        return 'resolve-model-id';
+      }
+
+      return undefined;
     }
     case 'synthesis': {
-      // No specific detail page for synthesis tasks yet
       return undefined;
     }
     case 'training': {
@@ -60,12 +54,40 @@ export const TaskCard = ({ task }: { task: Task }) => {
   const detailUrl = getTaskDetailUrl(task);
   const isClickable = !!detailUrl && task.task_status !== 'F';
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = async (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('.id-copier')) {
       return;
     }
 
     if (detailUrl) {
+      // Special case: resolve model ID from tag for model_upload tasks
+      if (
+        detailUrl === 'resolve-model-id' &&
+        task.task_type === 'model_upload' &&
+        task.tag
+      ) {
+        e.preventDefault();
+
+        try {
+          console.log('🔍 Resolving model ID for tag:', task.tag);
+
+          const normalizedTag = task.tag.replace('/', '_').replace('@main', '');
+          console.log('� Normalized tag:', normalizedTag);
+
+          const model = await fetchModelByIdOrTag(normalizedTag);
+
+          if (model?.id) {
+            console.log('✅ Found model with ID:', model.id);
+            globalThis.location.href = `/model/${model.id}`;
+          } else {
+            console.log('⚠️ Model found but no ID available');
+          }
+        } catch (error) {
+          console.error('❌ Failed to resolve model:', error);
+        }
+        return;
+      }
+
       globalThis.location.href = detailUrl;
     }
   };

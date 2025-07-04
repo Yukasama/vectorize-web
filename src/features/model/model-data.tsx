@@ -1,10 +1,12 @@
-import { fetchModelByTag } from '@/features/sidebar/services/model-service';
+import { fetchModelByIdOrTag } from '@/features/sidebar/services/model-service';
+import { formatDate } from '@/features/tasks/lib/date-helpers';
 import { useQuery } from '@tanstack/react-query';
 import { CounterChart } from './counter-chart';
 import { ModelTaskList } from './model-task-list';
 
 interface ModelDataProps {
-  modelTag: string;
+  modelId: string;
+  modelTag?: string;
 }
 
 const getSourceDisplayName = (source: string): string => {
@@ -24,15 +26,15 @@ const getSourceDisplayName = (source: string): string => {
   }
 };
 
-export const ModelData = ({ modelTag }: ModelDataProps) => {
+export const ModelData = ({ modelId, modelTag }: ModelDataProps) => {
   const {
     data: model,
     error,
     isLoading,
   } = useQuery({
-    enabled: !!modelTag,
-    queryFn: () => fetchModelByTag(modelTag),
-    queryKey: ['model', modelTag],
+    enabled: !!modelId,
+    queryFn: () => fetchModelByIdOrTag(modelId),
+    queryKey: ['model', modelId],
   });
 
   if (isLoading) {
@@ -60,6 +62,10 @@ export const ModelData = ({ modelTag }: ModelDataProps) => {
       <div className="border-border bg-card text-card-foreground rounded-lg border p-4">
         <div className="space-y-3">
           <div>
+            <span className="font-semibold">ID:</span>
+            <span className="ml-2 font-mono text-sm">{model.id}</span>
+          </div>
+          <div>
             <span className="font-semibold">Name:</span> {truncatedName}
           </div>
           <div>
@@ -71,20 +77,20 @@ export const ModelData = ({ modelTag }: ModelDataProps) => {
           </div>
           <div>
             <span className="font-semibold">Created at:</span>{' '}
-            {model.created_at}
+            {formatDate(model.created_at)}
           </div>
         </div>
       </div>
 
       {/* Model Chart Section */}
       <div>
-        <CounterChart modelTag={modelTag} />
+        <CounterChart modelTag={modelTag ?? ''} />
       </div>
 
       {/* Model Tasks Section */}
       <div>
         <h2 className="mb-2 text-xl font-semibold">Tasks for this Model</h2>
-        <ModelTaskList modelTag={modelTag} />
+        <ModelTaskList modelId={modelId} modelTag={modelTag} />
       </div>
     </div>
   );

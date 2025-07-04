@@ -3,7 +3,7 @@ import { TaskStatus } from '../types/task';
 
 export const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  date.setHours(date.getHours() - 2);
+  date.setHours(date.getHours() + 2);
   return date.toLocaleString(undefined, {
     day: 'numeric',
     hour: '2-digit',
@@ -31,7 +31,6 @@ export const getDuration = (start: Date, end: Date) => {
 export const getRelative = (date: Date | string) => {
   const base = typeof date === 'string' ? new Date(date) : date;
   const now = new Date();
-  now.setHours(now.getHours() - 2);
   const diffMs = now.getTime() - base.getTime();
   const diffSec = Math.floor(diffMs / 1000);
   if (diffSec < 60) {
@@ -72,7 +71,6 @@ export const useDuration = (
     let end: Date;
     if (live) {
       end = new Date();
-      end.setHours(end.getHours() - 2); // Subtract 2 hours
     } else if (endDate) {
       end = typeof endDate === 'string' ? new Date(endDate) : endDate;
     } else {

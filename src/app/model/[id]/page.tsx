@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/sidebar';
 import { ModelData } from '@/features/model/model-data';
 import { AppSidebar } from '@/features/sidebar/app-sidebar';
-import { fetchModelByTag } from '@/features/sidebar/services/model-service';
+import { fetchModelById } from '@/features/sidebar/services/model-service';
 import { ThemeToggle } from '@/features/theme/theme-toggle';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
@@ -23,7 +23,7 @@ export default function ModelDetailPage() {
     isLoading,
   } = useQuery({
     enabled: !!modelId && modelId.length > 0,
-    queryFn: () => fetchModelByTag(modelId),
+    queryFn: () => fetchModelById(modelId),
     queryKey: ['model', modelId],
   });
 
@@ -50,8 +50,6 @@ export default function ModelDetailPage() {
     );
   }
 
-  const modelTag = model?.model_tag ?? '';
-
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -70,8 +68,8 @@ export default function ModelDetailPage() {
         <Separator className="mb-4" />
         <main className="flex-1 p-8">
           <h1 className="mb-4 text-2xl font-bold">Model Details</h1>
-          {modelTag ? (
-            <ModelData modelTag={modelTag} />
+          {modelId ? (
+            <ModelData modelId={modelId} modelTag={model?.model_tag} />
           ) : (
             <div className="text-muted-foreground">Loading model...</div>
           )}

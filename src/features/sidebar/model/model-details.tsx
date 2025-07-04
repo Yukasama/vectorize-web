@@ -1,7 +1,7 @@
 'use client';
 
 import { DetailsHoverCard } from '@/components/ui/details-hover-card';
-import { fetchModelByTag } from '@/features/sidebar/services/model-service';
+import { fetchModelById } from '@/features/sidebar/services/model-service';
 import { formatRelativeDate } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
@@ -16,7 +16,7 @@ export const ModelDetailsHoverCardContent = ({
   const [copiedTag, setCopiedTag] = React.useState(false);
   const { data: model, isLoading: loading } = useQuery({
     enabled: !!modelId,
-    queryFn: () => fetchModelByTag(modelId),
+    queryFn: () => fetchModelById(modelId),
     queryKey: ['model', modelId],
   });
 

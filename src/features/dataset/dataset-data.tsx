@@ -1,4 +1,5 @@
 import { fetchDatasetById } from '@/features/sidebar/services/dataset-service';
+import { formatDate } from '@/features/tasks/lib/date-helpers';
 import { useQuery } from '@tanstack/react-query';
 import { DatasetTaskList } from './dataset-task-list';
 
@@ -59,7 +60,7 @@ export const DatasetData = ({ datasetId }: DatasetDataProps) => {
           {dataset.created_at && (
             <div>
               <span className="font-semibold">Created at:</span>{' '}
-              {dataset.created_at}
+              {formatDate(dataset.created_at)}
             </div>
           )}
         </div>

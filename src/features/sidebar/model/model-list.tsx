@@ -76,10 +76,7 @@ const ModelListItem = ({ model }: { readonly model: Model }) => {
                 setNewName={setNewName}
               />
             ) : (
-              <Link
-                className="min-w-0 flex-1"
-                href={`/model/${model.model_tag}`}
-              >
+              <Link className="min-w-0 flex-1" href={`/model/${model.id}`}>
                 <SidebarListItemName
                   edit={edit}
                   handleSave={handleSave}
@@ -94,7 +91,7 @@ const ModelListItem = ({ model }: { readonly model: Model }) => {
             )}
           </HoverCardTrigger>
           <HoverCardContent align="start" className="w-96" side="top">
-            <ModelDetailsHoverCardContent modelId={model.model_tag} />
+            <ModelDetailsHoverCardContent modelId={model.id} />
           </HoverCardContent>
         </HoverCard>
         <ModelListOptions model={model} setEdit={setEdit} />

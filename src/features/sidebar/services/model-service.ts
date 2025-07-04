@@ -124,6 +124,28 @@ export const fetchModelByTag = async (
 };
 
 /**
+ * Fetch a single model by its ID or tag.
+ */
+export const fetchModelByIdOrTag = async (
+  identifier: string,
+): Promise<Model | undefined> => {
+  try {
+    const { data } = await client.get<Model>(`/models/${identifier}`);
+    return data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response?.status === 304) {
+      return;
+    }
+
+    const errorMessage = getBackendErrorMessage(error);
+    console.error(`Error fetching model by ID/tag: ${errorMessage}`, error);
+    throw new Error(errorMessage);
+  }
+};
+
+export const fetchModelById = fetchModelByIdOrTag;
+
+/**
  * Update a model's name.
  */
 export const updateModelName = async (

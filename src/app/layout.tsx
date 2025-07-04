@@ -9,11 +9,6 @@ import type { PropsWithChildren } from 'react';
 import { constructMetadata } from '../lib/metadata';
 import './globals.css';
 
-const geistSans = localFont({
-  src: './fonts/GeistVF.woff',
-  variable: '--font-geist-sans',
-  weight: '100 900',
-});
 const geistMono = localFont({
   src: './fonts/GeistMonoVF.woff',
   variable: '--font-geist-mono',
@@ -36,13 +31,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={cn(
-          'font-sans antialiased',
-          geistSans.variable,
-          geistMono.variable,
-        )}
-      >
+      <body className={cn('font-sans antialiased', geistMono.variable)}>
         <Provider nonce={nonce ?? undefined}>
           <div className="flex min-h-screen w-full flex-col">
             <main className="flex flex-col">{children}</main>

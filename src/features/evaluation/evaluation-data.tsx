@@ -1,12 +1,34 @@
 import { fetchEvaluationStatus } from '@/features/service-starter/evaluation-service';
 import { TASKS_STATUS_MAP } from '@/features/tasks/config/mappers';
+import { formatDate } from '@/features/tasks/lib/date-helpers';
 import { useQuery } from '@tanstack/react-query';
 
 interface EvaluationDataProps {
+  baselineId?: string;
   evaluationId: string;
+  modelId?: string;
+}
+interface EvaluationStatusResponseWithDatasets {
+  baseline_metrics?: null | Record<string, unknown>;
+  baseline_model_tag?: null | string;
+  created_at: string;
+  end_date?: null | string;
+  error_msg?: null | string;
+  evaluation_dataset_ids?: string[];
+  evaluation_metrics?: null | Record<string, unknown>;
+  evaluation_summary?: null | string;
+  model_tag?: null | string;
+  progress: number;
+  status: string;
+  task_id: string;
+  updated_at: string;
 }
 
-export const EvaluationData = ({ evaluationId }: EvaluationDataProps) => {
+export const EvaluationData = ({
+  baselineId,
+  evaluationId,
+  modelId,
+}: EvaluationDataProps) => {
   const {
     data: status,
     error,
@@ -27,6 +49,12 @@ export const EvaluationData = ({ evaluationId }: EvaluationDataProps) => {
       <div className="text-destructive">Error loading evaluation status</div>
     );
   }
+
+  // Debug: Log das gesamte status-Objekt und dataset_info
+  console.log('EvaluationData status:', status);
+  console.log('EvaluationData dataset_info:', status.dataset_info);
+
+  const statusWithDatasets = status as EvaluationStatusResponseWithDatasets;
 
   return (
     <div className="space-y-4">
@@ -57,7 +85,7 @@ export const EvaluationData = ({ evaluationId }: EvaluationDataProps) => {
             </div>
             <div>
               <span className="font-semibold">Created at:</span>{' '}
-              {status.created_at.slice(0, 16)}
+              {formatDate(status.created_at)}
             </div>
             {status.evaluation_summary && (
               <div>
@@ -68,7 +96,7 @@ export const EvaluationData = ({ evaluationId }: EvaluationDataProps) => {
             {status.end_date && (
               <div>
                 <span className="font-semibold">End date:</span>{' '}
-                {status.end_date}
+                {formatDate(status.end_date)}
               </div>
             )}
           </div>
@@ -76,58 +104,58 @@ export const EvaluationData = ({ evaluationId }: EvaluationDataProps) => {
 
         {/* Right column - Model and Dataset information in cards */}
         <div className="space-y-3">
-          {status.model_tag && (
+          {baselineId && (
             <a
               className="border-border bg-card text-card-foreground hover:bg-accent hover:text-accent-foreground block rounded-lg border p-3 transition-colors"
-              href={`/model/${status.model_tag}`}
-            >
-              <div className="text-muted-foreground mb-1 text-xs font-medium">
-                Model
-              </div>
-              <div className="text-sm font-medium break-all">
-                {status.model_tag.length > 60
-                  ? `${status.model_tag.slice(0, 60)}...`
-                  : status.model_tag}
-              </div>
-            </a>
-          )}
-          {status.baseline_model_tag && (
-            <a
-              className="border-border bg-card text-card-foreground hover:bg-accent hover:text-accent-foreground block rounded-lg border p-3 transition-colors"
-              href={`/model/${status.baseline_model_tag}`}
+              href={`/model/${baselineId}`}
             >
               <div className="text-muted-foreground mb-1 text-xs font-medium">
                 Baseline Model
               </div>
               <div className="text-sm font-medium break-all">
-                {status.baseline_model_tag.length > 60
-                  ? `${status.baseline_model_tag.slice(0, 60)}...`
-                  : status.baseline_model_tag}
+                {String(baselineId).length > 60
+                  ? `${String(baselineId).slice(0, 60)}...`
+                  : String(baselineId)}
               </div>
             </a>
           )}
-          {status.dataset_info && (
+          {modelId && (
+            <a
+              className="border-border bg-card text-card-foreground hover:bg-accent hover:text-accent-foreground block rounded-lg border p-3 transition-colors"
+              href={`/model/${modelId}`}
+            >
+              <div className="text-muted-foreground mb-1 text-xs font-medium">
+                Model
+              </div>
+              <div className="text-sm font-medium break-all">
+                {String(modelId).length > 60
+                  ? `${String(modelId).slice(0, 60)}...`
+                  : String(modelId)}
+              </div>
+            </a>
+          )}
+          {statusWithDatasets.evaluation_dataset_ids &&
+          Array.isArray(statusWithDatasets.evaluation_dataset_ids) &&
+          statusWithDatasets.evaluation_dataset_ids.length > 0 ? (
             <div className="space-y-2">
-              {status.dataset_info.split(',').map((id: string) => {
-                const trimmed = id.trim();
-                const cleanId = trimmed.replace(/^Dataset:\s*/, '');
-                return (
-                  <a
-                    className="border-border bg-card text-card-foreground hover:bg-accent hover:text-accent-foreground block rounded-lg border p-3 transition-colors"
-                    href={`/dataset/${cleanId}`}
-                    key={trimmed}
-                  >
-                    <div className="text-muted-foreground mb-1 text-xs font-medium">
-                      Dataset
-                    </div>
-                    <div className="text-sm font-medium break-all">
-                      {cleanId.length > 60
-                        ? `${cleanId.slice(0, 60)}...`
-                        : cleanId}
-                    </div>
-                  </a>
-                );
-              })}
+              {statusWithDatasets.evaluation_dataset_ids.map((id: string) => (
+                <a
+                  className="border-border bg-card text-card-foreground hover:bg-accent hover:text-accent-foreground block rounded-lg border p-3 transition-colors"
+                  href={`/dataset/${id}`}
+                  key={id}
+                >
+                  <div className="text-muted-foreground mb-1 text-xs font-medium">
+                    Dataset
+                  </div>
+                  <div className="text-sm font-medium break-all">
+                    {id.length > 60 ? `${id.slice(0, 60)}...` : id}
+                  </div>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <div className="text-muted-foreground">
+              Kein Datensatz verknüpft
             </div>
           )}
         </div>

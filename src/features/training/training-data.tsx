@@ -1,22 +1,41 @@
 import { fetchTrainingById } from '@/features/service-starter/training-service';
 import { TASKS_STATUS_MAP } from '@/features/tasks/config/mappers';
+import { formatDate } from '@/features/tasks/lib/date-helpers';
 import { useQuery } from '@tanstack/react-query';
-import { TrainingTaskList } from './training-task-list';
 
 interface TrainingDataProps {
   trainingId: string;
 }
 
 export const TrainingData = ({ trainingId }: TrainingDataProps) => {
-  const {
-    data: status,
-    error,
-    isLoading,
-  } = useQuery({
+  const { data, error, isLoading } = useQuery({
     enabled: !!trainingId,
     queryFn: () => fetchTrainingById(trainingId),
     queryKey: ['training-status', trainingId],
   });
+
+  // Add a type assertion for the data to ensure type safety
+  const status = data;
+
+  const statusWithDatasets = status
+    ? (status as typeof status & { train_dataset_ids?: string | string[] })
+    : undefined;
+  let trainDatasetIds: string[] = [];
+  if (statusWithDatasets) {
+    if (Array.isArray(statusWithDatasets.train_dataset_ids)) {
+      trainDatasetIds = statusWithDatasets.train_dataset_ids;
+    } else if (
+      typeof statusWithDatasets.train_dataset_ids === 'string' &&
+      statusWithDatasets.train_dataset_ids
+    ) {
+      trainDatasetIds = [statusWithDatasets.train_dataset_ids];
+    }
+  }
+
+  const statusWithBaseline = status as typeof status & {
+    baseline_model_id?: string;
+  };
+  const statusWithCreated = status as typeof status & { created_at?: string };
 
   if (isLoading) {
     return (
@@ -50,16 +69,10 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
                 ].label || status.status}
               </span>
             </div>
-            {status.started_at && (
+            {statusWithCreated.created_at && (
               <div>
-                <span className="font-semibold">Started at:</span>{' '}
-                {new Date(status.started_at).toLocaleString()}
-              </div>
-            )}
-            {status.finished_at && (
-              <div>
-                <span className="font-semibold">Finished at:</span>{' '}
-                {new Date(status.finished_at).toLocaleString()}
+                <span className="font-semibold">Created at:</span>{' '}
+                {formatDate(statusWithCreated.created_at)}
               </div>
             )}
             {typeof status.epoch === 'number' && (
@@ -91,7 +104,28 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
                   Trained Model ID
                 </div>
                 <div className="text-sm font-medium break-all">
-                  {status.trained_model_id}
+                  <a
+                    className="text-primary hover:text-primary/80 underline"
+                    href={`/model/${encodeURIComponent(status.trained_model_id)}`}
+                  >
+                    {status.trained_model_id}
+                  </a>
+                </div>
+              </div>
+            )}
+          {typeof statusWithBaseline.baseline_model_id === 'string' &&
+            statusWithBaseline.baseline_model_id && (
+              <div className="border-border bg-card text-card-foreground rounded-lg border p-4">
+                <div className="text-muted-foreground mb-1 text-xs font-medium">
+                  Base Model ID
+                </div>
+                <div className="text-sm font-medium break-all">
+                  <a
+                    className="text-primary hover:text-primary/80 underline"
+                    href={`/model/${encodeURIComponent(statusWithBaseline.baseline_model_id)}`}
+                  >
+                    {statusWithBaseline.baseline_model_id}
+                  </a>
                 </div>
               </div>
             )}
@@ -107,12 +141,22 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
           )}
           <div className="border-border bg-card text-card-foreground rounded-lg border p-4">
             <div className="text-muted-foreground mb-1 text-xs font-medium">
-              Validation Dataset Path
+              Training Dataset(s)
             </div>
-            <div className="text-sm font-medium break-all">
-              {typeof status.validation_dataset_path === 'string' &&
-              status.validation_dataset_path ? (
-                status.validation_dataset_path
+            <div
+              className="flex flex-col gap-1 overflow-y-auto text-sm font-medium break-all"
+              style={{ maxHeight: '8.5em' }}
+            >
+              {trainDatasetIds.length > 0 ? (
+                trainDatasetIds.map((id: string) => (
+                  <a
+                    className="text-primary hover:text-primary/80 underline"
+                    href={`/dataset/${encodeURIComponent(id)}`}
+                    key={id}
+                  >
+                    {id}
+                  </a>
+                ))
               ) : (
                 <span className="text-muted-foreground">None specified</span>
               )}
@@ -178,17 +222,6 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
         <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-red-800">
           <h3 className="mb-2 text-lg font-semibold text-red-900">Error</h3>
           <p className="text-sm">{status.error}</p>
-        </div>
-      )}
-
-      {/* Training History Section */}
-      {status.model_tag && (
-        <div className="border-border bg-card text-card-foreground rounded-lg border p-6">
-          <h3 className="mb-4 text-lg font-semibold">Training History</h3>
-          <TrainingTaskList
-            currentTrainingId={status.id}
-            modelTag={status.model_tag}
-          />
         </div>
       )}
     </div>
