@@ -1,6 +1,5 @@
 import { client } from '@/lib/client';
 import { getBackendErrorMessage } from '@/lib/error-utils';
-// --- Media Synthesis Endpoints ---
 
 // Response from the /synthetic/media endpoint (media upload for synthesis)
 export interface SyntheticMediaResponse {

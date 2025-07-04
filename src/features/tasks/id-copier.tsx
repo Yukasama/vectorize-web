@@ -13,8 +13,8 @@ export const IdCopier = ({ taskId }: { taskId: string }) => {
       await navigator.clipboard.writeText(taskId);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
-    } catch (error) {
-      console.error('Failed to copy ID', error);
+    } catch {
+      // Clipboard write failed, do nothing
     }
   };
 

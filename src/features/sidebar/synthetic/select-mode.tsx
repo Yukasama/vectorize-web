@@ -4,6 +4,10 @@ import { DatasetList } from '@/features/service-starter/select-dataset/dataset-l
 import React from 'react';
 import type { Dataset } from '../services/dataset-service';
 
+/**
+ * SelectMode provides UI for searching and selecting datasets in grid or table view.
+ * Includes search input, view toggle, and dataset list display.
+ */
 interface SelectModeProps {
   handleSelect: (dataset: Dataset) => void;
   localSelectedDatasets: Dataset[];
@@ -25,6 +29,7 @@ export const SelectMode = ({
     <div className="p-2">
       <div className="mb-2">
         <div className="flex items-center gap-2">
+          {/* Search input for datasets */}
           <Input
             className="w-full"
             onChange={(e) => setSearch(e.target.value)}
@@ -32,6 +37,7 @@ export const SelectMode = ({
             value={search}
           />
           <div className="flex-shrink-0">
+            {/* View toggle buttons */}
             <Button
               onClick={() => setView('grid')}
               size="sm"
@@ -51,6 +57,7 @@ export const SelectMode = ({
           </div>
         </div>
       </div>
+      {/* Dataset list with scrollable area */}
       <div className="max-h-60 overflow-y-auto">
         <div className="px-0 py-3">
           <DatasetList

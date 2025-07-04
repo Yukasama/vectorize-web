@@ -30,6 +30,10 @@ import {
 import { DatasetDetailsHoverCard } from './dataset-details';
 import { DatasetOptions } from './dataset-options';
 
+/**
+ * DatasetListItem displays a single dataset in the sidebar, supporting rename and hover details.
+ * Handles edit state, saving, and error feedback for renaming.
+ */
 const DatasetListItem = ({ dataset }: { dataset: Dataset }) => {
   const queryClient = useQueryClient();
   const [edit, setEdit] = useState(false);
@@ -37,7 +41,12 @@ const DatasetListItem = ({ dataset }: { dataset: Dataset }) => {
   const [saving, setSaving] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  /**
+   * Save the new dataset name if changed and valid.
+   * Handles backend version check and error feedback.
+   */
   const handleSave = async () => {
+    // Prevent saving if name is unchanged or empty
     if (!newName.trim() || newName === dataset.name) {
       setEdit(false);
       setNewName(dataset.name);
@@ -45,17 +54,20 @@ const DatasetListItem = ({ dataset }: { dataset: Dataset }) => {
     }
     setSaving(true);
     try {
+      // Ensure dataset version is present before updating (required by backend)
       if (dataset.version === undefined) {
         throw new Error('Missing dataset version');
       }
+      // Attempt to update the dataset name
       await updateDataset(dataset.id, newName.trim(), dataset.version);
       setEdit(false);
+      // Invalidate dataset queries to refresh sidebar after rename
       void queryClient.invalidateQueries({
         exact: false,
         queryKey: ['datasets'],
       });
-    } catch (error) {
-      console.error('Error renaming dataset:', error);
+    } catch {
+      // Show user-friendly error if renaming fails
       toast.error('Error renaming dataset');
     } finally {
       setSaving(false);
@@ -67,6 +79,7 @@ const DatasetListItem = ({ dataset }: { dataset: Dataset }) => {
       <div className="flex w-full min-w-0 items-center">
         <HoverCard>
           <HoverCardTrigger asChild>
+            {/* Show input for editing or static name for viewing */}
             {edit ? (
               <SidebarListItemName
                 edit={edit}
@@ -93,16 +106,22 @@ const DatasetListItem = ({ dataset }: { dataset: Dataset }) => {
               </Link>
             )}
           </HoverCardTrigger>
+          {/* Show dataset details in hover card */}
           <HoverCardContent align="start" className="w-96" side="top">
             <DatasetDetailsHoverCard datasetId={dataset.id} />
           </HoverCardContent>
         </HoverCard>
+        {/* Options menu for dataset actions */}
         <DatasetOptions dataset={dataset} setEdit={setEdit} />
       </div>
     </SidebarMenuSubItem>
   );
 };
 
+/**
+ * DatasetList displays all datasets in a collapsible sidebar section.
+ * Supports search, pagination, and error/loading states.
+ */
 export const DatasetList = () => {
   const [datasetSearch, setDatasetSearch] = useState('');
   const [open, setOpen] = useState(true);
@@ -132,12 +151,15 @@ export const DatasetList = () => {
     }
   }, [data]);
 
+  // Filter datasets by search string
   const filteredDatasets = allDatasets.filter((dataset) =>
     dataset.name.toLowerCase().includes(datasetSearch.toLowerCase()),
   );
 
+  // Limit visible datasets for pagination
   const visibleDatasets = filteredDatasets.slice(0, visibleCount);
 
+  // Show loading skeletons while fetching
   if (isLoading) {
     return (
       <SidebarMenu>
@@ -159,6 +181,7 @@ export const DatasetList = () => {
     );
   }
 
+  // Show error message if fetching fails
   if (error) {
     return (
       <SidebarMenu>

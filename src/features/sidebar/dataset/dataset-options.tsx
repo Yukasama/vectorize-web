@@ -6,6 +6,10 @@ import { toast } from 'sonner';
 import type { Dataset } from '../services/dataset-service';
 import { ConfirmDeleteDialog } from './confirm-delete-dialog';
 
+/**
+ * DatasetOptions provides rename and delete actions for a dataset in the sidebar.
+ * Handles confirmation dialog, deletion, and error/success feedback.
+ */
 interface DatasetListOptionsProps {
   dataset: Dataset;
   onDeleted?: (id: string) => void;
@@ -20,6 +24,9 @@ export const DatasetOptions = ({
   const queryClient = useQueryClient();
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
+  /**
+   * Handles dataset deletion with confirmation dialog and feedback.
+   */
   const handleDelete = async () => {
     const success = await import('../services/dataset-service').then((m) =>
       m.deleteDataset(dataset.id),

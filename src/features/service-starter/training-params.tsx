@@ -1,5 +1,7 @@
 'use client';
 
+// TrainingParamsStep allows users to configure and start a model training task.
+// Handles parameter input, validation, error display, and triggers training via service call.
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useQueryClient } from '@tanstack/react-query';
@@ -16,6 +18,7 @@ interface TrainingParamsStepProps {
   setTrainingParams: (params: { batchSize: number; epochs: number }) => void;
   trainingParams: { batchSize: number; epochs: number };
 }
+
 export const TrainingParamsStep = ({
   onBack,
   onReset,
@@ -24,6 +27,7 @@ export const TrainingParamsStep = ({
   setTrainingParams,
   trainingParams,
 }: TrainingParamsStepProps) => {
+  // State for form fields and UI feedback
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
   const queryClient = useQueryClient();
@@ -55,6 +59,7 @@ export const TrainingParamsStep = ({
   const [timeoutSeconds, setTimeoutSeconds] = useState<'' | number>('');
   const [valDatasetId, setValDatasetId] = useState<string>('');
 
+  // Handles starting the training process
   const handleStart = async () => {
     setIsSubmitting(true);
     setError(undefined);
@@ -90,6 +95,7 @@ export const TrainingParamsStep = ({
         warmup_steps: warmupSteps === '' ? undefined : Number(warmupSteps),
         weight_decay: weightDecay === '' ? undefined : Number(weightDecay),
       });
+      // Show success toast and refresh tasks
       const { toast } = await import('sonner');
       toast.success('Training started!');
       void queryClient.invalidateQueries({ exact: false, queryKey: ['tasks'] });
@@ -116,6 +122,7 @@ export const TrainingParamsStep = ({
 
       onReset();
     } catch (error_) {
+      // Robust error handling with user-friendly message
       const err: {
         message?: string;
         response?: { data?: { message?: string } };
@@ -129,7 +136,7 @@ export const TrainingParamsStep = ({
     }
   };
 
-  // Update parent state on param change
+  // Keep parent state in sync with local changes
   React.useEffect(() => {
     setTrainingParams({
       batchSize:
@@ -508,6 +515,7 @@ export const TrainingParamsStep = ({
           </div>
         </div>
       </div>
+      {/* Display error message if present */}
       {error && <div className="mt-4 text-red-500">{error}</div>}
       <div className="mt-6 flex gap-2">
         <Button disabled={isSubmitting} onClick={onBack} variant="outline">

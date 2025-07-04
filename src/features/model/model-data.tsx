@@ -27,6 +27,7 @@ const getSourceDisplayName = (source: string): string => {
 };
 
 export const ModelData = ({ modelId, modelTag }: ModelDataProps) => {
+  // Fetch model details using React Query
   const {
     data: model,
     error,
@@ -38,15 +39,19 @@ export const ModelData = ({ modelId, modelTag }: ModelDataProps) => {
   });
 
   if (isLoading) {
+    // Show loading state while fetching model data
     return <div className="text-muted-foreground">Loading model data...</div>;
   }
   if (error) {
+    // Show error state if model data could not be loaded
     return <div className="text-destructive">Error loading model data</div>;
   }
   if (!model) {
+    // Show message if model is not found
     return <div className="text-destructive">Model not found</div>;
   }
 
+  // Truncate long model name and tag for display
   const truncatedName =
     model.name && model.name.length > 50
       ? `${model.name.slice(0, 50)}...`

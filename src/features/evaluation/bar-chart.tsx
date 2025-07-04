@@ -20,6 +20,7 @@ export const EvaluationScatterChart = ({
   baselineMetrics,
   evaluationMetrics,
 }: BarChartProps) => {
+  // Show message if no metrics are available
   if (!evaluationMetrics && !baselineMetrics) {
     return (
       <Card className="mt-4">
@@ -35,6 +36,7 @@ export const EvaluationScatterChart = ({
     );
   }
 
+  // Show comparison chart if both evaluation and baseline metrics are available
   if (evaluationMetrics && baselineMetrics) {
     const keys = Object.keys(evaluationMetrics).filter(
       (k) =>
@@ -88,6 +90,7 @@ export const EvaluationScatterChart = ({
     );
   }
 
+  // Show chart for evaluation metrics only
   if (evaluationMetrics) {
     const keys = Object.keys(evaluationMetrics).filter(
       (k) => k !== 'num_samples' && typeof evaluationMetrics[k] === 'number',
@@ -136,6 +139,7 @@ export const EvaluationScatterChart = ({
     );
   }
 
+  // Show chart for baseline metrics only
   if (baselineMetrics) {
     const keys = Object.keys(baselineMetrics).filter(
       (k) => k !== 'num_samples' && typeof baselineMetrics[k] === 'number',

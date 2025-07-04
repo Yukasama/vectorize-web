@@ -25,6 +25,10 @@ import { ModelList } from './model/model-list';
 import { ModelUpload } from './model/model-upload';
 import { SyntheticGenerateDialog } from './synthetic/synthetic-generate-dialog';
 
+/**
+ * Sidebar for navigation, upload, and synthetic dataset actions.
+ * Includes model/dataset lists and upload dialogs.
+ */
 export const AppSidebar = () => {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [tab, setTab] = useState<'dataset' | 'model'>('model');

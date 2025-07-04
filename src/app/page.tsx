@@ -19,12 +19,13 @@ import { useState } from 'react';
 import { ServiceStarter } from '../features/service-starter/service-starter';
 
 export default function Page() {
+  // State for the current step in the workflow (0: model, 1: dataset, 2: service)
   const [step, setStep] = useState(0);
 
-  // Breadcrumbs: 0 = model, 1 = dataset, 2 = service
   const getBreadcrumbColor = (idx: number) =>
     step === idx ? 'text-foreground font-semibold' : 'text-muted-foreground';
 
+  // Handle breadcrumb navigation: only allow going back to previous steps
   const handleBreadcrumbClick = (targetStep: number) => {
     if (targetStep < step) {
       setStep(targetStep);
@@ -42,6 +43,7 @@ export default function Page() {
               className="mr-2 data-[orientation=vertical]:h-4"
               orientation="vertical"
             />
+            {/* Breadcrumb navigation for workflow steps */}
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
@@ -92,9 +94,11 @@ export default function Page() {
         </header>
         <div className="flex h-[calc(100dvh-4rem)] flex-col">
           <div className="grid h-full min-h-0 w-full gap-4 p-4 md:grid-cols-[1fr_320px]">
+            {/* Main workflow area: ServiceStarter controls the step logic */}
             <div className="bg-muted/50 flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border-2 border-transparent shadow-lg transition-colors">
               <ServiceStarter setStep={setStep} step={step} />
             </div>
+            {/* Task list area */}
             <div className="h-full min-h-0">
               <TaskList />
             </div>

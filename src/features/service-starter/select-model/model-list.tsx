@@ -18,12 +18,15 @@ interface ModelListProps {
   view: 'grid' | 'table';
 }
 
+// ModelList component displays a list of models in either grid or table view.
+// It supports searching, selection, and handles loading/error states.
 export const ModelList = ({
   onSelect,
   search,
   selectedModel,
   view,
 }: ModelListProps) => {
+  // Fetch all models using React Query
   const {
     data: models = [],
     error,
@@ -33,21 +36,26 @@ export const ModelList = ({
     queryKey: ['models'],
   });
 
+  // Filter models by search string (case-insensitive)
   const filteredModels = models.filter((m) =>
     m.name.toLowerCase().includes(search.toLowerCase()),
   );
 
+  // Show loading state while fetching models
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">Loading...</div>
     );
   }
+  // Show error state if fetching models fails
   if (error) {
     return <div className="text-red-500">Error loading models.</div>;
   }
+  // Show message if no models match the search
   if (filteredModels.length === 0) {
     return <div className="text-muted-foreground p-4">No models found.</div>;
   }
+  // Render models in grid view
   if (view === 'grid') {
     return (
       <div className="grid grid-cols-4 gap-4 px-4 py-3">
@@ -62,6 +70,7 @@ export const ModelList = ({
               onClick={() => onSelect(model)}
             >
               <p className="text-sm font-medium">
+                {/* Truncate long model names for display */}
                 {model.name.length > 17
                   ? model.name.slice(0, 17) + '...'
                   : model.name}
@@ -75,6 +84,7 @@ export const ModelList = ({
       </div>
     );
   }
+  // Render models in table view
   return (
     <Table className="px-0 py-3">
       <TableHeader>
@@ -89,6 +99,7 @@ export const ModelList = ({
           return (
             <TableRow key={model.model_tag}>
               <TableCell>
+                {/* Truncate long model names for display */}
                 {model.name.length > 17
                   ? model.name.slice(0, 17) + '...'
                   : model.name}

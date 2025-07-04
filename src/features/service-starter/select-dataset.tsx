@@ -5,6 +5,10 @@ import { DatasetList } from './select-dataset/dataset-list';
 import { DatasetListFooter } from './select-dataset/select-dataset-footer';
 import { DatasetListHeader } from './select-dataset/select-dataset-header';
 
+/**
+ * SelectDataset component allows users to search, select, and review datasets for a workflow step.
+ * Handles local selection state, search, and view mode (grid/table), and passes selected datasets to parent on next.
+ */
 export const SelectDataset = ({
   initialSelectedDatasets = [],
   onBack,
@@ -16,12 +20,16 @@ export const SelectDataset = ({
   onNext?: () => void;
   setSelectedDatasets: (datasets: Dataset[]) => void;
 }) => {
+  // Search string for filtering datasets
   const [search, setSearch] = useState('');
+  // View mode: grid or table
   const [view, setView] = useState<'grid' | 'table'>('grid');
+  // Local state for selected datasets
   const [localSelectedDatasets, setLocalSelectedDatasets] = useState<Dataset[]>(
     initialSelectedDatasets,
   );
 
+  // Toggle selection of a dataset
   const handleSelect = (dataset: Dataset) => {
     if (localSelectedDatasets.some((d) => d.id === dataset.id)) {
       setLocalSelectedDatasets(
@@ -32,6 +40,7 @@ export const SelectDataset = ({
     }
   };
 
+  // Pass selected datasets to parent and trigger next step
   const handleNext = () => {
     setSelectedDatasets(localSelectedDatasets);
     if (onNext) {

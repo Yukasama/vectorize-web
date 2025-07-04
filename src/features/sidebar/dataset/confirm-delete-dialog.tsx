@@ -10,6 +10,10 @@ import {
 } from '@/components/ui/dialog';
 import * as React from 'react';
 
+/**
+ * Dialog component to confirm deletion of a dataset.
+ * Shows a warning and requires user confirmation before proceeding.
+ */
 interface ConfirmDeleteDialogProps {
   datasetName: string;
   onCancel?: () => void;
@@ -17,9 +21,6 @@ interface ConfirmDeleteDialogProps {
   open?: boolean;
 }
 
-/**
- * Dialog component to confirm deletion of a dataset.
- */
 export const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
   datasetName,
   onCancel,

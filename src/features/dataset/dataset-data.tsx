@@ -8,6 +8,7 @@ interface DatasetDataProps {
 }
 
 export const DatasetData = ({ datasetId }: DatasetDataProps) => {
+  // Fetch dataset details using React Query
   const {
     data: dataset,
     error,
@@ -19,11 +20,13 @@ export const DatasetData = ({ datasetId }: DatasetDataProps) => {
   });
 
   if (isLoading) {
+    // Show loading state while fetching dataset details
     return (
       <div className="text-muted-foreground">Loading dataset details...</div>
     );
   }
   if (error || !dataset) {
+    // Show error state if dataset could not be loaded
     return (
       <div className="text-destructive">Error loading dataset details</div>
     );

@@ -1,11 +1,13 @@
-'use client';
-
 import { DetailsHoverCard } from '@/components/ui/details-hover-card';
 import { fetchDatasetById } from '@/features/sidebar/services/dataset-service';
 import { formatRelativeDate } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import * as React from 'react';
 
+/**
+ * DatasetDetailsHoverCard displays dataset details in a hover card.
+ * Fetches dataset info by ID and provides copy-to-clipboard functionality.
+ */
 export const DatasetDetailsHoverCard = ({
   datasetId,
 }: {
@@ -18,6 +20,7 @@ export const DatasetDetailsHoverCard = ({
     queryKey: ['dataset', datasetId],
   });
 
+  // Handles copying the dataset ID to clipboard
   const handleCopy = (id: string) => {
     void navigator.clipboard.writeText(id);
     setCopied(true);

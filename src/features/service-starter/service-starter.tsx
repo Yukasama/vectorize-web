@@ -3,10 +3,14 @@ import { useState } from 'react';
 import type { Dataset } from '../sidebar/services/dataset-service';
 import type { Model } from '../sidebar/services/model-service';
 import { EvaluationParamsStep } from './evaluation-params';
-import { TrainingParamsStep } from './params-list';
 import { SelectDataset } from './select-dataset';
 import { SelectModel } from './select-model';
+import { TrainingParamsStep } from './training-params';
 
+/**
+ * ServiceStarter manages the multi-step workflow for starting training or evaluation services.
+ * Handles step navigation, mode switching, and state for selected model, datasets, and parameters.
+ */
 export const ServiceStarter = ({
   setStep,
   step,
@@ -14,6 +18,7 @@ export const ServiceStarter = ({
   setStep: (step: number) => void;
   step: number;
 }) => {
+  // State for selected model, datasets, and parameters
   const [selectedModel, setSelectedModel] = useState<Model | undefined>();
   const [selectedDatasets, setSelectedDatasets] = useState<Dataset[]>([]);
   const [trainingParams, setTrainingParams] = useState<{
@@ -25,8 +30,10 @@ export const ServiceStarter = ({
     maxSamples: number;
   }>({ maxSamples: 1000 });
 
+  // Mode: 'training' or 'evaluation'
   const [mode, setMode] = useState<'evaluation' | 'training'>('training');
 
+  // Reset all workflow state and return to first step
   const handleReset = () => {
     setStep(0);
     setSelectedModel(undefined);
@@ -37,6 +44,7 @@ export const ServiceStarter = ({
   return (
     <div className="flex h-full flex-col overflow-hidden">
       <div className="flex-1 overflow-y-auto p-6">
+        {/* Step 0: Select model */}
         {step === 0 && (
           <SelectModel
             initialSelectedModel={selectedModel}
@@ -44,6 +52,7 @@ export const ServiceStarter = ({
             setSelectedModel={setSelectedModel}
           />
         )}
+        {/* Step 1: Select dataset(s) */}
         {step === 1 && (
           <SelectDataset
             initialSelectedDatasets={selectedDatasets}
@@ -52,6 +61,7 @@ export const ServiceStarter = ({
             setSelectedDatasets={setSelectedDatasets}
           />
         )}
+        {/* Step 2: Configure training or evaluation parameters */}
         {step === 2 && (
           <Tabs
             className="w-full"

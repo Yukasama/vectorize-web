@@ -1,6 +1,5 @@
 import { client } from '@/lib/client';
 import { getBackendErrorMessage } from '@/lib/error-utils';
-import { messages } from '@/lib/messages';
 import { isAxiosError } from 'axios';
 
 /**
@@ -40,7 +39,6 @@ export const updateDataset = async (
     await client.put(`/datasets/${id}`, { name }, { headers });
   } catch (error) {
     const errorMessage = getBackendErrorMessage(error);
-    console.error(`Error updating dataset: ${errorMessage}`, error);
     throw new Error(errorMessage);
   }
 };
@@ -70,15 +68,10 @@ export const fetchDatasets = async (
       isAxiosError(error) &&
       (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED')
     ) {
-      console.warn('Backend not reachable - returning empty datasets list');
       return { items: [], total: 0 };
     }
 
     const errorMessage = getBackendErrorMessage(error);
-    console.error(
-      `${messages.dataset.general.unknownError}: ${errorMessage}`,
-      error,
-    );
     throw new Error(errorMessage);
   }
 };
@@ -116,15 +109,10 @@ export const fetchAllDatasets = async (): Promise<Dataset[]> => {
       isAxiosError(error) &&
       (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED')
     ) {
-      console.warn('Backend not reachable - returning empty datasets list');
       return [];
     }
 
     const errorMessage = getBackendErrorMessage(error);
-    console.error(
-      `${messages.dataset.general.unknownError}: ${errorMessage}`,
-      error,
-    );
     throw new Error(errorMessage);
   }
 };
@@ -140,10 +128,6 @@ export const fetchDatasetById = async (
     return data;
   } catch (error) {
     const errorMessage = getBackendErrorMessage(error);
-    console.error(
-      `${messages.dataset.general.unknownError}: ${errorMessage}`,
-      error,
-    );
     throw new Error(errorMessage);
   }
 };
@@ -157,7 +141,6 @@ export const deleteDataset = async (id: string): Promise<boolean> => {
     return true;
   } catch (error) {
     const errorMessage = getBackendErrorMessage(error);
-    console.error(`${messages.dataset.delete.error}: ${errorMessage}`, error);
     throw new Error(errorMessage);
   }
 };

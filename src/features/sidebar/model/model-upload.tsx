@@ -173,10 +173,13 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
     setUploading(true);
     try {
       let uploaded = false;
+      // Try local file upload first
       uploaded = await uploadSelectedFile();
+      // If not uploaded, try GitHub upload
       if (!uploaded) {
         uploaded = await uploadFromGithub();
       }
+      // If not uploaded, try Hugging Face upload
       if (!uploaded) {
         uploaded = await uploadFromHuggingFace();
       }
@@ -185,6 +188,7 @@ export const ModelUpload = ({ onSuccess }: ModelUploadProps) => {
         if (onSuccess) {
           onSuccess();
         }
+        // Invalidate tasks query to refresh sidebar after upload
         void queryClient.invalidateQueries({
           exact: false,
           queryKey: ['tasks'],

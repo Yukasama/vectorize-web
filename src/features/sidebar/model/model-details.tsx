@@ -7,6 +7,11 @@ import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import * as React from 'react';
 
+/**
+ * ModelDetailsHoverCardContent displays model details in a hover card.
+ * Fetches model info by ID and provides copy-to-clipboard for ID and tag.
+ * Shows source icon for GitHub, Hugging Face, or local models.
+ */
 export const ModelDetailsHoverCardContent = ({
   modelId,
 }: {
@@ -20,12 +25,14 @@ export const ModelDetailsHoverCardContent = ({
     queryKey: ['model', modelId],
   });
 
+  // Handles copying the model ID to clipboard
   const handleCopy = (id: string) => {
     void navigator.clipboard.writeText(id);
     setCopiedId(true);
     setTimeout(() => setCopiedId(false), 1200);
   };
 
+  // Handles copying the model tag to clipboard
   const handleCopyTag = (tag: string) => {
     void navigator.clipboard.writeText(tag);
     setCopiedTag(true);
@@ -46,6 +53,7 @@ export const ModelDetailsHoverCardContent = ({
       title={model?.name ?? ''}
       updatedAt={model?.updated_at ? formatRelativeDate(model.updated_at) : ''}
     >
+      {/* Show source icon for GitHub, Hugging Face, or local */}
       {model?.source === 'github' && (
         <Image
           alt="GitHub Logo"

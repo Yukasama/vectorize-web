@@ -3,7 +3,12 @@ import { Progress } from '@/components/ui/progress';
 import { X } from 'lucide-react';
 import React from 'react';
 
-// File upload state for synthetic media
+/**
+ * UploadMode component for synthetic dataset generation.
+ * Provides a drag-and-drop area and file input for uploading media or PDF files.
+ * Displays a list of selected files with upload progress and error/success status.
+ */
+
 export interface FileUploadState {
   done: boolean;
   error: boolean;
@@ -35,7 +40,7 @@ export const UploadMode = ({
   uploading,
 }: UploadModeProps) => (
   <div className="space-y-4">
-    {/* Drag-and-Drop Area */}
+    {/* Drag-and-Drop Area for file selection */}
     <button
       aria-label="Upload files by clicking or dragging"
       className={`flex h-44 min-h-[176px] w-full min-w-0 cursor-pointer items-center justify-center rounded border-2 border-dashed transition ${
@@ -83,7 +88,7 @@ export const UploadMode = ({
       />
     </button>
 
-    {/* File List with Progress */}
+    {/* File List with Progress and status */}
     {fileStates.length > 0 && (
       <div className="bg-muted rounded p-4">
         {fileStates.map((state) => (
@@ -100,6 +105,7 @@ export const UploadMode = ({
                 <span className="w-10 text-right text-xs">
                   {state.progress}%
                 </span>
+                {/* Show status for each file */}
                 {state.done && !state.error && (
                   <span className="ml-2 text-xs text-green-600">Done</span>
                 )}
@@ -108,7 +114,7 @@ export const UploadMode = ({
                 )}
               </div>
             </div>
-            {/* Remove file button */}
+            {/* Remove file button for each file */}
             <button
               className="ml-2 text-red-500 hover:text-red-700"
               disabled={uploading || !!taskId}

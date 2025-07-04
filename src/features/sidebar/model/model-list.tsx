@@ -30,6 +30,10 @@ import {
 import { ModelDetailsHoverCardContent } from './model-details';
 import { ModelListOptions } from './model-options';
 
+/**
+ * ModelListItem displays a single model in the sidebar, supporting rename and hover details.
+ * Handles edit state, saving, and error feedback for renaming.
+ */
 const ModelListItem = ({ model }: { readonly model: Model }) => {
   const queryClient = useQueryClient();
   const [edit, setEdit] = useState(false);
@@ -37,7 +41,12 @@ const ModelListItem = ({ model }: { readonly model: Model }) => {
   const [saving, setSaving] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  /**
+   * Save the new model name if changed and valid.
+   * Handles backend version check and error feedback.
+   */
   const handleSave = async () => {
+    // Prevent saving if name is unchanged or empty
     if (!newName.trim() || newName === model.name) {
       setEdit(false);
       setNewName(model.name);
@@ -47,12 +56,13 @@ const ModelListItem = ({ model }: { readonly model: Model }) => {
     try {
       await updateModelName(model.id, newName.trim(), model.version);
       setEdit(false);
+      // Invalidate model queries to refresh sidebar after rename
       void queryClient.invalidateQueries({
         exact: false,
         queryKey: ['models'],
       });
-    } catch (error) {
-      console.error('Error renaming model:', error);
+    } catch {
+      // Show user-friendly error if renaming fails
       toast.error('Error renaming model');
     } finally {
       setSaving(false);
@@ -64,6 +74,7 @@ const ModelListItem = ({ model }: { readonly model: Model }) => {
       <div className="flex w-full min-w-0 items-center">
         <HoverCard>
           <HoverCardTrigger asChild>
+            {/* Show input for editing or static name for viewing */}
             {edit ? (
               <SidebarListItemName
                 edit={edit}
@@ -90,16 +101,22 @@ const ModelListItem = ({ model }: { readonly model: Model }) => {
               </Link>
             )}
           </HoverCardTrigger>
+          {/* Show model details in hover card */}
           <HoverCardContent align="start" className="w-96" side="top">
             <ModelDetailsHoverCardContent modelId={model.id} />
           </HoverCardContent>
         </HoverCard>
+        {/* Options menu for model actions */}
         <ModelListOptions model={model} setEdit={setEdit} />
       </div>
     </SidebarMenuSubItem>
   );
 };
 
+/**
+ * ModelList displays all models in a collapsible sidebar section.
+ * Supports search, show more/less, and error/loading states.
+ */
 export const ModelList = () => {
   const [modelSearch, setModelSearch] = useState('');
   const [open, setOpen] = useState(true);
@@ -124,6 +141,7 @@ export const ModelList = () => {
     showMoreModels ? filteredModels.length : 5,
   );
 
+  // Show loading skeletons while fetching
   if (isLoading) {
     return (
       <SidebarMenu>
@@ -148,6 +166,7 @@ export const ModelList = () => {
     );
   }
 
+  // Show error message if fetching fails
   if (error) {
     return (
       <SidebarMenu>

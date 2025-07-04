@@ -14,8 +14,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 
 export default function DatasetDetailPage() {
+  // Get the dataset ID from the URL params
   const params = useParams();
   const datasetId = typeof params.id === 'string' ? params.id : '';
+  // Fetch dataset details using React Query
   const {
     data: dataset,
     error,
@@ -26,6 +28,7 @@ export default function DatasetDetailPage() {
     queryKey: ['dataset', datasetId],
   });
 
+  // Prepare the dataset name or status message for the header
   let datasetNameContent;
   if (isLoading) {
     datasetNameContent = (
@@ -40,6 +43,7 @@ export default function DatasetDetailPage() {
       <span className="text-destructive text-sm">Dataset not found</span>
     );
   } else if (dataset.name) {
+    // Truncate long dataset names for display
     const truncatedName =
       dataset.name.length > 50
         ? `${dataset.name.slice(0, 50)}...`
@@ -69,6 +73,7 @@ export default function DatasetDetailPage() {
         <Separator className="mb-4" />
         <main className="flex-1 p-8">
           <h1 className="mb-4 text-2xl font-bold">Dataset Details</h1>
+          {/* Render the main dataset details component */}
           <DatasetData datasetId={datasetId} />
         </main>
       </SidebarInset>

@@ -26,6 +26,7 @@ export const DatasetList = ({
   selectedDatasets,
   view,
 }: DatasetListProps) => {
+  // Fetch all datasets using React Query
   const {
     data: datasets = [],
     error,
@@ -35,18 +36,22 @@ export const DatasetList = ({
     queryKey: ['datasets'],
   });
 
+  // Filter datasets by search string
   const filteredDatasets = datasets.filter((d) =>
     d.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   let content;
   if (isLoading) {
+    // Show loading state while fetching datasets
     content = (
       <div className="flex items-center justify-center py-8">Loading...</div>
     );
   } else if (error) {
+    // Show error state if datasets could not be loaded
     content = <div className="text-red-500">Error loading datasets.</div>;
   } else if (view === 'grid') {
+    // Render datasets as a grid of cards
     content = (
       <div className="grid grid-cols-4 gap-4 px-4 py-3">
         {filteredDatasets.map((dataset) => {
@@ -71,6 +76,7 @@ export const DatasetList = ({
       </div>
     );
   } else {
+    // Render datasets as a table with checkboxes
     content = (
       <Table className="py-3">
         <TableHeader>

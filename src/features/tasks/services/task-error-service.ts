@@ -23,8 +23,7 @@ export const fetchTaskDetails = async (
     // Try the general tasks endpoint first
     const { data } = await client.get<TaskDetails>(`/tasks/${taskId}`);
     return data;
-  } catch (error) {
-    console.warn(`Failed to fetch task details for ${taskId}:`, error);
+  } catch {
     // Return a minimal fallback object
     return {
       created_at: new Date().toISOString(),
@@ -88,8 +87,7 @@ export const fetchTaskErrorDetails = async (
 
     const { data } = await client.get<TaskErrorDetails>(endpoint);
     return data;
-  } catch (error) {
-    console.warn(`Failed to fetch error details for task ${taskId}:`, error);
+  } catch {
     // Return a fallback object instead of undefined
     return {
       error_msg: undefined,

@@ -27,6 +27,7 @@ interface ModelTaskListProps {
 }
 
 export const ModelTaskList = ({ modelId, modelTag }: ModelTaskListProps) => {
+  // Fetch all tasks related to the given model
   const {
     data: tasks,
     error,
@@ -34,21 +35,15 @@ export const ModelTaskList = ({ modelId, modelTag }: ModelTaskListProps) => {
   } = useQuery({
     enabled: !!modelId,
     queryFn: async () => {
-      console.log(
-        '[ModelTaskList] Filtering tasks for model_id:',
-        modelId,
-        'model_tag:',
-        modelTag,
-      );
       const allTasks: TaskResponse['items'] = [];
 
-      // Trainings als Basismodell (korrekt: baseline_id)
+      // Fetch trainings where this model is the baseline
       const { data: baseTrainings } = await client.get<TaskResponse>(
         `/tasks?baseline_id=${modelId}&task_type=training`,
       );
       allTasks.push(...baseTrainings.items);
 
-      // Trainings als Ergebnis (kein direkter Filter, clientseitig filtern)
+      // Fetch all trainings and filter for those where this model is the result
       let allTrainings: TaskResponse = {
         items: [],
         limit: 0,
@@ -61,7 +56,7 @@ export const ModelTaskList = ({ modelId, modelTag }: ModelTaskListProps) => {
         );
         allTrainings = data;
       } catch {
-        // intentionally ignored
+        // Ignore errors for this optional fetch
       }
       allTasks.push(
         ...allTrainings.items.filter(
@@ -70,21 +65,15 @@ export const ModelTaskList = ({ modelId, modelTag }: ModelTaskListProps) => {
         ),
       );
 
-      // Evaluation als evaluiertes Modell (jetzt mit model_tag statt model_id)
+      // Fetch evaluations for this model (by tag)
       if (modelTag) {
         const { data: evalMain } = await client.get<TaskResponse>(
           `/tasks?tag=${modelTag}&task_type=evaluation`,
         );
-        console.log(
-          '[ModelTaskList] Evaluation (tag):',
-          evalMain.items.map((t: Task & { tag?: string }) => ({
-            id: t.id,
-            tag: t.tag,
-          })),
-        );
         allTasks.push(...evalMain.items);
       }
 
+      // Deduplicate and sort all tasks by creation date (descending)
       const uniqueTasks = allTasks.filter(
         (task, idx, self) => idx === self.findIndex((t) => t.id === task.id),
       );
@@ -100,12 +89,15 @@ export const ModelTaskList = ({ modelId, modelTag }: ModelTaskListProps) => {
   });
 
   if (isLoading) {
+    // Show loading state while fetching tasks
     return <div className="text-muted-foreground">Loading tasks...</div>;
   }
   if (error) {
+    // Show error state if tasks could not be loaded
     return <div className="text-destructive">Error loading tasks</div>;
   }
   if (tasks?.items.length === 0) {
+    // Show message if there are no tasks for this model
     return (
       <div className="text-muted-foreground">No tasks for this model.</div>
     );
@@ -126,6 +118,7 @@ export const ModelTaskList = ({ modelId, modelTag }: ModelTaskListProps) => {
         {tasks?.items.map((task) => (
           <TableRow key={task.id}>
             <TableCell className="font-mono text-xs">
+              {/* Render a link for evaluation/training tasks, otherwise just show the ID */}
               {(() => {
                 if (task.task_type === 'evaluation') {
                   return (

@@ -14,6 +14,11 @@ import { ChevronDown, ListFilter, X } from 'lucide-react';
 import { TASKS_TYPE_MAP } from './config/mappers';
 import { TaskType } from './types/task';
 
+/**
+ * Task type filter dropdown for task lists.
+ * Supports multi-select and clear-all actions.
+ */
+
 interface TypeFilterProps {
   onTypeChange: (types: TaskType[]) => void;
   selectedTypes: TaskType[];
@@ -23,6 +28,7 @@ export const TypeFilter = ({
   onTypeChange,
   selectedTypes,
 }: TypeFilterProps) => {
+  // Toggle a type in the selectedTypes array
   const handleTypeToggle = (type: TaskType) => {
     if (selectedTypes.includes(type)) {
       onTypeChange(selectedTypes.filter((t) => t !== type));
@@ -45,6 +51,7 @@ export const TypeFilter = ({
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>Filter by Type</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {/* Render a checkbox for each task type */}
         {Object.entries(TASKS_TYPE_MAP).map(([type, label]) => (
           <DropdownMenuCheckboxItem
             checked={selectedTypes.includes(type as TaskType)}
@@ -56,6 +63,7 @@ export const TypeFilter = ({
             </div>
           </DropdownMenuCheckboxItem>
         ))}
+        {/* Show clear-all button if any types are selected */}
         {selectedTypes.length > 0 && (
           <>
             <DropdownMenuSeparator />

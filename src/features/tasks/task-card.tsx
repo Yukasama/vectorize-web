@@ -12,6 +12,12 @@ import { formatDate, useDuration, useRelativeTime } from './lib/date-helpers';
 import { TaskErrorHoverCard } from './task-error-hover-card';
 import { Task } from './types/task';
 
+/**
+ * Card UI for displaying a single task with status, actions, and details.
+ * Supports click navigation and error/status display.
+ */
+
+// Returns the detail URL for a given task, or undefined if not applicable
 const getTaskDetailUrl = (task: Task): string | undefined => {
   switch (task.task_type) {
     case 'dataset_upload': {
@@ -24,11 +30,10 @@ const getTaskDetailUrl = (task: Task): string | undefined => {
       if (task.model_id) {
         return `/model/${task.model_id}`;
       }
-
+      // If only a tag is present, resolve model ID later
       if (task.tag) {
         return 'resolve-model-id';
       }
-
       return undefined;
     }
     case 'synthesis': {
@@ -43,7 +48,9 @@ const getTaskDetailUrl = (task: Task): string | undefined => {
   }
 };
 
+// Main card component for a single task
 export const TaskCard = ({ task }: { task: Task }) => {
+  // Calculate duration and relative time for display
   const duration = useDuration(
     task.created_at,
     task.task_status,
@@ -51,10 +58,13 @@ export const TaskCard = ({ task }: { task: Task }) => {
   );
   const relative = useRelativeTime(task.created_at);
 
+  // Get the detail URL and determine if the card is clickable
   const detailUrl = getTaskDetailUrl(task);
   const isClickable = !!detailUrl && task.task_status !== 'F';
 
+  // Handle click: navigate or resolve model ID if needed
   const handleClick = async (e: React.MouseEvent) => {
+    // Prevent navigation if clicking the ID copier
     if ((e.target as HTMLElement).closest('.id-copier')) {
       return;
     }
@@ -67,31 +77,24 @@ export const TaskCard = ({ task }: { task: Task }) => {
         task.tag
       ) {
         e.preventDefault();
-
         try {
-          console.log('🔍 Resolving model ID for tag:', task.tag);
-
+          // Normalize tag and fetch model by tag
           const normalizedTag = task.tag.replace('/', '_').replace('@main', '');
-          console.log('� Normalized tag:', normalizedTag);
-
           const model = await fetchModelByIdOrTag(normalizedTag);
-
           if (model?.id) {
-            console.log('✅ Found model with ID:', model.id);
             globalThis.location.href = `/model/${model.id}`;
-          } else {
-            console.log('⚠️ Model found but no ID available');
           }
-        } catch (error) {
-          console.error('❌ Failed to resolve model:', error);
+        } catch {
+          // Swallow error silently
         }
         return;
       }
-
+      // Navigate to detail URL
       globalThis.location.href = detailUrl;
     }
   };
 
+  // Card content: header, status, and meta info
   const cardContent = (
     <CardContent className="p-0.5">
       <div className="mb-3 flex flex-1 items-start justify-between">
@@ -114,6 +117,7 @@ export const TaskCard = ({ task }: { task: Task }) => {
               {TASKS_TYPE_MAP[task.task_type]}
             </Badge>
             <div className="translate-y-3">
+              {/* Status indicators for queue and running */}
               {task.task_status === 'Q' && (
                 <div className="flex items-center gap-1.5 text-xs text-amber-600">
                   <div className="flex gap-0.5">
@@ -141,6 +145,7 @@ export const TaskCard = ({ task }: { task: Task }) => {
         </div>
       </div>
 
+      {/* Status bar color based on task status */}
       <div
         className={cn(
           task.task_status === 'Q' && 'skeleton-amber',
@@ -151,8 +156,10 @@ export const TaskCard = ({ task }: { task: Task }) => {
         )}
       />
 
+      {/* Footer: status icon, duration, and creation date */}
       <div className="text-muted-foreground flex items-center justify-between border-t pt-2 text-sm">
         <div className="flex items-center gap-1">
+          {/* Status icon for done, failed, or running/queued */}
           {task.task_status === 'D' && (
             <Check className="mt-[1px] h-4 w-4 text-emerald-500" />
           )}
@@ -174,6 +181,7 @@ export const TaskCard = ({ task }: { task: Task }) => {
     </CardContent>
   );
 
+  // Render clickable button or static card based on status
   if (isClickable) {
     return (
       <button

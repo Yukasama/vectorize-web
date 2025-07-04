@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * Task status filter dropdown for task lists.
+ * Supports multi-select and clear-all actions.
+ */
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {

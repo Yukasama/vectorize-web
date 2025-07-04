@@ -51,10 +51,6 @@ export const EvaluationData = ({
     );
   }
 
-  // Debug: Log das gesamte status-Objekt und dataset_info
-  console.log('EvaluationData status:', status);
-  console.log('EvaluationData dataset_info:', status.dataset_info);
-
   const statusWithDatasets = status as EvaluationStatusResponseWithDatasets;
 
   return (

@@ -11,6 +11,11 @@ import { ReactNode } from 'react';
 import { fetchTaskErrorDetails } from './services/task-error-service';
 import { Task, TaskType } from './types/task';
 
+/**
+ * Hover card for showing error details of failed tasks.
+ * Fetches and displays error info on hover for failed tasks.
+ */
+
 interface TaskErrorHoverCardProps {
   children: ReactNode;
   task: Task | TaskLike;
@@ -34,11 +39,13 @@ export const TaskErrorHoverCard = ({
   const taskId = ('id' in task ? task.id : task.task_id) ?? '';
   const taskStatus =
     ('task_status' in task ? task.task_status : task.status) ?? '';
+  // Use explicit taskType if provided, otherwise fallback to task object or default
   const actualTaskType: string =
     taskType ??
     ('task_type' in task ? task.task_type : undefined) ??
     'training';
 
+  // Fetch error details only if task failed and has an ID
   const {
     data: errorDetails,
     error,
@@ -52,10 +59,12 @@ export const TaskErrorHoverCard = ({
     staleTime: 0,
   });
 
+  // If not failed, just render children
   if (taskStatus !== 'F') {
     return <>{children}</>;
   }
 
+  // Render hover card with error details for failed tasks
   return (
     <HoverCard>
       <HoverCardTrigger asChild>{children}</HoverCardTrigger>
@@ -71,18 +80,21 @@ export const TaskErrorHoverCard = ({
           <div className="text-muted-foreground text-sm">
             <strong>Type:</strong> {actualTaskType}
           </div>
+          {/* Loading state for error details */}
           {isLoading && (
             <div className="text-muted-foreground flex items-center gap-2 text-sm">
               <div className="border-muted-foreground h-2 w-2 animate-spin rounded-full border border-t-transparent" />
               Loading error details...
             </div>
           )}
+          {/* Error fetching error details */}
           {error && (
             <div className="flex items-center gap-2 text-sm text-amber-600">
               <AlertTriangle className="h-4 w-4" />
               Unable to load error details
             </div>
           )}
+          {/* Show error message if available */}
           {errorDetails?.error_msg && (
             <div className="rounded-md bg-red-50 p-3 text-sm">
               <div className="mb-1 font-medium text-red-800">
@@ -91,6 +103,7 @@ export const TaskErrorHoverCard = ({
               <div className="text-red-700">{errorDetails.error_msg}</div>
             </div>
           )}
+          {/* Fallback if no error message is available */}
           {errorDetails && !errorDetails.error_msg && !error && (
             <div className="text-muted-foreground text-sm">
               <div className="mb-1 font-medium">Error Details:</div>

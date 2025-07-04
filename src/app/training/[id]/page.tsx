@@ -12,9 +12,11 @@ import { TrainingData } from '@/features/training/training-data';
 import { useParams } from 'next/navigation';
 
 export default function TrainingDetailPage() {
+  // Get the training ID from the URL params
   const params = useParams();
   const trainingId = typeof params.id === 'string' ? params.id : '';
 
+  // Prepare the training name for the header
   const trainingNameContent = (
     <span className="text-muted-foreground text-sm font-medium">
       Training: {trainingId}
@@ -38,6 +40,7 @@ export default function TrainingDetailPage() {
         </header>
         <Separator className="mb-4" />
         <main className="flex-1 p-8">
+          {/* Render the main training details component */}
           <TrainingData trainingId={trainingId} />
         </main>
       </SidebarInset>

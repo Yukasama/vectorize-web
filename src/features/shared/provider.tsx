@@ -1,9 +1,11 @@
-'use client';
-
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from 'next-themes';
 import type { PropsWithChildren } from 'react';
 
+/**
+ * Provider wraps the app with QueryClientProvider and ThemeProvider.
+ * Sets up React Query and theme context for all children.
+ */
 interface Props extends PropsWithChildren {
   nonce?: string;
 }

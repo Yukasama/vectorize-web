@@ -1,6 +1,5 @@
 import { client } from '@/lib/client';
 import { getBackendErrorMessage } from '@/lib/error-utils';
-import { messages } from '@/lib/messages';
 import axios from 'axios';
 
 export interface Model {
@@ -30,7 +29,6 @@ export const deleteModel = async (id: string): Promise<boolean> => {
     return true;
   } catch (error) {
     const errorMessage = getBackendErrorMessage(error);
-    console.error(`${messages.model.delete.error}: ${errorMessage}`, error);
     throw new Error(errorMessage);
   }
 };
@@ -53,12 +51,10 @@ export const fetchModels = async (
     return { items: data.items, total: data.total };
   } catch (error) {
     if (axios.isAxiosError(error) && error.code === 'ERR_NETWORK') {
-      console.warn('Backend not reachable - returning empty models list');
       return { items: [], total: 0 };
     }
 
     const errorMessage = getBackendErrorMessage(error);
-    console.error(`Error fetching models: ${errorMessage}`, error);
     throw new Error(errorMessage);
   }
 };
@@ -93,12 +89,10 @@ export const fetchAllModels = async (): Promise<Model[]> => {
     return allModels;
   } catch (error) {
     if (axios.isAxiosError(error) && error.code === 'ERR_NETWORK') {
-      console.warn('Backend not reachable - returning empty models list');
       return [];
     }
 
     const errorMessage = getBackendErrorMessage(error);
-    console.error(`Error fetching all models: ${errorMessage}`, error);
     throw new Error(errorMessage);
   }
 };
@@ -118,7 +112,6 @@ export const fetchModelByTag = async (
     }
 
     const errorMessage = getBackendErrorMessage(error);
-    console.error(`Error fetching model: ${errorMessage}`, error);
     throw new Error(errorMessage);
   }
 };
@@ -138,7 +131,6 @@ export const fetchModelByIdOrTag = async (
     }
 
     const errorMessage = getBackendErrorMessage(error);
-    console.error(`Error fetching model by ID/tag: ${errorMessage}`, error);
     throw new Error(errorMessage);
   }
 };
@@ -158,7 +150,6 @@ export const updateModelName = async (
     await client.put(`/models/${id}`, { name }, { headers: headers });
   } catch (error) {
     const errorMessage = getBackendErrorMessage(error);
-    console.error(`Error updating model name: ${errorMessage}`, error);
     throw new Error(errorMessage);
   }
 };

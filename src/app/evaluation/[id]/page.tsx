@@ -16,6 +16,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+// Helper to filter only numeric metrics from an object
 const filterMetrics = (obj: unknown): Record<string, number> | undefined => {
   if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
     const entries = Object.entries(obj).filter(
@@ -29,18 +30,22 @@ const filterMetrics = (obj: unknown): Record<string, number> | undefined => {
 };
 
 export default function EvaluationDetailPage() {
+  // Get evaluation ID from URL params
   const params = useParams();
   const evaluationId = typeof params.id === 'string' ? params.id : '';
 
+  // Fetch evaluation status using React Query
   const { data: status } = useQuery({
     enabled: !!evaluationId,
     queryFn: () => fetchEvaluationStatus(evaluationId),
     queryKey: ['evaluation-status', evaluationId],
   });
 
+  // State for resolved model and baseline IDs
   const [modelId, setModelId] = useState<string | undefined>();
   const [baselineId, setBaselineId] = useState<string | undefined>();
 
+  // Resolve model and baseline IDs from tags when status changes
   useEffect(() => {
     const resolveModelIds = async () => {
       if (status?.model_tag) {
@@ -59,6 +64,7 @@ export default function EvaluationDetailPage() {
     void resolveModelIds();
   }, [status?.model_tag, status?.baseline_model_tag]);
 
+  // Prepare evaluation name for header
   const evaluationNameContent = (
     <span className="text-muted-foreground text-sm">
       Evaluation: {evaluationId}
@@ -82,11 +88,13 @@ export default function EvaluationDetailPage() {
         </header>
         <Separator className="mb-4" />
         <main className="flex-1 p-8">
+          {/* Render evaluation status and model/baseline cards */}
           <EvaluationData
             baselineId={baselineId}
             evaluationId={evaluationId}
             modelId={modelId}
           />
+          {/* Render scatter chart for evaluation and baseline metrics */}
           <EvaluationScatterChart
             baselineMetrics={filterMetrics(status?.baseline_metrics)}
             evaluationMetrics={filterMetrics(status?.evaluation_metrics)}
@@ -98,6 +106,7 @@ export default function EvaluationDetailPage() {
               {status?.evaluation_metrics && (
                 <div className="border-border bg-card text-card-foreground rounded-lg border p-4">
                   <h3 className="mb-3 font-semibold">Evaluation metrics</h3>
+                  {/* Pretty-print evaluation metrics as JSON */}
                   <pre className="bg-muted overflow-x-auto rounded p-2 text-xs">
                     {JSON.stringify(status.evaluation_metrics, undefined, 2)}
                   </pre>
@@ -106,6 +115,7 @@ export default function EvaluationDetailPage() {
               {status?.baseline_metrics && (
                 <div className="border-border bg-card text-card-foreground rounded-lg border p-4">
                   <h3 className="mb-3 font-semibold">Baseline metrics</h3>
+                  {/* Pretty-print baseline metrics as JSON */}
                   <pre className="bg-muted overflow-x-auto rounded p-2 text-xs">
                     {JSON.stringify(status.baseline_metrics, undefined, 2)}
                   </pre>

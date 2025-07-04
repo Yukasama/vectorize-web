@@ -5,6 +5,10 @@ import { ModelList } from './select-model/model-list';
 import { ModelListFooter } from './select-model/model-list-footer';
 import { ModelListHeader } from './select-model/model-list-header';
 
+/**
+ * SelectModel component allows users to search, select, and review a model for a workflow step.
+ * Handles local selection state, search, and view mode (grid/table), and passes selected model to parent on change.
+ */
 export const SelectModel = ({
   initialSelectedModel,
   onBack,
@@ -16,12 +20,16 @@ export const SelectModel = ({
   onNext?: () => void;
   setSelectedModel: (model: Model | undefined) => void;
 }) => {
+  // Search string for filtering models
   const [search, setSearch] = useState('');
+  // View mode: grid or table
   const [view, setView] = useState<'grid' | 'table'>('grid');
+  // Local state for selected model
   const [localSelectedModel, setLocalSelectedModel] = useState<
     Model | undefined
   >(initialSelectedModel);
 
+  // Toggle selection of a model (deselect if already selected)
   const handleSelect = (model: Model) => {
     const newModel =
       localSelectedModel && localSelectedModel.id === model.id

@@ -6,6 +6,10 @@ import { toast } from 'sonner';
 import type { Model } from '../services/model-service';
 import { ConfirmDeleteDialog } from './confirm-delete-dialog';
 
+/**
+ * ModelOptions provides rename and delete actions for a model in the sidebar.
+ * Handles confirmation dialog, deletion, and error/success feedback.
+ */
 interface ModelListOptionsProps {
   model: Model;
   onDeleted?: (id: string) => void;
@@ -20,6 +24,9 @@ export const ModelOptions = ({
   const queryClient = useQueryClient();
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
+  /**
+   * Handles model deletion with confirmation dialog and feedback.
+   */
   const handleDelete = async () => {
     const success = await import('../services/model-service').then((m) =>
       m.deleteModel(model.id),

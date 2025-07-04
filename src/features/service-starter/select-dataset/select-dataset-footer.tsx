@@ -14,6 +14,7 @@ export const DatasetListFooter = ({
 }: DatasetListFooterProps) => (
   <div className="sticky bottom-0 left-0 z-10 flex w-full items-center justify-between border-t px-4 py-3">
     <div>
+      {/* Render Back button if onBack handler is provided */}
       {onBack && (
         <Button onClick={onBack} variant="secondary">
           Back
@@ -21,6 +22,7 @@ export const DatasetListFooter = ({
       )}
     </div>
     <div className="flex items-center gap-2">
+      {/* Render Next button if onNext handler is provided; disable if no dataset is selected */}
       {onNext && (
         <Button
           disabled={selectedDatasets.length === 0}

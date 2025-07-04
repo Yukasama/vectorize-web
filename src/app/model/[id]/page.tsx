@@ -14,9 +14,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 
 export default function ModelDetailPage() {
+  // Get the model ID from the URL params
   const params = useParams();
   const modelId = typeof params.id === 'string' ? params.id : '';
 
+  // Fetch model details using React Query
   const {
     data: model,
     error,
@@ -27,6 +29,7 @@ export default function ModelDetailPage() {
     queryKey: ['model', modelId],
   });
 
+  // Prepare the model name or status message for the header
   let modelNameContent;
   if (!modelId || isLoading) {
     modelNameContent = (
@@ -37,6 +40,7 @@ export default function ModelDetailPage() {
       <span className="text-destructive text-sm">Error loading model</span>
     );
   } else if (model?.name) {
+    // Truncate long model names for display
     const truncatedName =
       model.name.length > 50 ? `${model.name.slice(0, 50)}...` : model.name;
     modelNameContent = (
@@ -68,6 +72,7 @@ export default function ModelDetailPage() {
         <Separator className="mb-4" />
         <main className="flex-1 p-8">
           <h1 className="mb-4 text-2xl font-bold">Model Details</h1>
+          {/* Render the main model details component if modelId is present */}
           {modelId ? (
             <ModelData modelId={modelId} modelTag={model?.model_tag} />
           ) : (

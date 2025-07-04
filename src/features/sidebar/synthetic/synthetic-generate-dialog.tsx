@@ -22,10 +22,10 @@ export const SyntheticGenerateDialog = ({
   onOpenChange,
   open,
 }: SyntheticGenerateDialogProps) => {
-  // Use the new dialog state hook
+  // Use the new dialog state hook to manage dialog visibility and state
   const dialogState = useDialogState({ onOpenChange, open });
 
-  // Custom hooks for upload and dataset selection
+  // Custom hooks for file upload and dataset selection logic
   const fileUploadHook = useFileUpload(
     open,
     dialogState.closeDialog,
@@ -56,7 +56,7 @@ export const SyntheticGenerateDialog = ({
           existing dataset.
         </span>
         <div className="space-y-4">
-          {/* Mode Toggle */}
+          {/* Mode Toggle: Switch between upload and select modes */}
           <div className="flex gap-2">
             <Button
               onClick={() => dialogState.setMode('upload')}
@@ -74,6 +74,7 @@ export const SyntheticGenerateDialog = ({
             </Button>
           </div>
 
+          {/* Render mode-specific UI: UploadMode or SelectMode */}
           {dialogState.mode === 'upload' ? (
             <UploadMode
               dragActive={fileUploadHook.dragActive}
@@ -99,7 +100,7 @@ export const SyntheticGenerateDialog = ({
             />
           )}
 
-          {/* Gemeinsamer Button für beide Modi */}
+          {/* Action button for both modes: handles upload or generate actions */}
           <div className="mt-4 flex gap-2">
             {(() => {
               const actionButtonProps = getActionButtonProps({
@@ -126,12 +127,13 @@ export const SyntheticGenerateDialog = ({
             })()}
           </div>
 
-          {/* Task status only */}
+          {/* Show task status if available */}
           {dialogState.taskId && (
             <div className="space-y-2">
               <div>Status: {dialogState.status}</div>
             </div>
           )}
+          {/* Show error message if present */}
           {dialogState.error && (
             <div className="text-sm text-red-600">{dialogState.error}</div>
           )}

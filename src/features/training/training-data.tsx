@@ -3,11 +3,17 @@ import { TASKS_STATUS_MAP } from '@/features/tasks/config/mappers';
 import { formatDate } from '@/features/tasks/lib/date-helpers';
 import { useQuery } from '@tanstack/react-query';
 
+/**
+ * Training status and metrics display for a given training run.
+ * Fetches, parses, and presents training details and errors.
+ */
+
 interface TrainingDataProps {
   trainingId: string;
 }
 
 export const TrainingData = ({ trainingId }: TrainingDataProps) => {
+  // Fetch training status by ID
   const { data, error, isLoading } = useQuery({
     enabled: !!trainingId,
     queryFn: () => fetchTrainingById(trainingId),
@@ -17,6 +23,7 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
   // Add a type assertion for the data to ensure type safety
   const status = data;
 
+  // Extract train dataset IDs as array
   const statusWithDatasets = status
     ? (status as typeof status & { train_dataset_ids?: string | string[] })
     : undefined;
@@ -32,16 +39,19 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
     }
   }
 
+  // Extract baseline model and creation date if present
   const statusWithBaseline = status as typeof status & {
     baseline_model_id?: string;
   };
   const statusWithCreated = status as typeof status & { created_at?: string };
 
+  // Loading state
   if (isLoading) {
     return (
       <div className="text-muted-foreground">Loading training status...</div>
     );
   }
+  // Error state
   if (error || !status) {
     return (
       <div className="text-destructive">Error loading training status</div>
@@ -69,12 +79,14 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
                 ].label || status.status}
               </span>
             </div>
+            {/* Show creation date if available */}
             {statusWithCreated.created_at && (
               <div>
                 <span className="font-semibold">Created at:</span>{' '}
                 {formatDate(statusWithCreated.created_at)}
               </div>
             )}
+            {/* Show epoch if available */}
             {typeof status.epoch === 'number' && (
               <div>
                 <span className="font-semibold">Epoch:</span> {status.epoch}
@@ -85,6 +97,7 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
 
         {/* Right column - Model and performance information */}
         <div className="space-y-3">
+          {/* Model tag info */}
           {status.model_tag && (
             <div className="border-border bg-card text-card-foreground rounded-lg border p-4">
               <div className="text-muted-foreground mb-1 text-xs font-medium">
@@ -97,6 +110,7 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
               </div>
             </div>
           )}
+          {/* Trained model ID info */}
           {typeof status.trained_model_id === 'string' &&
             status.trained_model_id && (
               <div className="border-border bg-card text-card-foreground rounded-lg border p-4">
@@ -113,6 +127,7 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
                 </div>
               </div>
             )}
+          {/* Baseline model info */}
           {typeof statusWithBaseline.baseline_model_id === 'string' &&
             statusWithBaseline.baseline_model_id && (
               <div className="border-border bg-card text-card-foreground rounded-lg border p-4">
@@ -129,6 +144,7 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
                 </div>
               </div>
             )}
+          {/* Output directory info */}
           {status.output_dir && (
             <div className="border-border bg-card text-card-foreground rounded-lg border p-4">
               <div className="text-muted-foreground mb-1 text-xs font-medium">
@@ -139,6 +155,7 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
               </div>
             </div>
           )}
+          {/* Training dataset(s) info */}
           <div className="border-border bg-card text-card-foreground rounded-lg border p-4">
             <div className="text-muted-foreground mb-1 text-xs font-medium">
               Training Dataset(s)
@@ -173,6 +190,7 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
         <div className="border-border bg-card text-card-foreground rounded-lg border p-6">
           <h3 className="mb-4 text-lg font-semibold">Performance Metrics</h3>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {/* Show runtime if available */}
             {typeof status.train_runtime === 'number' && (
               <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <div className="text-muted-foreground mb-1 text-xs font-medium">
@@ -183,6 +201,7 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
                 </div>
               </div>
             )}
+            {/* Show samples/sec if available */}
             {typeof status.train_samples_per_second === 'number' && (
               <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <div className="text-muted-foreground mb-1 text-xs font-medium">
@@ -193,6 +212,7 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
                 </div>
               </div>
             )}
+            {/* Show steps/sec if available */}
             {typeof status.train_steps_per_second === 'number' && (
               <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <div className="text-muted-foreground mb-1 text-xs font-medium">
@@ -203,6 +223,7 @@ export const TrainingData = ({ trainingId }: TrainingDataProps) => {
                 </div>
               </div>
             )}
+            {/* Show train loss if available */}
             {typeof status.train_loss === 'number' && (
               <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <div className="text-muted-foreground mb-1 text-xs font-medium">

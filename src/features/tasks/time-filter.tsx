@@ -10,14 +10,21 @@ import { PopoverClose } from '@radix-ui/react-popover';
 import { Timer } from 'lucide-react';
 import { useState } from 'react';
 
+/**
+ * Time filter popover for hiding old completed tasks.
+ * Lets user set max age (in hours) for visible tasks.
+ */
+
 interface TimeFilterProps {
   maxHours: number;
   onMaxHoursChange: (hours: number) => void;
 }
 
 export const TimeFilter = ({ maxHours, onMaxHoursChange }: TimeFilterProps) => {
+  // Local state for input value
   const [inputValue, setInputValue] = useState(maxHours.toString());
 
+  // Apply the new max hours if valid
   const handleApply = () => {
     const hours = Number.parseInt(inputValue);
     if (!Number.isNaN(hours) && hours > 0) {

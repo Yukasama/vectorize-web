@@ -1,6 +1,11 @@
 import { client } from '@/lib/client';
 
 /**
+ * Provides API calls and types for starting and monitoring model training jobs.
+ * Includes robust error handling for backend and validation errors.
+ */
+
+/**
  * Parameters for starting a training job.
  */
 export interface StartTrainingParams {
@@ -56,6 +61,7 @@ export interface TrainingTaskResponse {
 /**
  * Start a training job with the required and optional parameters.
  * Only sends required and filled optional fields.
+ * Throws user-friendly errors for backend and validation issues.
  */
 export const startTraining = async (
   params: StartTrainingParams,
@@ -128,6 +134,9 @@ export const startTraining = async (
   }
 };
 
+/**
+ * Fetch the status of a training job by its ID.
+ */
 export const fetchTrainingById = async (
   id: string,
 ): Promise<TrainingStatusResponse> => {
@@ -137,6 +146,9 @@ export const fetchTrainingById = async (
   return data;
 };
 
+/**
+ * Fetch all fine-tune training tasks for a given model tag.
+ */
 export const fetchFineTuneTrainingTasks = async (
   modelTag: string,
 ): Promise<TrainingTaskResponse[]> => {
@@ -146,6 +158,9 @@ export const fetchFineTuneTrainingTasks = async (
   return data;
 };
 
+/**
+ * Fetch all fine-tune training tasks for a given model ID.
+ */
 export const fetchFineTuneTrainingTasksByModelId = async (
   modelId: string,
 ): Promise<TrainingTaskResponse[]> => {

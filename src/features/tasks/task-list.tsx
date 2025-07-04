@@ -27,14 +27,22 @@ import { TypeFilter } from './type-filter';
 import { TaskResponse, TaskStatus, TaskType } from './types/task';
 import { useTaskPollingAndListSync } from './use-task-polling';
 
+/**
+ * Task list with filters, search, and error/empty states.
+ * Fetches, filters, and displays tasks with live updates.
+ */
+
 export const TaskList = () => {
+  // Enable polling and syncing for live task updates
   useTaskPollingAndListSync();
 
+  // State for search and filters
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatuses, setSelectedStatuses] = useState<TaskStatus[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<TaskType[]>([]);
   const [maxHours, setMaxHours] = useState(1);
 
+  // Fetch tasks from API, filtered by maxHours
   const { data, isError, isFetching, refetch } = useQuery({
     queryFn: () =>
       client
@@ -43,6 +51,7 @@ export const TaskList = () => {
     queryKey: ['tasks', maxHours],
   });
 
+  // Memoized filter for tasks based on search and filters
   const filteredTasks = useMemo(() => {
     if (!data) {
       return [];
@@ -57,6 +66,7 @@ export const TaskList = () => {
 
   return (
     <div className="h-[calc(100vh-80px)] space-y-2" data-testid="task-list">
+      {/* Header with task count and separator */}
       <div className="flex items-center gap-3">
         <h3 className="text-md font-medium">Tasks</h3>
         <Separator className="bg-desc/50 flex-1" />
@@ -65,6 +75,7 @@ export const TaskList = () => {
         </p>
       </div>
 
+      {/* Search and filter controls */}
       <div className="flex flex-col gap-2">
         <div className="relative flex-1">
           <div className="flex items-center justify-between gap-2">
@@ -98,6 +109,7 @@ export const TaskList = () => {
         </div>
       </div>
 
+      {/* Error state for failed fetch */}
       {isError && (
         <Card className="py-12 text-center">
           <CardContent>
@@ -118,6 +130,7 @@ export const TaskList = () => {
         </Card>
       )}
 
+      {/* Loading state with skeletons */}
       {!isError && isFetching && !data && (
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((key) => (
@@ -133,6 +146,7 @@ export const TaskList = () => {
         </div>
       )}
 
+      {/* Empty state if no tasks match filters */}
       {!isError && !isFetching && filteredTasks.length === 0 && (
         <Card className="py-12 text-center">
           <CardContent>
@@ -162,6 +176,7 @@ export const TaskList = () => {
         </Card>
       )}
 
+      {/* Render filtered task cards */}
       {!isError && !isFetching && filteredTasks.length > 0 && (
         <div className="hide-scrollbar h-[calc(100vh-300px)] space-y-4 overflow-y-auto scroll-auto pt-3">
           {filteredTasks.map((task) => (
