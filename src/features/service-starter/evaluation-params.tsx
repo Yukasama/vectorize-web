@@ -66,7 +66,10 @@ export const EvaluationParamsStep = ({
       // Show success toast and refresh tasks
       const { toast } = await import('sonner');
       toast.success('Evaluation started!');
-      void queryClient.invalidateQueries({ exact: false, queryKey: ['tasks'] });
+      await queryClient.invalidateQueries({
+        exact: false,
+        queryKey: ['tasks'],
+      });
 
       // Reset all parameters to default values
       setMaxSamples(1000);

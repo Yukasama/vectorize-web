@@ -1,3 +1,5 @@
+'use client';
+
 import { DetailsHoverCard } from '@/components/ui/details-hover-card';
 import { fetchDatasetById } from '@/features/sidebar/services/dataset-service';
 import { formatRelativeDate } from '@/lib/utils';
