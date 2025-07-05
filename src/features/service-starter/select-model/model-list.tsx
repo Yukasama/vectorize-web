@@ -71,11 +71,12 @@ export const ModelList = ({
               key={model.model_tag}
               onClick={() => onSelect(model)}
             >
-              <p className="text-sm font-medium">
+              <p
+                className="max-w-full truncate text-sm font-medium"
+                title={model.name}
+              >
                 {/* Truncate long model names for display */}
-                {model.name.length > 17
-                  ? model.name.slice(0, 17) + '...'
-                  : model.name}
+                {model.name}
               </p>
               {isSelected && (
                 <span className="text-primary text-xs">Selected</span>

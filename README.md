@@ -25,7 +25,6 @@ docker build -t vectorize_web:0.1.0 .
 - Next.js 15
 - Tailwind v4
 - Dark Theme (next-themes)
-- End-To-End Tests (Playwright)
 - Logging (Pino)
 - Typesafe Environment Variables (t3-env)
 - Formatting (Prettier)
@@ -41,16 +40,16 @@ vectorize-web/
 │   ├── components/         # Reusable UI components (buttons, cards, dialogs, etc.)
 │   │   └── ui/             # Atomic UI primitives (badge, button, card, etc.)
 │   ├── features/           # Main feature modules (dataset, model, evaluation, training)
-│   │   ├── dataset/        # Dataset management, upload, and integration
-│   │   ├── evaluation/     # Model evaluation, charts, and evaluation data
-│   │   ├── model/          # Model management, upload, and integration
+│   │   ├── dataset/        # Dataset data
+│   │   ├── evaluation/     # Evaluation data
+│   │   ├── model/          # Model data
 │   │   ├── service-starter/# Multi-step workflow for training/evaluation services
 │   │   ├── shared/         # Shared providers and context
 │   │   ├── sidebar/        # Sidebar UI and synthetic data workflows
 │   │   ├── synthetic/      # Synthetic data generation dialogs and hooks
 │   │   ├── tasks/          # Task management, filtering, and status cards
 │   │   ├── theme/          # Theme toggling and related UI
-│   │   └── training/       # Training status and metrics display
+│   │   └── training/       # Training data
 │   ├── hooks/              # Custom React hooks
 │   ├── lib/                # Utility functions, API clients, logging, etc.
 │   ├── types/              # Shared TypeScript types
