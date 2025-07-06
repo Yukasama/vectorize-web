@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
-import { Calendar, CheckCircle2, Database, FileText } from 'lucide-react';
+import { Calendar, CheckCircle2, Database } from 'lucide-react';
 import type { Dataset } from '../../sidebar/services/dataset-service';
 import { fetchAllDatasets } from '../../sidebar/services/dataset-service';
 
@@ -30,8 +30,8 @@ interface DatasetListProps {
 // Helper function to format date for display
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'short',
     day: 'numeric',
+    month: 'short',
     year: 'numeric',
   });
 };
@@ -39,22 +39,6 @@ const formatDate = (dateString: string) => {
 // Helper function to truncate text
 const truncateText = (text: string, maxLength: number) => {
   return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
-};
-
-// Helper function to format file size
-const formatFileSize = (sizeInBytes?: number) => {
-  if (!sizeInBytes) return 'Unknown size';
-
-  const units = ['B', 'KB', 'MB', 'GB'];
-  let size = sizeInBytes;
-  let unitIndex = 0;
-
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024;
-    unitIndex++;
-  }
-
-  return `${size.toFixed(1)} ${units[unitIndex]}`;
 };
 
 export const DatasetList = ({
@@ -156,66 +140,7 @@ export const DatasetList = ({
                         </div>
                       </div>
                     )}
-
-                    {dataset.size && (
-                      <div className="flex items-center gap-2">
-                        <FileText className="text-muted-foreground h-3 w-3" />
-                        <div>
-                          <div className="text-muted-foreground">Size</div>
-                          <div className="font-medium">
-                            {formatFileSize(dataset.size)}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {dataset.records_count && (
-                      <div className="flex items-center gap-2">
-                        <Database className="text-muted-foreground h-3 w-3" />
-                        <div>
-                          <div className="text-muted-foreground">Records</div>
-                          <div className="font-medium">
-                            {dataset.records_count.toLocaleString()}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {dataset.format && (
-                      <div className="flex items-center gap-2">
-                        <div className="bg-muted-foreground/20 h-3 w-3 rounded" />
-                        <div>
-                          <div className="text-muted-foreground">Format</div>
-                          <div className="font-medium uppercase">
-                            {dataset.format}
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
-
-                  {dataset.tags && dataset.tags.length > 0 && (
-                    <div>
-                      <div className="text-muted-foreground mb-1 text-xs">
-                        Tags
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {dataset.tags.slice(0, 4).map((tag, index) => (
-                          <span
-                            key={index}
-                            className="bg-muted text-muted-foreground rounded px-2 py-1 text-xs"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                        {dataset.tags.length > 4 && (
-                          <span className="bg-muted text-muted-foreground rounded px-2 py-1 text-xs">
-                            +{dataset.tags.length - 4} more
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </HoverCardContent>
             </HoverCard>
@@ -242,11 +167,11 @@ export const DatasetList = ({
             );
             return (
               <TableRow
-                key={dataset.id}
                 className={cn(
                   'cursor-pointer transition-colors',
                   isSelected && 'bg-primary/5',
                 )}
+                key={dataset.id}
                 onClick={() => onSelect(dataset)}
               >
                 <TableCell className="max-w-0">
@@ -274,36 +199,18 @@ export const DatasetList = ({
                             </span>
                           </div>
                         )}
-                        {dataset.tags && dataset.tags.length > 0 && (
-                          <div className="text-xs">
-                            <span className="text-muted-foreground">
-                              Tags:{' '}
-                            </span>
-                            <span className="font-medium">
-                              {dataset.tags.join(', ')}
-                            </span>
-                          </div>
-                        )}
                       </div>
                     </HoverCardContent>
                   </HoverCard>
-                </TableCell>
-                <TableCell className="text-muted-foreground text-sm">
-                  {dataset.records_count
-                    ? dataset.records_count.toLocaleString()
-                    : 'Unknown'}
-                </TableCell>
-                <TableCell className="text-muted-foreground text-sm">
-                  {formatFileSize(dataset.size)}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center">
                     <input
                       aria-checked={isSelected}
                       checked={isSelected}
+                      className="cursor-pointer"
                       onChange={() => onSelect(dataset)}
                       type="checkbox"
-                      className="cursor-pointer"
                     />
                     {isSelected && (
                       <CheckCircle2 className="text-primary animate-in zoom-in-75 ml-2 h-4 w-4 duration-200" />

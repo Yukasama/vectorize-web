@@ -6,14 +6,14 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 const HoverCard = ({
-  openDelay = 0,
   closeDelay = 0,
+  openDelay = 0,
   ...props
 }: React.ComponentProps<typeof HoverCardPrimitive.Root>) => (
   <HoverCardPrimitive.Root
+    closeDelay={closeDelay}
     data-slot="hover-card"
     openDelay={openDelay}
-    closeDelay={closeDelay}
     {...props}
   />
 );

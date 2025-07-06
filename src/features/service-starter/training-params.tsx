@@ -176,88 +176,88 @@ export const TrainingParamsStep = ({
             </h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               <div className="space-y-2">
-                <Label htmlFor="epochs-input" className="text-sm font-medium">
+                <Label className="text-sm font-medium" htmlFor="epochs-input">
                   Epochs
                 </Label>
                 <Input
+                  className="transition-all duration-200"
                   id="epochs-input"
-                  type="number"
                   min={1}
-                  value={epochs === '' ? '' : epochs}
                   onChange={(e) =>
                     setEpochs(
                       e.target.value === '' ? '' : Number(e.target.value),
                     )
                   }
                   placeholder="e.g. 3"
-                  className="transition-all duration-200"
+                  type="number"
+                  value={epochs === '' ? '' : epochs}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label
-                  htmlFor="batch-size-input"
                   className="text-sm font-medium"
+                  htmlFor="batch-size-input"
                 >
                   Batch Size per Device
                 </Label>
                 <Input
+                  className="transition-all duration-200"
                   id="batch-size-input"
-                  type="number"
                   min={1}
-                  value={
-                    perDeviceTrainBatchSize === ''
-                      ? ''
-                      : perDeviceTrainBatchSize
-                  }
                   onChange={(e) =>
                     setPerDeviceTrainBatchSize(
                       e.target.value === '' ? '' : Number(e.target.value),
                     )
                   }
                   placeholder="e.g. 16"
-                  className="transition-all duration-200"
+                  type="number"
+                  value={
+                    perDeviceTrainBatchSize === ''
+                      ? ''
+                      : perDeviceTrainBatchSize
+                  }
                 />
               </div>
 
               <div className="space-y-2">
                 <Label
-                  htmlFor="learning-rate-input"
                   className="text-sm font-medium"
+                  htmlFor="learning-rate-input"
                 >
                   Learning Rate
                 </Label>
                 <Input
+                  className="transition-all duration-200"
                   id="learning-rate-input"
-                  type="number"
                   min={0}
-                  step="any"
-                  value={learningRate === '' ? '' : learningRate}
                   onChange={(e) =>
                     setLearningRate(
                       e.target.value === '' ? '' : Number(e.target.value),
                     )
                   }
                   placeholder="e.g. 0.0001"
-                  className="transition-all duration-200"
+                  step="any"
+                  type="number"
+                  value={learningRate === '' ? '' : learningRate}
                 />
               </div>
 
               <div className="space-y-2 lg:col-span-2">
                 <Label
-                  htmlFor="val-dataset-id-input"
                   className="text-sm font-medium"
+                  htmlFor="val-dataset-id-input"
                 >
                   Validation Dataset ID
                   <span className="text-muted-foreground ml-1">(optional)</span>
                 </Label>
                 <Input
+                  className="transition-all duration-200"
                   id="val-dataset-id-input"
-                  type="text"
-                  value={valDatasetId}
                   onChange={(e) => setValDatasetId(e.target.value)}
                   placeholder="Dataset ID or leave empty for 10% split"
-                  className="transition-all duration-200"
+                  type="text"
+                  value={valDatasetId}
                 />
               </div>
             </div>
@@ -266,11 +266,11 @@ export const TrainingParamsStep = ({
           <Separator />
 
           {/* Advanced Settings */}
-          <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
+          <Collapsible onOpenChange={setShowAdvanced} open={showAdvanced}>
             <CollapsibleTrigger asChild>
               <Button
-                variant="ghost"
                 className="flex items-center gap-2 p-0 hover:bg-transparent"
+                variant="ghost"
               >
                 <h3 className="text-md flex items-center gap-2 font-medium">
                   <Settings2 className="h-4 w-4" />
@@ -289,203 +289,203 @@ export const TrainingParamsStep = ({
                 {/* Optimization Parameters */}
                 <div className="space-y-2">
                   <Label
-                    htmlFor="warmup-steps-input"
                     className="text-sm font-medium"
+                    htmlFor="warmup-steps-input"
                   >
                     Warmup Steps
                   </Label>
                   <Input
+                    className="transition-all duration-200"
                     id="warmup-steps-input"
-                    type="number"
                     min={0}
-                    value={warmupSteps === '' ? '' : warmupSteps}
                     onChange={(e) =>
                       setWarmupSteps(
                         e.target.value === '' ? '' : Number(e.target.value),
                       )
                     }
                     placeholder="e.g. 100"
-                    className="transition-all duration-200"
+                    type="number"
+                    value={warmupSteps === '' ? '' : warmupSteps}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label
-                    htmlFor="optimizer-input"
                     className="text-sm font-medium"
+                    htmlFor="optimizer-input"
                   >
                     Optimizer
                   </Label>
                   <Input
+                    className="transition-all duration-200"
                     id="optimizer-input"
-                    type="text"
-                    value={optimizerName}
                     onChange={(e) => setOptimizerName(e.target.value)}
                     placeholder="e.g. AdamW"
-                    className="transition-all duration-200"
+                    type="text"
+                    value={optimizerName}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label
-                    htmlFor="scheduler-input"
                     className="text-sm font-medium"
+                    htmlFor="scheduler-input"
                   >
                     Scheduler
                   </Label>
                   <Input
+                    className="transition-all duration-200"
                     id="scheduler-input"
-                    type="text"
-                    value={scheduler}
                     onChange={(e) => setScheduler(e.target.value)}
                     placeholder="e.g. linear"
-                    className="transition-all duration-200"
+                    type="text"
+                    value={scheduler}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label
-                    htmlFor="weight-decay-input"
                     className="text-sm font-medium"
+                    htmlFor="weight-decay-input"
                   >
                     Weight Decay
                   </Label>
                   <Input
+                    className="transition-all duration-200"
                     id="weight-decay-input"
-                    type="number"
                     min={0}
-                    step="any"
-                    value={weightDecay === '' ? '' : weightDecay}
                     onChange={(e) =>
                       setWeightDecay(
                         e.target.value === '' ? '' : Number(e.target.value),
                       )
                     }
                     placeholder="e.g. 0.01"
-                    className="transition-all duration-200"
+                    step="any"
+                    type="number"
+                    value={weightDecay === '' ? '' : weightDecay}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label
-                    htmlFor="max-grad-norm-input"
                     className="text-sm font-medium"
+                    htmlFor="max-grad-norm-input"
                   >
                     Max Grad Norm
                   </Label>
                   <Input
+                    className="transition-all duration-200"
                     id="max-grad-norm-input"
-                    type="number"
                     min={0}
-                    step="any"
-                    value={maxGradNorm === '' ? '' : maxGradNorm}
                     onChange={(e) =>
                       setMaxGradNorm(
                         e.target.value === '' ? '' : Number(e.target.value),
                       )
                     }
                     placeholder="e.g. 1.0"
-                    className="transition-all duration-200"
+                    step="any"
+                    type="number"
+                    value={maxGradNorm === '' ? '' : maxGradNorm}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label
-                    htmlFor="evaluation-steps-input"
                     className="text-sm font-medium"
+                    htmlFor="evaluation-steps-input"
                   >
                     Evaluation Steps
                   </Label>
                   <Input
+                    className="transition-all duration-200"
                     id="evaluation-steps-input"
-                    type="number"
                     min={0}
-                    value={evaluationSteps === '' ? '' : evaluationSteps}
                     onChange={(e) =>
                       setEvaluationSteps(
                         e.target.value === '' ? '' : Number(e.target.value),
                       )
                     }
                     placeholder="e.g. 100"
-                    className="transition-all duration-200"
+                    type="number"
+                    value={evaluationSteps === '' ? '' : evaluationSteps}
                   />
                 </div>
 
                 {/* System Parameters */}
                 <div className="space-y-2">
                   <Label
-                    htmlFor="output-path-input"
                     className="text-sm font-medium"
+                    htmlFor="output-path-input"
                   >
                     Output Path
                   </Label>
                   <Input
+                    className="transition-all duration-200"
                     id="output-path-input"
-                    type="text"
-                    value={outputPath}
                     onChange={(e) => setOutputPath(e.target.value)}
                     placeholder="path/to/output"
-                    className="transition-all duration-200"
+                    type="text"
+                    value={outputPath}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label
-                    htmlFor="dataloader-workers-input"
                     className="text-sm font-medium"
+                    htmlFor="dataloader-workers-input"
                   >
                     Dataloader Workers
                   </Label>
                   <Input
+                    className="transition-all duration-200"
                     id="dataloader-workers-input"
-                    type="number"
                     min={0}
-                    value={
-                      dataloaderNumWorkers === '' ? '' : dataloaderNumWorkers
-                    }
                     onChange={(e) =>
                       setDataloaderNumWorkers(
                         e.target.value === '' ? '' : Number(e.target.value),
                       )
                     }
                     placeholder="e.g. 4"
-                    className="transition-all duration-200"
+                    type="number"
+                    value={
+                      dataloaderNumWorkers === '' ? '' : dataloaderNumWorkers
+                    }
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="device-input" className="text-sm font-medium">
+                  <Label className="text-sm font-medium" htmlFor="device-input">
                     Device
                   </Label>
                   <Input
+                    className="transition-all duration-200"
                     id="device-input"
-                    type="text"
-                    value={device}
                     onChange={(e) => setDevice(e.target.value)}
                     placeholder="cpu, cuda, ..."
-                    className="transition-all duration-200"
+                    type="text"
+                    value={device}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label
-                    htmlFor="timeout-seconds-input"
                     className="text-sm font-medium"
+                    htmlFor="timeout-seconds-input"
                   >
                     Timeout (seconds)
                   </Label>
                   <Input
+                    className="transition-all duration-200"
                     id="timeout-seconds-input"
-                    type="number"
                     min={0}
-                    value={timeoutSeconds === '' ? '' : timeoutSeconds}
                     onChange={(e) =>
                       setTimeoutSeconds(
                         e.target.value === '' ? '' : Number(e.target.value),
                       )
                     }
                     placeholder="e.g. 3600"
-                    className="transition-all duration-200"
+                    type="number"
+                    value={timeoutSeconds === '' ? '' : timeoutSeconds}
                   />
                 </div>
               </div>
@@ -496,56 +496,56 @@ export const TrainingParamsStep = ({
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="flex items-center justify-between space-x-2">
                     <Label
-                      htmlFor="use-amp"
                       className="cursor-pointer text-sm font-medium"
+                      htmlFor="use-amp"
                     >
                       Use AMP (Automatic Mixed Precision)
                     </Label>
                     <Switch
-                      id="use-amp"
                       checked={useAmp}
+                      id="use-amp"
                       onCheckedChange={setUseAmp}
                     />
                   </div>
 
                   <div className="flex items-center justify-between space-x-2">
                     <Label
-                      htmlFor="show-progress-bar"
                       className="cursor-pointer text-sm font-medium"
+                      htmlFor="show-progress-bar"
                     >
                       Show Progress Bar
                     </Label>
                     <Switch
-                      id="show-progress-bar"
                       checked={showProgressBar}
+                      id="show-progress-bar"
                       onCheckedChange={setShowProgressBar}
                     />
                   </div>
 
                   <div className="flex items-center justify-between space-x-2">
                     <Label
-                      htmlFor="save-best-model"
                       className="cursor-pointer text-sm font-medium"
+                      htmlFor="save-best-model"
                     >
                       Save Best Model
                     </Label>
                     <Switch
-                      id="save-best-model"
                       checked={saveBestModel}
+                      id="save-best-model"
                       onCheckedChange={setSaveBestModel}
                     />
                   </div>
 
                   <div className="flex items-center justify-between space-x-2">
                     <Label
-                      htmlFor="save-each-epoch"
                       className="cursor-pointer text-sm font-medium"
+                      htmlFor="save-each-epoch"
                     >
                       Save Each Epoch
                     </Label>
                     <Switch
-                      id="save-each-epoch"
                       checked={saveEachEpoch}
+                      id="save-each-epoch"
                       onCheckedChange={setSaveEachEpoch}
                     />
                   </div>

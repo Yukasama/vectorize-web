@@ -112,40 +112,40 @@ export const EvaluationParamsStep = ({
               <Settings2 className="h-4 w-4" />
               Evaluation Settings
             </h3>
-            <div className="gap-4 flex flex-col">
+            <div className="flex flex-col gap-4">
               <div className="space-y-2">
                 <Label
-                  htmlFor="max-samples-input"
                   className="text-sm font-medium"
+                  htmlFor="max-samples-input"
                 >
                   Max Samples
                 </Label>
                 <Input
+                  className="transition-all duration-200"
                   id="max-samples-input"
-                  type="number"
                   min={1}
-                  value={maxSamples}
                   onChange={(e) => setMaxSamples(Number(e.target.value))}
                   placeholder="e.g. 1000"
-                  className="transition-all duration-200"
+                  type="number"
+                  value={maxSamples}
                 />
               </div>
 
               <div className="space-y-2 lg:col-span-2">
                 <Label
-                  htmlFor="baseline-model-tag-input"
                   className="text-sm font-medium"
+                  htmlFor="baseline-model-tag-input"
                 >
                   Baseline Model Tag
                   <span className="text-muted-foreground ml-1">(optional)</span>
                 </Label>
                 <Input
+                  className="transition-all duration-200"
                   id="baseline-model-tag-input"
-                  type="text"
-                  value={baselineModelTag}
                   onChange={(e) => setBaselineModelTag(e.target.value)}
                   placeholder="e.g. my-baseline-model"
-                  className="transition-all duration-200"
+                  type="text"
+                  value={baselineModelTag}
                 />
               </div>
             </div>
@@ -164,7 +164,7 @@ export const EvaluationParamsStep = ({
       </div>
 
       {/* Sticky footer with buttons */}
-      <div className="bg-background sticky bottom-0 left-0 z-10 flex w-full items-center justify-between border-t px-4 py-3 rounded-lg">
+      <div className="bg-background sticky bottom-0 left-0 z-10 flex w-full items-center justify-between rounded-lg border-t px-4 py-3">
         <div>
           <Button disabled={isSubmitting} onClick={onBack} variant="outline">
             Back

@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
-import { Activity, Calendar, CheckCircle2, Tag } from 'lucide-react';
+import { Calendar, CheckCircle2, Tag } from 'lucide-react';
 import type { Model } from '../../sidebar/services/model-service';
 import { fetchAllModels } from '../../sidebar/services/model-service';
 
@@ -30,8 +30,8 @@ interface ModelListProps {
 // Helper function to format date for display
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'short',
     day: 'numeric',
+    month: 'short',
     year: 'numeric',
   });
 };
@@ -156,49 +156,7 @@ export const ModelList = ({
                         </div>
                       </div>
                     )}
-
-                    {model.status && (
-                      <div className="flex items-center gap-2">
-                        <Activity className="text-muted-foreground h-3 w-3" />
-                        <div>
-                          <div className="text-muted-foreground">Status</div>
-                          <div className="font-medium capitalize">
-                            {model.status}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {model.size && (
-                      <div className="flex items-center gap-2">
-                        <div className="bg-muted-foreground/20 h-3 w-3 rounded" />
-                        <div>
-                          <div className="text-muted-foreground">Size</div>
-                          <div className="font-medium">{model.size}</div>
-                        </div>
-                      </div>
-                    )}
                   </div>
-
-                  {model.metrics && Object.keys(model.metrics).length > 0 && (
-                    <div>
-                      <div className="text-muted-foreground mb-1 text-xs">
-                        Metrics
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {Object.entries(model.metrics)
-                          .slice(0, 3)
-                          .map(([key, value]) => (
-                            <span
-                              key={key}
-                              className="bg-muted text-muted-foreground rounded px-2 py-1 text-xs"
-                            >
-                              {key}: {String(value)}
-                            </span>
-                          ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </HoverCardContent>
             </HoverCard>
@@ -224,11 +182,11 @@ export const ModelList = ({
           const isSelected = selectedModel?.model_tag === model.model_tag;
           return (
             <TableRow
-              key={model.model_tag}
               className={cn(
                 'cursor-pointer transition-colors',
                 isSelected && 'bg-primary/5',
               )}
+              key={model.model_tag}
               onClick={() => onSelect(model)}
             >
               <TableCell>
@@ -259,19 +217,14 @@ export const ModelList = ({
                 {truncateText(model.model_tag, 20)}
               </TableCell>
               <TableCell>
-                <span className="text-sm capitalize">
-                  {model.status || 'Unknown'}
-                </span>
-              </TableCell>
-              <TableCell>
                 <div className="flex items-center">
                   <input
                     aria-checked={isSelected}
                     checked={isSelected}
+                    className="cursor-pointer"
                     name="model-select"
                     onChange={() => onSelect(model)}
                     type="radio"
-                    className="cursor-pointer"
                   />
                   {isSelected && (
                     <CheckCircle2 className="text-primary animate-in zoom-in-75 ml-2 h-4 w-4 duration-200" />

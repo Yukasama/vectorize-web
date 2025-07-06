@@ -125,7 +125,7 @@ export const SidebarListItemName = ({
       className={
         (edit
           ? 'bg-muted/70 flex items-center gap-2 rounded'
-          : 'hover:bg-muted/70 px-2 flex items-center gap-2 rounded transition-colors duration-100') +
+          : 'hover:bg-muted/70 flex items-center gap-2 rounded px-2 transition-colors duration-100') +
         ' h-7 min-h-0 min-w-0 flex-1 pr-2'
       }
       style={{ maxWidth: '100%', minWidth: 0 }}
@@ -183,7 +183,7 @@ export const SidebarListItemName = ({
           style={{ maxWidth: 'calc(100% - 0.5rem)', minWidth: 0 }}
         >
           {name}
-          {"Local"}
+          {'Local'}
         </span>
       )}
     </span>
@@ -208,10 +208,10 @@ export const SidebarListItemOptions = ({
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
       <Button
+        className="size-8"
         onClick={(e) => e.stopPropagation()}
         tabIndex={-1}
         variant="ghost"
-        className="size-8"
       >
         <MoreVertical className="h-4 w-4" />
       </Button>

@@ -19,7 +19,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FilePlus2, Upload } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { DatasetList } from './dataset/dataset-list';
 import { DatasetUpload } from './dataset/dataset-upload';
@@ -35,16 +34,14 @@ export const AppSidebar = () => {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [tab, setTab] = useState<'dataset' | 'model'>('model');
   const [syntheticOpen, setSyntheticOpen] = useState(false);
-  const router = useRouter();
-  const pathname = usePathname();
 
   return (
     <Sidebar className="text-[var(--sidebar-foreground)] transition-all duration-200">
       <SidebarHeader className="header-bg mb-2 w-full px-2 pt-[9px]">
         <div className="mt-2 flex w-full items-center justify-between px-1.5">
           <div className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Logo" height={28} width={28} />
-            <Link href="/" className="font-semibold" title="Go to homepage">
+            <Image alt="Logo" height={28} src="/logo.png" width={28} />
+            <Link className="font-semibold" href="/" title="Go to homepage">
               Vectorize
             </Link>
           </div>

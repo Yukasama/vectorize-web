@@ -5,7 +5,6 @@ interface DetailsHoverCardProps {
   copied: boolean;
   copiedTag?: boolean;
   createdAt?: string;
-  createdAtBelowId?: boolean;
   id: string;
   loading: boolean;
   maxLength?: number;
@@ -13,7 +12,6 @@ interface DetailsHoverCardProps {
   onCopyTag?: (tag: string) => void;
   tag?: string;
   title: string;
-  updatedAt?: string;
 }
 
 const truncate = (str: string, max = 24) =>
@@ -24,7 +22,6 @@ export const DetailsHoverCard: React.FC<DetailsHoverCardProps> = ({
   copied,
   copiedTag = false,
   createdAt,
-  createdAtBelowId = false,
   id,
   loading,
   maxLength = 40,
@@ -32,7 +29,6 @@ export const DetailsHoverCard: React.FC<DetailsHoverCardProps> = ({
   onCopyTag,
   tag,
   title,
-  updatedAt,
 }) => (
   <div className="bg-background relative min-w-[120px] rounded-lg shadow-md">
     {loading && <div>Loading data...</div>}
