@@ -104,9 +104,9 @@ export const EvaluationParamsStep = ({
   return (
     <div className="relative flex h-full min-h-screen w-full flex-col">
       {/* Scrollable content area */}
-      <div className="flex-1 overflow-y-auto px-8 py-6">
+      <div className="flex-1 overflow-y-auto">
         {/* Evaluation Settings */}
-        <div className="space-y-6">
+        <div className="bg-faded space-y-6 rounded-lg border p-4">
           <div>
             <h3 className="text-md mb-4 flex items-center gap-2 font-medium">
               <Settings2 className="h-4 w-4" />
