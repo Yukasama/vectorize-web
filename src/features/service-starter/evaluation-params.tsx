@@ -136,7 +136,7 @@ export const EvaluationParamsStep = ({
                   className="text-sm font-medium"
                   htmlFor="baseline-model-tag-input"
                 >
-                  Baseline Model Tag
+                  <p>Baseline Model Tag</p>
                   <span className="text-muted-foreground ml-1">(optional)</span>
                 </Label>
                 <Input

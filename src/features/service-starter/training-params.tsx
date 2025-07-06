@@ -247,7 +247,7 @@ export const TrainingParamsStep = ({
                   className="text-sm font-medium"
                   htmlFor="val-dataset-id-input"
                 >
-                  Validation Dataset ID
+                  <p>Validation Dataset ID</p>
                   <span className="text-muted-foreground ml-1">(optional)</span>
                 </Label>
                 <Input
