@@ -2,6 +2,11 @@
 
 import { Card } from '@/components/ui/card';
 import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card';
+import {
   Table,
   TableBody,
   TableCell,
@@ -9,7 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { truncateText } from '@/lib/truncate';
+import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
+import { Calendar, CheckCircle2, Database } from 'lucide-react';
 import type { Dataset } from '../../sidebar/services/dataset-service';
 import { fetchAllDatasets } from '../../sidebar/services/dataset-service';
 
@@ -19,6 +27,15 @@ interface DatasetListProps {
   selectedDatasets: Dataset[];
   view: 'grid' | 'table';
 }
+
+// Helper function to format date for display
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+};
 
 export const DatasetList = ({
   onSelect,
@@ -51,37 +68,88 @@ export const DatasetList = ({
     // Show error state if datasets could not be loaded
     content = <div className="text-red-500">Error loading datasets.</div>;
   } else if (view === 'grid') {
-    // Render datasets as a grid of cards
+    // Render datasets as a grid of cards with hover effects
     content = (
       <div className="grid grid-cols-4 gap-4 px-4 py-3">
         {filteredDatasets.map((dataset) => {
           const isSelected = selectedDatasets.some((d) => d.id === dataset.id);
           return (
-            <Card
-              className={`cursor-pointer border-2 p-4 ${
-                isSelected ? 'border-primary' : 'border-transparent'
-              }`}
-              key={dataset.id}
-              onClick={() => onSelect(dataset)}
-            >
-              <p className="truncate text-sm font-medium" title={dataset.name}>
-                {dataset.name}
-              </p>
-              {isSelected && (
-                <span className="text-primary text-xs">Selected</span>
-              )}
-            </Card>
+            <HoverCard key={dataset.id} openDelay={300}>
+              <HoverCardTrigger asChild>
+                <Card
+                  className={cn(
+                    'relative cursor-pointer p-4 transition-all duration-200 hover:shadow-md',
+                    isSelected
+                      ? 'border-primary bg-primary/5 ring-primary/20 scale-105 ring-2'
+                      : 'border-border hover:border-primary/50 hover:bg-accent/20',
+                  )}
+                  onClick={() => onSelect(dataset)}
+                >
+                  {/* Selection indicator */}
+                  {isSelected && (
+                    <div className="animate-in zoom-in-75 absolute -top-2 -right-2 duration-200">
+                      <div className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full shadow-lg">
+                        <CheckCircle2 className="h-4 w-4" />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <p className="w-[150px] truncate text-sm leading-tight font-medium">
+                      {dataset.name}
+                    </p>
+
+                    <div className="text-muted-foreground flex items-center gap-1 text-xs">
+                      <Database className="h-3 w-3" />
+                      <span>Dataset</span>
+                    </div>
+
+                    {isSelected && (
+                      <div className="animate-in slide-in-from-bottom-2 duration-200">
+                        <span className="text-primary text-xs font-medium">
+                          ✓ Selected
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              </HoverCardTrigger>
+
+              <HoverCardContent className="w-80" side="top">
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="text-sm font-semibold">{dataset.name}</h4>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    {dataset.created_at && (
+                      <div className="flex items-center gap-2">
+                        <Calendar className="text-muted-foreground h-3 w-3" />
+                        <div>
+                          <div className="text-muted-foreground">Created</div>
+                          <div className="font-medium">
+                            {formatDate(dataset.created_at)}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
           );
         })}
       </div>
     );
   } else {
-    // Render datasets as a table with checkboxes
+    // Render datasets as a table with checkboxes and hover effects
     content = (
       <Table className="py-3">
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
+            <TableHead>Records</TableHead>
+            <TableHead>Size</TableHead>
             <TableHead>Select</TableHead>
           </TableRow>
         </TableHeader>
@@ -91,17 +159,56 @@ export const DatasetList = ({
               (d) => d.id === dataset.id,
             );
             return (
-              <TableRow key={dataset.id}>
-                <TableCell className="max-w-0 truncate" title={dataset.name}>
-                  {dataset.name}
+              <TableRow
+                className={cn(
+                  'cursor-pointer transition-colors',
+                  isSelected && 'bg-primary/5',
+                )}
+                key={dataset.id}
+                onClick={() => onSelect(dataset)}
+              >
+                <TableCell className="max-w-0">
+                  <HoverCard openDelay={300}>
+                    <HoverCardTrigger asChild>
+                      <span
+                        className="cursor-pointer truncate"
+                        title={dataset.name}
+                      >
+                        {truncateText(dataset.name, 30)}
+                      </span>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-80" side="right">
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-semibold">
+                          {truncateText(dataset.name, 35)}
+                        </h4>
+                        {dataset.created_at && (
+                          <div className="text-xs">
+                            <span className="text-muted-foreground">
+                              Created:{' '}
+                            </span>
+                            <span className="font-medium">
+                              {formatDate(dataset.created_at)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
                 </TableCell>
                 <TableCell>
-                  <input
-                    aria-checked={isSelected}
-                    checked={isSelected}
-                    onChange={() => onSelect(dataset)}
-                    type="checkbox"
-                  />
+                  <div className="flex items-center">
+                    <input
+                      aria-checked={isSelected}
+                      checked={isSelected}
+                      className="cursor-pointer"
+                      onChange={() => onSelect(dataset)}
+                      type="checkbox"
+                    />
+                    {isSelected && (
+                      <CheckCircle2 className="text-primary animate-in zoom-in-75 ml-2 h-4 w-4 duration-200" />
+                    )}
+                  </div>
                 </TableCell>
               </TableRow>
             );

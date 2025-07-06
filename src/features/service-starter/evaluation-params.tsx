@@ -1,8 +1,10 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useQueryClient } from '@tanstack/react-query';
+import { Settings2 } from 'lucide-react';
 import React, { useState } from 'react';
 import { Dataset } from '../sidebar/services/dataset-service';
 import { Model } from '../sidebar/services/model-service';
@@ -100,57 +102,82 @@ export const EvaluationParamsStep = ({
   }, [maxSamples, baselineModelTag, setEvaluationParams]);
 
   return (
-    <div className="px-8 py-6">
-      <h2 className="mb-6 text-lg font-semibold">Evaluation Parameters</h2>
-      <div className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2 lg:grid-cols-3">
-        <div>
-          <label
-            className="mb-1 block text-sm font-medium"
-            htmlFor="max-samples-input"
-          >
-            Max samples
-          </label>
-          <input
-            autoComplete="off"
-            className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
-            id="max-samples-input"
-            min={1}
-            onChange={(e) => setMaxSamples(Number(e.target.value))}
-            placeholder="e.g. 1000"
-            type="number"
-            value={maxSamples}
-          />
+    <div className="relative flex h-full min-h-screen w-full flex-col">
+      {/* Scrollable content area */}
+      <div className="flex-1 overflow-y-auto px-8 py-6">
+        {/* Evaluation Settings */}
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-md mb-4 flex items-center gap-2 font-medium">
+              <Settings2 className="h-4 w-4" />
+              Evaluation Settings
+            </h3>
+            <div className="flex flex-col gap-4">
+              <div className="space-y-2">
+                <Label
+                  className="text-sm font-medium"
+                  htmlFor="max-samples-input"
+                >
+                  Max Samples
+                </Label>
+                <Input
+                  className="transition-all duration-200"
+                  id="max-samples-input"
+                  min={1}
+                  onChange={(e) => setMaxSamples(Number(e.target.value))}
+                  placeholder="e.g. 1000"
+                  type="number"
+                  value={maxSamples}
+                />
+              </div>
+
+              <div className="space-y-2 lg:col-span-2">
+                <Label
+                  className="text-sm font-medium"
+                  htmlFor="baseline-model-tag-input"
+                >
+                  <p>Baseline Model Tag</p>
+                  <span className="text-muted-foreground ml-1">(optional)</span>
+                </Label>
+                <Input
+                  className="transition-all duration-200"
+                  id="baseline-model-tag-input"
+                  onChange={(e) => setBaselineModelTag(e.target.value)}
+                  placeholder="e.g. my-baseline-model"
+                  type="text"
+                  value={baselineModelTag}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-        <div>
-          <label
-            className="mb-1 block text-sm font-medium"
-            htmlFor="baseline-model-tag-input"
-          >
-            Baseline model tag (optional)
-          </label>
-          <input
-            autoComplete="off"
-            className="focus:border-primary focus:ring-primary/30 w-full rounded border border-white/80 bg-white px-3 py-2 text-sm text-black shadow-sm transition placeholder:text-gray-400 focus:ring-2 focus:outline-none"
-            id="baseline-model-tag-input"
-            onChange={(e) => setBaselineModelTag(e.target.value)}
-            placeholder="e.g. my-baseline-model"
-            type="text"
-            value={baselineModelTag}
-          />
-        </div>
+
+        {/* Display error message if present */}
+        {error && (
+          <div className="bg-destructive/10 border-destructive/20 mt-6 rounded-md border p-3">
+            <p className="text-destructive text-sm">{error}</p>
+          </div>
+        )}
+
+        {/* Add bottom padding to ensure content doesn't get hidden behind the footer */}
+        <div className="pb-20" />
       </div>
-      <Separator className="my-2" />
-      {/* Display error message if present */}
-      {error && <div className="mt-4 text-red-500">{error}</div>}
-      <div className="mt-6 flex gap-2">
-        <Button disabled={isSubmitting} onClick={onBack} variant="outline">
-          Back
-        </Button>
-        <Button disabled={isSubmitting} onClick={handleStart}>
-          {isSubmitting ? 'Starting...' : 'Start evaluation'}
-        </Button>
+
+      {/* Sticky footer with buttons */}
+      <div className="bg-background sticky bottom-0 left-0 z-10 flex w-full items-center justify-between rounded-lg border-t px-4 py-3">
+        <div>
+          <Button disabled={isSubmitting} onClick={onBack} variant="outline">
+            Back
+          </Button>
+        </div>
+        <div>
+          <Button disabled={isSubmitting} onClick={handleStart}>
+            {isSubmitting ? 'Starting...' : 'Start Evaluation'}
+          </Button>
+        </div>
       </div>
     </div>
   );
 };
+
 export default EvaluationParamsStep;

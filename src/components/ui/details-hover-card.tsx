@@ -5,7 +5,6 @@ interface DetailsHoverCardProps {
   copied: boolean;
   copiedTag?: boolean;
   createdAt?: string;
-  createdAtBelowId?: boolean;
   id: string;
   loading: boolean;
   maxLength?: number;
@@ -13,7 +12,6 @@ interface DetailsHoverCardProps {
   onCopyTag?: (tag: string) => void;
   tag?: string;
   title: string;
-  updatedAt?: string;
 }
 
 const truncate = (str: string, max = 24) =>
@@ -24,7 +22,6 @@ export const DetailsHoverCard: React.FC<DetailsHoverCardProps> = ({
   copied,
   copiedTag = false,
   createdAt,
-  createdAtBelowId = false,
   id,
   loading,
   maxLength = 40,
@@ -32,12 +29,11 @@ export const DetailsHoverCard: React.FC<DetailsHoverCardProps> = ({
   onCopyTag,
   tag,
   title,
-  updatedAt,
 }) => (
-  <div className="bg-background relative min-w-[180px] rounded-lg p-1 shadow-md">
+  <div className="bg-background relative min-w-[120px] rounded-lg shadow-md">
     {loading && <div>Loading data...</div>}
     {!loading && (
-      <div className="space-y-2 pb-5 text-sm">
+      <div className="space-y-2 text-sm">
         <div className="flex items-center gap-2 text-base font-semibold">
           {truncate(title, maxLength)}
           {children}
@@ -136,21 +132,9 @@ export const DetailsHoverCard: React.FC<DetailsHoverCardProps> = ({
             )}
           </div>
         )}
-        {createdAtBelowId && createdAt && (
-          <div className="text-muted-foreground text-xs select-none">
-            Created {createdAt}
-          </div>
-        )}
-        {!createdAtBelowId && createdAt && (
-          <div className="text-muted-foreground absolute right-4 bottom-2 text-right text-xs select-none">
-            Created {createdAt}
-          </div>
-        )}
-        {updatedAt && (
-          <div className="text-muted-foreground absolute right-4 bottom-2 text-right text-xs select-none">
-            Updated {updatedAt}
-          </div>
-        )}
+        <div className="text-muted-foreground text-xs select-none">
+          Created {createdAt}
+        </div>
       </div>
     )}
     {!loading && !id && <div>No data found.</div>}

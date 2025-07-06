@@ -44,14 +44,12 @@ export const ModelDetailsHoverCardContent = ({
       copied={copiedId}
       copiedTag={copiedTag}
       createdAt={model?.created_at ? formatRelativeDate(model.created_at) : ''}
-      createdAtBelowId
       id={model?.id ?? ''}
       loading={loading}
       onCopy={handleCopy}
       onCopyTag={model?.model_tag ? handleCopyTag : undefined}
       tag={model?.model_tag ?? ''}
       title={model?.name ?? ''}
-      updatedAt={model?.updated_at ? formatRelativeDate(model.updated_at) : ''}
     >
       {/* Show source icon for GitHub, Hugging Face, or local */}
       {model?.source === 'github' && (
