@@ -8,7 +8,6 @@ import {
 } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, Settings2 } from 'lucide-react';
@@ -263,13 +262,12 @@ export const TrainingParamsStep = ({
             </div>
           </div>
 
-          <Separator />
-
           {/* Advanced Settings */}
           <Collapsible onOpenChange={setShowAdvanced} open={showAdvanced}>
             <CollapsibleTrigger asChild>
               <Button
                 className="flex items-center gap-2 p-0 hover:bg-transparent"
+                size="sm"
                 variant="ghost"
               >
                 <h3 className="text-md flex items-center gap-2 font-medium">
@@ -492,62 +490,61 @@ export const TrainingParamsStep = ({
 
               {/* Toggle Options */}
               <div className="pt-4">
-                <h4 className="mb-3 text-sm font-medium">Options</h4>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div className="flex items-center justify-between space-x-2">
+                <div className="grid grid-cols-1 gap-4 gap-x-7 md:grid-cols-2">
+                  <div className="flex items-center space-x-3">
+                    <Switch
+                      checked={useAmp}
+                      id="use-amp"
+                      onCheckedChange={setUseAmp}
+                    />
                     <Label
                       className="cursor-pointer text-sm font-medium"
                       htmlFor="use-amp"
                     >
                       Use AMP (Automatic Mixed Precision)
                     </Label>
-                    <Switch
-                      checked={useAmp}
-                      id="use-amp"
-                      onCheckedChange={setUseAmp}
-                    />
                   </div>
 
-                  <div className="flex items-center justify-between space-x-2">
+                  <div className="flex items-center space-x-3">
+                    <Switch
+                      checked={showProgressBar}
+                      id="show-progress-bar"
+                      onCheckedChange={setShowProgressBar}
+                    />
                     <Label
                       className="cursor-pointer text-sm font-medium"
                       htmlFor="show-progress-bar"
                     >
                       Show Progress Bar
                     </Label>
-                    <Switch
-                      checked={showProgressBar}
-                      id="show-progress-bar"
-                      onCheckedChange={setShowProgressBar}
-                    />
                   </div>
 
-                  <div className="flex items-center justify-between space-x-2">
+                  <div className="flex items-center space-x-3">
+                    <Switch
+                      checked={saveBestModel}
+                      id="save-best-model"
+                      onCheckedChange={setSaveBestModel}
+                    />
                     <Label
                       className="cursor-pointer text-sm font-medium"
                       htmlFor="save-best-model"
                     >
                       Save Best Model
                     </Label>
-                    <Switch
-                      checked={saveBestModel}
-                      id="save-best-model"
-                      onCheckedChange={setSaveBestModel}
-                    />
                   </div>
 
-                  <div className="flex items-center justify-between space-x-2">
+                  <div className="flex items-center space-x-3">
+                    <Switch
+                      checked={saveEachEpoch}
+                      id="save-each-epoch"
+                      onCheckedChange={setSaveEachEpoch}
+                    />
                     <Label
                       className="cursor-pointer text-sm font-medium"
                       htmlFor="save-each-epoch"
                     >
                       Save Each Epoch
                     </Label>
-                    <Switch
-                      checked={saveEachEpoch}
-                      id="save-each-epoch"
-                      onCheckedChange={setSaveEachEpoch}
-                    />
                   </div>
                 </div>
               </div>
