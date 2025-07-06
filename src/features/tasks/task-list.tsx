@@ -178,7 +178,7 @@ export const TaskList = () => {
 
       {/* Render filtered task cards */}
       {!isError && !isFetching && filteredTasks.length > 0 && (
-        <div className="hide-scrollbar h-[calc(100vh-300px)] space-y-4 overflow-y-auto scroll-auto pt-3">
+        <div className="hide-scrollbar h-[calc(100vh-220px)] space-y-4 overflow-y-auto scroll-auto pt-3">
           {filteredTasks.map((task) => (
             <TaskCard key={task.id} task={task} />
           ))}

@@ -152,7 +152,7 @@ export const TaskCard = ({ task }: { task: Task }) => {
           task.task_status === 'R' && 'skeleton-blue',
           task.task_status === 'D' && 'bg-emerald-500',
           task.task_status === 'F' && 'bg-red-500',
-          '-top-1 h-[1px] w-full',
+          '-top-1 h-[1px] min-h-[1px] w-full',
         )}
       />
 
