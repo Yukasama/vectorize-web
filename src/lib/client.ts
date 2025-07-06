@@ -5,7 +5,7 @@ import https from 'https';
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
 export const client: AxiosInstance = axios.create({
-  baseURL: 'https://localhost/v1/api',
+  baseURL: 'https://vectorize.candlezone.eu/v1/api',
   httpsAgent,
   timeout: 10000,
 });
