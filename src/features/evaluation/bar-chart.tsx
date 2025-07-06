@@ -51,7 +51,6 @@ export const EvaluationScatterChart = ({
     data: Record<string, number | string>[],
     bars: { color: string; key: string; name: string }[],
     title: string,
-    metricsLabel: string,
   ) => (
     <Card className="mt-4">
       <CardHeader>
@@ -81,9 +80,6 @@ export const EvaluationScatterChart = ({
             ))}
           </BarChart>
         </ResponsiveContainer>
-        <div className="text-muted-foreground mt-2 text-xs">
-          <b>Metrics:</b> {metricsLabel}
-        </div>
       </CardContent>
     </Card>
   );
@@ -118,8 +114,8 @@ export const EvaluationScatterChart = ({
     );
 
     const chartData = keys.map((k) => ({
-      baseline: baselineMetrics[k],
-      evaluation: evaluationMetrics[k],
+      baseline: baselineMetrics[k].toFixed(5),
+      evaluation: evaluationMetrics[k].toFixed(5),
       metric: k,
     }));
 
@@ -130,7 +126,6 @@ export const EvaluationScatterChart = ({
         { color: '#10b981', key: 'evaluation', name: 'Evaluation' },
       ],
       'Metrics Comparison: Baseline vs. Evaluation',
-      keys.join(', '),
     );
   }
 
@@ -151,7 +146,6 @@ export const EvaluationScatterChart = ({
       chartData,
       [{ color: '#10b981', key: 'evaluation', name: 'Evaluation' }],
       'Evaluation Metrics',
-      keys.join(', '),
     );
   }
 
@@ -172,7 +166,6 @@ export const EvaluationScatterChart = ({
       chartData,
       [{ color: '#3b82f6', key: 'baseline', name: 'Baseline' }],
       'Baseline Metrics',
-      keys.join(', '),
     );
   }
 };
