@@ -14,11 +14,11 @@ export const DatasetListFooter = ({
   onNext,
   selectedDatasets,
 }: DatasetListFooterProps) => (
-  <div className="sticky bottom-0 left-0 z-10 flex w-full items-center justify-between border-t px-4 py-3">
+  <div className="bg-background sticky bottom-0 left-0 z-10 flex w-full items-center justify-between rounded-lg border-t px-4 py-3">
     <div>
       {/* Render Back button if onBack handler is provided */}
       {onBack && (
-        <Button onClick={onBack} variant="secondary">
+        <Button onClick={onBack} variant="outline">
           Back
         </Button>
       )}

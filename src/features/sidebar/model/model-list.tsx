@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/sidebar';
 import { SidebarListItemName } from '@/components/ui/sidebar-list-item';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ChevronDown, ChevronUp, Search } from 'lucide-react';
+import { Bot, ChevronDown, ChevronUp, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -199,7 +199,10 @@ export const ModelList = () => {
         <SidebarMenuItem>
           <CollapsibleTrigger asChild>
             <SidebarMenuButton className="sticky top-0 z-10 flex w-full items-center gap-2 bg-white dark:bg-black">
-              <span className="text-md">Models</span>
+              <div className="text-md flex items-center gap-2 font-semibold">
+                <Bot className="h-4.5 w-4.5" />
+                Models
+              </div>
               <span className="ml-auto flex flex-row items-center gap-2">
                 {open ? (
                   <ChevronUp className="h-5 w-5" />

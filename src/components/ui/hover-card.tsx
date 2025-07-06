@@ -6,9 +6,16 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 const HoverCard = ({
+  openDelay = 0,
+  closeDelay = 0,
   ...props
 }: React.ComponentProps<typeof HoverCardPrimitive.Root>) => (
-  <HoverCardPrimitive.Root data-slot="hover-card" {...props} />
+  <HoverCardPrimitive.Root
+    data-slot="hover-card"
+    openDelay={openDelay}
+    closeDelay={closeDelay}
+    {...props}
+  />
 );
 
 const HoverCardTrigger = ({

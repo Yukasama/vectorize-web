@@ -17,6 +17,8 @@ import {
 } from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FilePlus2, Upload } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { DatasetList } from './dataset/dataset-list';
@@ -36,30 +38,19 @@ export const AppSidebar = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const handleVectorizeClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (pathname === '/') {
-      globalThis.location.reload();
-    } else {
-      router.push('/');
-    }
-  };
-
   return (
     <Sidebar className="text-[var(--sidebar-foreground)] transition-all duration-200">
-      <SidebarHeader className="header-bg mb-6 w-full pt-2.5">
-        <div className="flex w-full items-center justify-between">
-          <button
-            className="focus:ring-primary hover:bg-muted ml-4 inline-block min-w-[120px] rounded bg-transparent p-2 text-center text-lg font-semibold text-[var(--sidebar-foreground)] shadow transition-colors focus:ring-2 focus:outline-none"
-            onClick={handleVectorizeClick}
-            title="Go to homepage"
-            type="button"
-          >
-            Vectorize
-          </button>
+      <SidebarHeader className="header-bg mb-2 w-full px-2 pt-[9px]">
+        <div className="mt-2 flex w-full items-center justify-between px-1.5">
+          <div className="flex items-center gap-2">
+            <Image src="/logo.png" alt="Logo" height={28} width={28} />
+            <Link href="/" className="font-semibold" title="Go to homepage">
+              Vectorize
+            </Link>
+          </div>
           <div className="flex gap-2">
             <Button
-              className="size-9 p-0"
+              className="size-7 p-0"
               onClick={() => setSyntheticOpen(true)}
               size="icon"
               title="Generate synthetic dataset"
@@ -73,12 +64,11 @@ export const AppSidebar = () => {
               open={syntheticOpen}
             />
             <Button
-              className="size-9 p-0"
+              className="size-7 bg-gradient-to-r from-blue-500 to-purple-500 p-0 text-white transition hover:from-blue-600 hover:to-purple-600"
               onClick={() => setUploadOpen(true)}
               size="icon"
               title="Upload"
               type="button"
-              variant="ghost"
             >
               <Upload className="h-5 w-5" />
             </Button>
@@ -111,7 +101,7 @@ export const AppSidebar = () => {
           </Tabs>
         </DialogContent>
       </Dialog>
-      <SidebarContent className="flex-1 overflow-y-auto">
+      <SidebarContent className="flex-1 gap-0 overflow-y-auto">
         <SidebarGroup>
           <ModelList />
         </SidebarGroup>

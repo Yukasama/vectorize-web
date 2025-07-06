@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/sidebar';
 import { SidebarListItemName } from '@/components/ui/sidebar-list-item';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ChevronDown, ChevronUp, Search } from 'lucide-react';
+import { ChevronDown, ChevronUp, FileText, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -214,7 +214,10 @@ export const DatasetList = () => {
         <SidebarMenuItem>
           <CollapsibleTrigger asChild>
             <SidebarMenuButton className="sticky top-0 z-10 flex w-full items-center gap-2 bg-white dark:bg-black">
-              <span className="text-md">Datasets</span>
+              <div className="text-md flex items-center gap-2 font-semibold">
+                <FileText className="h-4.5 w-4.5" />
+                Datasets
+              </div>
               <span className="ml-auto flex flex-row items-center gap-2">
                 {open ? (
                   <ChevronUp className="h-5 w-5" />
