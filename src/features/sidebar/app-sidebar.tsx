@@ -39,12 +39,14 @@ export const AppSidebar = () => {
     <Sidebar className="text-[var(--sidebar-foreground)] transition-all duration-200">
       <SidebarHeader className="header-bg mb-2 w-full px-2 pt-[9px]">
         <div className="mt-2 flex w-full items-center justify-between px-1.5">
-          <div className="flex items-center gap-2">
+          <Link
+            className="flex items-center gap-2"
+            href="/"
+            title="Go to homepage"
+          >
             <Image alt="Logo" height={28} src="/logo.png" width={28} />
-            <Link className="font-semibold" href="/" title="Go to homepage">
-              Vectorize
-            </Link>
-          </div>
+            <h3 className="font-semibold">Vectorize</h3>
+          </Link>
           <div className="flex gap-2">
             <Button
               className="size-7 p-0"

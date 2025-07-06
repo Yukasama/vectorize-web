@@ -94,6 +94,15 @@ export const TaskCard = ({ task }: { task: Task }) => {
     }
   };
 
+  const synthesisName =
+    task.task_type === 'synthesis' ? 'Synthetic Generation' : undefined;
+  const trainingName =
+    task.task_type === 'training' &&
+    (task.task_status === 'R' || task.task_status === 'Q')
+      ? 'Training new model...'
+      : undefined;
+  const taskName = synthesisName ?? trainingName ?? task.tag;
+
   // Card content: header, status, and meta info
   const cardContent = (
     <CardContent className="p-0.5">
@@ -101,9 +110,7 @@ export const TaskCard = ({ task }: { task: Task }) => {
         <div className="flex-1 space-y-0.5">
           <div className="flex items-center gap-3">
             <h3 className="text-md w-[210px] truncate font-semibold">
-              {task.task_type === 'synthesis'
-                ? 'Synthetic Generation'
-                : task.tag}
+              {taskName}
             </h3>
             <div className="id-copier">
               <IdCopier taskId={task.id} />
@@ -186,7 +193,7 @@ export const TaskCard = ({ task }: { task: Task }) => {
     return (
       <button
         className={cn(
-          'bg-background hover:bg-muted/30 relative w-full cursor-pointer rounded-xl text-left transition-all duration-200 hover:shadow-md',
+          'bg-background hover:bg-accent/70 relative w-full cursor-pointer rounded-xl p-0.5 text-left transition-all duration-200',
         )}
         onClick={handleClick}
         type="button"
@@ -197,7 +204,7 @@ export const TaskCard = ({ task }: { task: Task }) => {
   }
 
   return (
-    <div className="bg-background relative w-full rounded-xl text-left transition-all duration-200 hover:shadow-md">
+    <div className="bg-background relative w-full rounded-xl text-left transition-all duration-200">
       {cardContent}
     </div>
   );

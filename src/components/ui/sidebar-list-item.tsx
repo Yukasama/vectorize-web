@@ -183,7 +183,6 @@ export const SidebarListItemName = ({
           style={{ maxWidth: 'calc(100% - 0.5rem)', minWidth: 0 }}
         >
           {name}
-          {'Local'}
         </span>
       )}
     </span>

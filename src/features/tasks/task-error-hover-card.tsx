@@ -1,5 +1,6 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import {
   HoverCard,
   HoverCardContent,
@@ -10,11 +11,6 @@ import { AlertTriangle, X } from 'lucide-react';
 import { ReactNode } from 'react';
 import { fetchTaskErrorDetails } from './services/task-error-service';
 import { Task, TaskType } from './types/task';
-
-/**
- * Hover card for showing error details of failed tasks.
- * Fetches and displays error info on hover for failed tasks.
- */
 
 interface TaskErrorHoverCardProps {
   children: ReactNode;
@@ -30,6 +26,10 @@ interface TaskLike {
   task_type?: TaskType;
 }
 
+/**
+ * Hover card for showing error details of failed tasks.
+ * Fetches and displays error info on hover for failed tasks.
+ */
 export const TaskErrorHoverCard = ({
   children,
   task,
@@ -78,7 +78,10 @@ export const TaskErrorHoverCard = ({
             <strong>Task ID:</strong> {taskId}
           </div>
           <div className="text-muted-foreground text-sm">
-            <strong>Type:</strong> {actualTaskType}
+            <strong>Type:</strong>
+            <Badge variant="secondary">
+              {actualTaskType[0].toUpperCase() + actualTaskType.slice(1)}
+            </Badge>
           </div>
           {/* Loading state for error details */}
           {isLoading && (
@@ -96,11 +99,8 @@ export const TaskErrorHoverCard = ({
           )}
           {/* Show error message if available */}
           {errorDetails?.error_msg && (
-            <div className="rounded-md bg-red-50 p-3 text-sm">
-              <div className="mb-1 font-medium text-red-800">
-                Error Message:
-              </div>
-              <div className="text-red-700">{errorDetails.error_msg}</div>
+            <div className="bg-faded rounded-md border p-3 text-sm">
+              <div className="text-red-500">{errorDetails.error_msg}</div>
             </div>
           )}
           {/* Fallback if no error message is available */}

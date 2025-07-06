@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { truncateText } from '@/lib/truncate';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { Calendar, CheckCircle2, Tag } from 'lucide-react';
@@ -34,11 +35,6 @@ const formatDate = (dateString: string) => {
     month: 'short',
     year: 'numeric',
   });
-};
-
-// Helper function to truncate text
-const truncateText = (text: string, maxLength: number) => {
-  return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
 };
 
 // ModelList component displays a list of models in either grid or table view.
@@ -116,7 +112,7 @@ export const ModelList = ({
 
                     <div className="text-muted-foreground flex items-center gap-1 text-xs">
                       <Tag className="h-3 w-3" />
-                      <span>{truncateText(model.model_tag, 15)}</span>
+                      <span>{truncateText(model.model_tag, 20)}</span>
                     </div>
 
                     {isSelected && (
@@ -133,15 +129,19 @@ export const ModelList = ({
               <HoverCardContent className="w-80" side="top">
                 <div className="space-y-3">
                   <div>
-                    <h4 className="text-sm font-semibold">{model.name}</h4>
+                    <h4 className="text-sm font-semibold">
+                      {truncateText(model.name, 35)}
+                    </h4>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="flex items-center gap-4 text-xs">
                     <div className="flex items-center gap-2">
                       <Tag className="text-muted-foreground h-3 w-3" />
                       <div>
                         <div className="text-muted-foreground">Tag</div>
-                        <div className="font-medium">{model.model_tag}</div>
+                        <div className="font-medium">
+                          {truncateText(model.model_tag, 50)}
+                        </div>
                       </div>
                     </div>
 
@@ -150,7 +150,7 @@ export const ModelList = ({
                         <Calendar className="text-muted-foreground h-3 w-3" />
                         <div>
                           <div className="text-muted-foreground">Created</div>
-                          <div className="font-medium">
+                          <div className="font-medium whitespace-nowrap">
                             {formatDate(model.created_at)}
                           </div>
                         </div>

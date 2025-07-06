@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { truncateText } from '@/lib/truncate';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { Calendar, CheckCircle2, Database } from 'lucide-react';
@@ -34,11 +35,6 @@ const formatDate = (dateString: string) => {
     month: 'short',
     year: 'numeric',
   });
-};
-
-// Helper function to truncate text
-const truncateText = (text: string, maxLength: number) => {
-  return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
 };
 
 export const DatasetList = ({
@@ -99,11 +95,8 @@ export const DatasetList = ({
                   )}
 
                   <div className="space-y-2">
-                    <p
-                      className="text-sm leading-tight font-medium"
-                      title={dataset.name}
-                    >
-                      {truncateText(dataset.name, 25)}
+                    <p className="w-[150px] truncate text-sm leading-tight font-medium">
+                      {dataset.name}
                     </p>
 
                     <div className="text-muted-foreground flex items-center gap-1 text-xs">
@@ -187,7 +180,7 @@ export const DatasetList = ({
                     <HoverCardContent className="w-80" side="right">
                       <div className="space-y-2">
                         <h4 className="text-sm font-semibold">
-                          {dataset.name}
+                          {truncateText(dataset.name, 35)}
                         </h4>
                         {dataset.created_at && (
                           <div className="text-xs">
