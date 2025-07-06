@@ -429,7 +429,7 @@ export default function EvaluationDetailPage() {
   const statusInfo = status ? getStatusInfo(status.status) : undefined;
 
   // Check if we should show the chart (has data or is still loading)
-  const shouldShowChart = (isLoading || evaluationMetrics) ?? baselineMetrics;
+  const shouldShowChart = isLoading ?? evaluationMetrics ?? baselineMetrics;
 
   return (
     <SidebarProvider>
